@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.SportsBasketball
 import androidx.compose.material3.Badge
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -29,7 +30,7 @@ fun CalendarTopBar(unreadCount: Int, onNotifClicked: () -> Unit) {
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    Icons.Default.SportBasketball,
+                    Icons.Default.SportsBasketball,
                     contentDescription = null,
                     tint   = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(28.dp),

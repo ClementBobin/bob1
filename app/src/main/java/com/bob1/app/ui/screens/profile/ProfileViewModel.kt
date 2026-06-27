@@ -16,9 +16,13 @@ object ProfileContracts {
     }
 }
 
-class ProfileViewModel(application: Application) : KViewModel<ProfileContracts.UiState>(ProfileContracts.UiState(), application) {
+class ProfileViewModel(application: Application) :
+    KViewModel<ProfileContracts.UiState>(ProfileContracts.UiState(), application) {
+
     private val session: SessionManager by inject()
+
     init { updateState { copy(user = session.currentUser()) } }
+
     fun logout() {
         session.clearSession()
         sendEvent(ProfileContracts.UiEvent.LoggedOut)

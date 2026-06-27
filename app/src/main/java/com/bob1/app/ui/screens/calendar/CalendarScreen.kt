@@ -61,7 +61,7 @@ private fun CalendarContent(
     onDayTapped: (Int) -> Unit = {},
     onMatchSelected: (Match) -> Unit = {},
     onDismissSheet: () -> Unit = {},
-    onRoleTapped: (Match, OfficialRole) -> Unit = {},
+    onRoleTapped: (Match, OfficialRole) -> Unit = { _, _ -> },
     onConfirmAction: () -> Unit = {},
     onDismissConfirmDialog: () -> Unit = {},
 ) {

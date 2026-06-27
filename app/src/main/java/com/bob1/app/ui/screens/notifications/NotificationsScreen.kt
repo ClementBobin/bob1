@@ -11,22 +11,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.bob1.app.domain.model.AppNotification
 import com.bob1.app.ui.core.components.ui.AppBottomBar
 import com.bob1.app.ui.core.components.ui.NotificationCard
 import dev.kindling.compose.KScreen
-import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationsScreen(
     navController: NavController
 ) {
-    val viewModel: NotificationsViewModel = koinViewModel()
-
     KScreen(
-        viewModel = viewModel,
+        viewModel = viewModel<NotificationsViewModel>(),
         navController = navController
     ) { state, viewModel ->
         Scaffold(
@@ -56,7 +54,7 @@ fun NotificationsScreen(
 
 @Composable
 private fun NotificationsContent(
-    state: NotificationsState,
+    state: NotificationsContracts.UiState,
     paddingValues: PaddingValues,
     onNotificationTapped: (AppNotification) -> Unit = {},
     onRetry: () -> Unit = {}

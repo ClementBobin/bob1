@@ -25,8 +25,13 @@ object MockInitializer {
         MockRegistry.clear()
 
         MockRegistry.registerMany(
-            authHandlers          // login, register, logout, me,
-                    // forgot-password, reset-password, confirm-email
+            authHandlers
+            +divisionHandlers
+            +matchHandlers
+            +notificationHandlers
+            +pointRuleHandlers
+            +settingsHandlers
+            +teamHandlers
         )
 
         if (debug) {

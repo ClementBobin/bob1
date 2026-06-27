@@ -2,6 +2,7 @@ package com.bob1.app.data.remote
 
 import com.bob1.app.data.dto.ErrorResponseDto
 import com.bob1.app.data.local.SessionManager
+import dev.kindling.android.natif.VibrationHelper
 import dev.kindling.core.components.KToastManager
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -84,7 +85,7 @@ fun createHttpClient(
                         path.endsWith("/auth/register")
                     if (isAuthEndpoint) {
                         // Wrong credentials — show API message, don't touch session
-                        val msg = runCatching { response.body<ErrorResponse>().text }
+                        val msg = runCatching { response.body<ErrorResponseDto>().text }
                             .recoverCatching { response.bodyAsText().take(200) }
                             .getOrDefault("Identifiants invalides.")
                         vibrationHelper?.warning()
@@ -109,7 +110,7 @@ fun createHttpClient(
                 }
 
                 status in 500..599 -> {
-                    val msg = runCatching { response.body<ErrorResponse>().text }
+                    val msg = runCatching { response.body<ErrorResponseDto>().text }
                         .recoverCatching { response.bodyAsText().take(200) }
                         .getOrDefault("No details provided")
                     vibrationHelper?.error()
@@ -125,50 +126,6 @@ fun createHttpClient(
             KToastManager.error("Network error", exception.message ?: "No details provided")
         }
     }
-
-    // Cookie-based auth: cyna_token / cyna_refresh_token are stored in SessionManager
-    // and sent automatically on every request.
-    if (sessionManager != null) {
-        install(HttpCookies) {
-            storage = SessionManagerCookieStorage(sessionManager)
-        }
-    }
-}
-
-// ── Cookie storage backed by SessionManager (persists across app restarts) ───
-
-/**
- * Implémentation de [CookiesStorage] qui persiste les cookies d'authentification
- * dans [SessionManager] (SharedPreferences) plutôt qu'en mémoire.
- *
- * Cookies gérés : `cyna_token` et `cyna_refresh_token`.
- * Le stockage est mis à jour à chaque `Set-Cookie` renvoyé par l'API (login, refresh).
- */
-private class SessionManagerCookieStorage(
-    private val sessionManager: SessionManager
-) : CookiesStorage {
-
-    override suspend fun get(requestUrl: Url): List<Cookie> = buildList {
-        sessionManager.token.value?.takeIf { it.isNotEmpty() }
-            ?.let { add(Cookie(name = "cyna_token", value = it)) }
-        sessionManager.refreshToken.value?.takeIf { it.isNotEmpty() }
-            ?.let { add(Cookie(name = "cyna_refresh_token", value = it)) }
-    }
-
-    override suspend fun addCookie(requestUrl: Url, cookie: Cookie) {
-        when (cookie.name) {
-            "cyna_token" -> sessionManager.saveTokens(
-                cookie.value,
-                sessionManager.refreshToken.value ?: ""
-            )
-            "cyna_refresh_token" -> sessionManager.saveTokens(
-                sessionManager.token.value ?: "",
-                cookie.value
-            )
-        }
-    }
-
-    override fun close() {}
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

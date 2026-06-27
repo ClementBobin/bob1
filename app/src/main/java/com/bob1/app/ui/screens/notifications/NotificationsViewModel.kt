@@ -6,7 +6,6 @@ import com.bob1.app.domain.repository.NotificationRepository
 import dev.kindling.compose.KViewModel
 import org.koin.core.component.inject
 
-// ── State ─────────────────────────────────────────────────────────────────────
 object NotificationsContracts {
     data class UiState(
         val isLoading: Boolean = false,
@@ -19,8 +18,6 @@ object NotificationsContracts {
     }
 }
 
-// ── ViewModel ─────────────────────────────────────────────────────────────────
-
 class NotificationsViewModel(
     application: Application,
 ) : KViewModel<NotificationsContracts.UiState>(NotificationsContracts.UiState(), application) {
@@ -32,31 +29,24 @@ class NotificationsViewModel(
     fun loadNotifications() {
         updateState { copy(isLoading = true, error = null) }
         fetchData(
-            source = { repo.getNotifications().getOrThrow() },
-            onResult = { result ->
-                result
-                    .onSuccess { notifications ->
-                        updateState { copy(isLoading = false, notifications = notifications) }
-                    }
-                    .onFailure { error ->
-                        updateState { copy(isLoading = false, error = error.message) }
-                    }
+            source   = { repo.getNotifications().getOrThrow() },
+            onResult = {
+                onSuccess { notifications -> updateState { copy(isLoading = false, notifications = notifications) } }
+                onFailure { e -> updateState { copy(isLoading = false, error = e.message) } }
             }
         )
     }
 
     fun onNotificationTapped(notification: AppNotification) {
-        // Mark as read
         fetchData(
-            source = { repo.markAsRead(notification.id) },
-            onResult = { result ->
-                result.onSuccess {
+            source   = { repo.markAsRead(notification.id) },
+            onResult = {
+                onSuccess {
                     updateState {
                         copy(notifications = notifications.map {
                             if (it.id == notification.id) it.copy(isRead = true) else it
                         })
                     }
-                    // Navigate to match if applicable
                     notification.matchId?.let { matchId ->
                         sendEvent(NotificationsContracts.UiEvent.NavigateToMatch(matchId))
                     }

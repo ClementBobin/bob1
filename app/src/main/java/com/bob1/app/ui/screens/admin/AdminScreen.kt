@@ -10,10 +10,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.bob1.app.ui.core.components.ui.admin.*
 import dev.kindling.compose.KScreen
-import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -21,10 +21,8 @@ fun AdminScreen(
     navController: NavController,
     onNavigateToMatchManagement: () -> Unit = {}
 ) {
-    val viewModel: AdminViewModel = koinViewModel()
-
     KScreen(
-        viewModel = viewModel,
+        viewModel = viewModel<AdminViewModel>(),
         navController = navController,
         onEvent = { _, _, event ->
             when (event) {

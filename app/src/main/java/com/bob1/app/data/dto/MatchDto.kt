@@ -2,7 +2,6 @@ package com.bob1.app.data.dto
 
 import com.bob1.app.domain.model.Match
 import kotlinx.serialization.Serializable
-import com.bob1.app.domain.model.OfficialRole
 
 @Serializable
 data class MatchDto(

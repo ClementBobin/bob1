@@ -30,4 +30,8 @@ internal class AuthRepositoryImpl(
     override suspend fun getCurrentUser(): Result<User> = runCatching {
         authAPI.getCurrentUser().toDomain()
     }
+
+    override fun register(registerRequest: Any) {
+        TODO("Not yet implemented")
+    }
 }

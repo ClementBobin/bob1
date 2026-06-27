@@ -1,7 +1,6 @@
 package com.bob1.app.mock.factories
 
 import com.bob1.app.data.dto.*
-import com.bob1.app.domain.model.OfficialRole
 import java.text.SimpleDateFormat
 import java.util.*
 

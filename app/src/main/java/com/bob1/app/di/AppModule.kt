@@ -3,8 +3,8 @@ package com.bob1.app.di
 import android.annotation.SuppressLint
 import com.bob1.app.BuildConfig
 import com.bob1.app.data.local.SessionManager
-import com.bob1.app.data.remote.createHttpClient
 import com.bob1.app.data.repository.*
+import com.bob1.app.data.remote.*
 import com.bob1.app.domain.repository.*
 import com.bob1.app.mock.registry.buildMockEngine
 import dev.kindling.android.natif.NotificationHelper
@@ -31,7 +31,7 @@ val appModule = module {
     // ── HTTP engine ───────────────────────────────────────────────────────────
     single<HttpClientEngine> {
         when {
-            false -> buildMockEngine(delayMs = 300L)
+            BuildConfig.MOCK_API -> buildMockEngine(delayMs = 400L)
             BuildConfig.DEBUG    -> {
                 val tm = trustAllTrustManager()
                 val sslContext = SSLContext.getInstance("TLS").apply {
@@ -55,6 +55,13 @@ val appModule = module {
             sessionManager = get(),
         )
     }
+
+    single { AuthAPI(get()) }
+    single { DivisionAPI(get()) }
+    single { TeamAPI(get()) }
+    single { MatchAPI(get()) }
+    single { NotificationAPI(get()) }
+    single { AdminAPI(get()) }
 
     // ── Repositories ──────────────────────────────────────────────────────────
     single<AuthRepository>         { AuthRepositoryImpl(get(), get()) }

@@ -12,23 +12,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.bob1.app.domain.model.UserRole
+import com.bob1.app.data.dto.UserRole
 import com.bob1.app.ui.core.Destination
-import com.bob1.app.ui.screens.calendar.AppBottomBar
+import com.bob1.app.ui.core.components.ui.AppBottomBar
 import dev.kindling.compose.KScreen
-import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController) {
-    val viewModel: ProfileViewModel = koinViewModel()
-
     KScreen(
-        viewModel     = viewModel,
+        viewModel     = viewModel<ProfileViewModel>(),
         navController = navController,
         onEvent = { _, _, event ->
-            if (event is ProfileEvent.LoggedOut) {
+            if (event is ProfileContracts.UiEvent.LoggedOut) {
                 navController.navigate(Destination.Login.route) {
                     popUpTo(0) { inclusive = true }
                 }

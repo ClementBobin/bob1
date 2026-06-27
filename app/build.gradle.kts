@@ -26,8 +26,16 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("boolean", "MOCK_API", "false")
-        buildConfigField("String", "BASE_URL", "\"https://api.projet-bob1.fr\"")
+        buildConfigField(
+            "boolean",
+            "MOCK_API",
+            localProps.getProperty("MOCK_API", "false")
+        )
+        buildConfigField(
+            "String",
+            "BASE_URL",
+            "\"${localProps.getProperty("BASE_URL", "https://api.staging.projet-bob1.fr")}\""
+        )
     }
 
     compileOptions {
@@ -71,7 +79,7 @@ dependencies {
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.cio)
     implementation(libs.ktor.client.okhttp)
-    implementation(libs.ktor.client.auth) // Added this
+    implementation(libs.ktor.client.auth)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.client.logging)

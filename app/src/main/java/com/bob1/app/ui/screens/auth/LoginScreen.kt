@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.bob1.app.R
 import com.bob1.app.ui.core.components.ui.AuthCard
 import com.bob1.app.ui.core.components.ui.FieldWithLabel
 import dev.kindling.compose.KScreen
@@ -30,8 +31,7 @@ import dev.kindling.core.components.KButton
 fun LoginScreen(
     navController: NavController,
     onNavigateToRegister: () -> Unit,
-    onNavigateToForgotPassword: () -> Unit = {},
-    onLoginSuccess: () -> Unit,
+    onLoginSuccess: () -> Unit
 ) {
     KScreen(
         viewModel = viewModel<AuthViewModel>(),
@@ -39,11 +39,10 @@ fun LoginScreen(
     ) { state, vm ->
         LoginContent(
             state = state,
-            onEmailChange = vm::onEmailChange,
-            onPasswordChange = vm::onPasswordChange,
+            onEmailChange = vm::onEmailChanged,
+            onPasswordChange = vm::onPasswordChanged,
             onLogin = { vm.login(onLoginSuccess) },
             onNavigateToRegister = onNavigateToRegister,
-            onNavigateToForgotPassword = onNavigateToForgotPassword
         )
     }
 }
@@ -54,8 +53,7 @@ private fun LoginContent(
     onEmailChange: (String) -> Unit = {},
     onPasswordChange: (String) -> Unit = {},
     onLogin: () -> Unit = {},
-    onNavigateToRegister: () -> Unit = {},
-    onNavigateToForgotPassword: () -> Unit = {}
+    onNavigateToRegister: () -> Unit = {}
 ) {
     var rememberMe by remember { mutableStateOf(false) }
     val cs = MaterialTheme.colorScheme
@@ -103,7 +101,7 @@ private fun LoginContent(
 
                 // Title
                 Text(
-                    text = stringResource(R.string.login_title),
+                    text = "Bon retour",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = cs.onSurface,
@@ -115,9 +113,9 @@ private fun LoginContent(
 
                 // Subtitle with register link
                 val subtitle = buildAnnotatedString {
-                    append(stringResource(R.string.login_subtitle_prefix))
+                    append("Ou ")
                     withStyle(SpanStyle(color = cs.primary, fontWeight = FontWeight.SemiBold)) {
-                        append(stringResource(R.string.login_subtitle_link))
+                        append("créez un compte")
                     }
                 }
                 TextButton(
@@ -149,10 +147,10 @@ private fun LoginContent(
 
                 // Email
                 FieldWithLabel(
-                    label = stringResource(R.string.login_email_label),
+                    label = "Adresse e-mail",
                     value = state.email,
                     onValueChange = onEmailChange,
-                    placeholder = stringResource(R.string.login_email_placeholder),
+                    placeholder = "Entrez votre e-mail",
                     isError = state.emailError != null,
                     enabled = !state.isLoading,
                     modifier = Modifier.fillMaxWidth()
@@ -172,58 +170,21 @@ private fun LoginContent(
 
                 // Password
                 FieldWithLabel(
-                    label = stringResource(R.string.login_password_label),
+                    label = "Mot de passe",
                     value = state.password,
                     onValueChange = onPasswordChange,
-                    placeholder = stringResource(R.string.login_password_placeholder),
+                    placeholder = "••••••••",
                     isPassword = true,
                     isError = state.passwordError != null,
                     enabled = !state.isLoading,
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(Modifier.height(12.dp))
-
-                // Remember me + Forgot password row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(
-                            checked = rememberMe,
-                            onCheckedChange = { rememberMe = it },
-                            enabled = !state.isLoading,
-                            colors = CheckboxDefaults.colors(
-                                checkedColor = cs.primary,
-                                checkmarkColor = cs.onPrimary
-                            )
-                        )
-                        Text(
-                            text = stringResource(R.string.login_remember_me),
-                            fontSize = 13.sp,
-                            color = cs.onSurfaceVariant
-                        )
-                    }
-                    TextButton(
-                        onClick = onNavigateToForgotPassword,
-                        contentPadding = PaddingValues(0.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.login_forgot_password),
-                            fontSize = 13.sp,
-                            color = cs.primary,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                }
-
                 Spacer(Modifier.height(20.dp))
 
                 // Submit button
                 KButton(
-                    text = stringResource(R.string.login_button),
+                    text = "Se connecter",
                     onClick = onLogin,
                     isLoading = state.isLoading,
                     modifier = Modifier.fillMaxWidth()

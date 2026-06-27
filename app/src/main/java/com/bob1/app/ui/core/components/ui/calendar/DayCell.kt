@@ -28,7 +28,7 @@ import com.bob1.app.domain.usecase.dotColor
 import java.util.Calendar
 
 @Composable
-private fun DayCell(
+fun DayCell(
     day: Int?,
     matches: List<Match>,
     onTap: () -> Unit,

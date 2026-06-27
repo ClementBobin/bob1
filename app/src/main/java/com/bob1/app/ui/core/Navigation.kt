@@ -8,10 +8,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.bob1.app.data.local.SessionManager
 import com.bob1.app.ui.screens.admin.AdminScreen
+import com.bob1.app.ui.screens.auth.LoginScreen
+import com.bob1.app.ui.screens.auth.RegisterScreen
 import com.bob1.app.ui.screens.calendar.CalendarScreen
 import com.bob1.app.ui.screens.notifications.NotificationsScreen
 import com.bob1.app.ui.screens.profile.ProfileScreen
 import dev.kindling.compose.KNavHost
+import dev.kindling.compose.navigate
 import org.koin.compose.koinInject
 
 // ── Destinations ──────────────────────────────────────────────────────────────
@@ -37,6 +40,20 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
         startDestination = if (token != null) Destination.Calendar else Destination.Login,
         modifier         = modifier,
     ) {
+        composable(Destination.Login.route) {
+            LoginScreen(
+                navController,
+                { navController.navigate(Destination.Register.route) },
+                { navController.navigate(Destination.Calendar.route) }
+            )
+        }
+        composable(Destination.Register.route) {
+            RegisterScreen(
+                navController,
+                { navController.navigate(Destination.Login.route) },
+                { navController.navigate(Destination.Calendar.route) }
+            )
+        }
         composable(Destination.Calendar.route) {
             CalendarScreen(navController)
         }
