@@ -1,6 +1,6 @@
 package com.bob1.app.data.remote
 
-import com.bob1.app.data.dto.ErrorResponse
+import com.bob1.app.data.dto.ErrorResponseDto
 import com.bob1.app.data.local.SessionManager
 import dev.kindling.core.components.KToastManager
 import io.ktor.client.HttpClient
@@ -100,7 +100,7 @@ fun createHttpClient(
                 }
 
                 status in 400..499 -> {
-                    val msg = runCatching { response.body<ErrorResponse>().text }
+                    val msg = runCatching { response.body<ErrorResponseDto>().text }
                         .recoverCatching { response.bodyAsText().take(200) }
                         .getOrDefault("No details provided")
                     vibrationHelper?.warning()

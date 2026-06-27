@@ -1,238 +1,238 @@
 package com.bob1.app.mock.factories
 
-import kotlinx.serialization.Serializable
+import com.bob1.app.data.dto.*
+import com.bob1.app.domain.model.OfficialRole
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
-import java.util.UUID
-import kotlin.random.Random
+import java.util.*
 
-// ---------------------------------------------------------------------------
-// Tiny faker helpers
-// ---------------------------------------------------------------------------
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
-private val firstNames  = listOf("Alice", "Bob", "Carlos", "Diana", "Emma", "François", "Grace", "Hugo")
-private val lastNames   = listOf("Martin", "Dupont", "Smith", "Garcia", "Müller", "Rossi", "Tanaka")
-private val companies   = listOf("Cyna", "Shield", "Guard", "Sentinel", "Apex", "Nexus", "Vortex")
-private val productSfx  = listOf("EDR Pro", "XDR Suite", "SOC Manager", "Zero Trust Gateway", "SIEM Core", "MDM Shield")
-private val catNames    = listOf("SOC", "EDR", "XDR", "SIEM", "Zero Trust", "MDM")
-private val planNames   = listOf("Mensuel", "Annuel", "Starter", "Pro", "Enterprise")
-private val loremWords  = listOf("security", "cloud", "advanced", "platform", "enterprise", "solution",
-    "protection", "monitoring", "detection", "response", "threat", "intelligence")
-
-private fun uuid()                  = UUID.randomUUID().toString()
-private fun randomInt()             = Random.nextInt(1, 9999)
-private fun randomOf(list: List<String>) = list[Random.nextInt(list.size)]
-private fun lorem(words: Int = 8)   = (1..words).map { randomOf(loremWords) }.joinToString(" ")
-private fun randomPrice(min: Double = 49.0, max: Double = 999.0) =
-    (min + Random.nextDouble() * (max - min)).roundTo(2)
-private fun Double.roundTo(decimals: Int): Double {
-    val factor = Math.pow(10.0, decimals.toDouble())
-    return Math.round(this * factor) / factor
+private fun uuid() = UUID.randomUUID().toString()
+private fun isoDate(year: Int, month: Int, day: Int, hour: Int = 15): String {
+    val cal = Calendar.getInstance().apply {
+        set(year, month - 1, day, hour, 0, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
+    return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
+        .also { it.timeZone = TimeZone.getTimeZone("UTC") }
+        .format(cal.time)
 }
-private fun isoDate(daysAgo: Int = Random.nextInt(365)): String {
+private fun offsetDate(daysAgo: Int): String {
     val cal = Calendar.getInstance()
     cal.add(Calendar.DAY_OF_YEAR, -daysAgo)
     return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).format(cal.time)
 }
-private fun futureDateIso(daysAhead: Int = Random.nextInt(30) + 30): String {
-    val cal = Calendar.getInstance()
-    cal.add(Calendar.DAY_OF_YEAR, daysAhead)
-    return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).format(cal.time)
-}
 
-// ---------------------------------------------------------------------------
-// Mock DTOs — shape identique aux DTOs v1
-// ---------------------------------------------------------------------------
+// ── Static mock data ──────────────────────────────────────────────────────────
 
+object BasketballMockData {
 
-@Serializable
-data class MockPurchasedService(
-    val id: String,
-    val name: String,
-    val category: String,
-    val status: String,
-    val activeUsage: Int,
-    val totalLicenses: Int,
-    val threatsBlocked: Int,
-    val lastSyncTime: String
-)
-// UserProfileDto
-@Serializable
-data class MockUser(
-    val id: Int,
-    val email: String,
-    val firstName: String,
-    val lastName: String,
-    val role: String,
-    val isEmailVerified: Boolean,
-    val createdAt: String,
-)
-
-// CategoryDto
-@Serializable
-data class MockCategory(
-    val id: Int,
-    val slug: String,
-    val name: String,
-    val description: String?,
-    val imageUrl: String?,
-    val displayOrder: Int,
-)
-
-// ProductDto (catalog)
-@Serializable
-data class MockProduct(
-    val id: Int,
-    val name: String,
-    val description: String,
-    val status: String,       // "Active" | "Inactive" | "Archived"
-    val imageUrl: String?,
-    val price: Double,
-)
-
-// OrderItemDto
-@Serializable
-data class MockOrderItem(
-    val id: Int,
-    val productNameSnapshot: String,
-    val planNameSnapshot: String,
-    val quantityUsers: Int,
-    val quantityDevices: Int,
-)
-
-// OrderSummaryDto
-@Serializable
-data class MockOrder(
-    val id: Int,
-    val status: String,        // "Pending" | "Paid" | "Failed" | "Refunded"
-    val totalAmount: Double,
-    val createdAt: String,
-    val invoiceUrl: String?,
-    val items: List<MockOrderItem>,
-)
-
-// SubscriptionDto
-@Serializable
-data class MockSubscription(
-    val id: Int,
-    val status: String,             // "Active" | "Cancelled" | "Expired"
-    val productName: String,
-    val planName: String,
-    val currentPeriodStart: String,
-    val currentPeriodEnd: String,
-    val autoRenew: Boolean,
-)
-
-// CatalogPageDto
-@Serializable
-data class PaginatedProducts(
-    val items: List<MockProduct>,
-    val total: Int,
-    val page: Int,
-    val pageSize: Int,
-    val totalPages: Int,
-)
-
-// Auth response — shape identique à AuthResultDto de l'API
-@Serializable
-data class MockAuthResponse(
-    val token: String,
-    val refreshToken: String,
-)
-
-// ---------------------------------------------------------------------------
-// Factory functions — miroir de factories.js
-// ---------------------------------------------------------------------------
-
-object MockFactories {
-
-    // UserProfileDto
-    fun makeUser(
-        email: String    = "${randomOf(firstNames).lowercase()}.${randomOf(lastNames).lowercase()}@example.com",
-        firstName: String = randomOf(firstNames),
-        lastName: String  = randomOf(lastNames),
-        role: String     = "user",
-        isEmailVerified: Boolean = true,
-    ) = MockUser(
-        id              = randomInt(),
-        email           = email,
-        firstName       = firstName,
-        lastName        = lastName,
-        role            = role,
-        isEmailVerified = isEmailVerified,
-        createdAt       = isoDate(),
+    // Divisions
+    val divisions = listOf(
+        DivisionDto(id = "div-u17", name = "U17"),
+        DivisionDto(id = "div-u15", name = "U15"),
+        DivisionDto(id = "div-u13", name = "U13"),
     )
 
-    /** Utilisateur de démo fixe — miroir de auth.js GET /user/profile */
-    fun makeDemoUser() = makeUser(
-        email     = "jean.dupont@entreprise.com",
-        firstName = "Jean",
-        lastName  = "Dupont",
-        role      = "user",
+    // Teams per division
+    val teams = listOf(
+        TeamDto(id = "t01", name = "Panthers Besançon",  divisionId = "div-u17"),
+        TeamDto(id = "t02", name = "Lions Dijon",        divisionId = "div-u17"),
+        TeamDto(id = "t03", name = "Eagles Belfort",     divisionId = "div-u17"),
+        TeamDto(id = "t04", name = "Wolves Montbéliard", divisionId = "div-u17"),
+        TeamDto(id = "t05", name = "Titans Besançon",    divisionId = "div-u15"),
+        TeamDto(id = "t06", name = "Hawks Lons",         divisionId = "div-u15"),
+        TeamDto(id = "t07", name = "Bears Pontarlier",   divisionId = "div-u15"),
+        TeamDto(id = "t08", name = "Sharks Dole",        divisionId = "div-u15"),
+        TeamDto(id = "t09", name = "Rockets Besançon",   divisionId = "div-u13"),
+        TeamDto(id = "t10", name = "Comets Vesoul",      divisionId = "div-u13"),
+        TeamDto(id = "t11", name = "Stars Gray",         divisionId = "div-u13"),
+        TeamDto(id = "t12", name = "Jets Lure",          divisionId = "div-u13"),
     )
 
-    // CategoryDto
-    fun makeCategory(): MockCategory {
-        val name = randomOf(catNames)
-        return MockCategory(
-            id           = randomInt(),
-            slug         = name.lowercase().replace(" ", "-"),
-            name         = name,
-            description  = lorem(10),
-            imageUrl     = "https://picsum.photos/seed/${(1..9999).random()}/800/400",
-            displayOrder = Random.nextInt(10),
+    // Users
+    val officialUser = UserDto(
+        id = "u-official", email = "arbitre@club.fr",
+        firstName = "Marc", lastName = "Dupuis", role = "OFFICIAL"
+    )
+    val adminUser = UserDto(
+        id = "u-admin", email = "admin@club.fr",
+        firstName = "Sophie", lastName = "Laurent", role = "ADMIN"
+    )
+
+    // Matches — spread across current + next month
+    val matches: List<MatchDto> by lazy { buildMatches() }
+
+    private fun buildMatches(): List<MatchDto> {
+        val now = Calendar.getInstance()
+        val y = now.get(Calendar.YEAR)
+        val m = now.get(Calendar.MONTH) + 1 // 1-based
+
+        // next month
+        val nm = if (m == 12) 1 else m + 1
+        val ny = if (m == 12) y + 1 else y
+
+        fun team(id: String) = teams.first { it.id == id }
+
+        fun slots(arbitres: Int, chrono: Int = 1, mar: Int = 1): List<RoleSlotDto> {
+            val s = mutableListOf<RoleSlotDto>()
+            if (arbitres >= 1) s += RoleSlotDto("ARBITRE_1")
+            if (arbitres >= 2) s += RoleSlotDto("ARBITRE_2", "u-official", "Marc Dupuis")
+            if (arbitres >= 3) s += RoleSlotDto("ARBITRE_3")
+            if (arbitres >= 4) s += RoleSlotDto("ARBITRE_4")
+            repeat(chrono) { s += RoleSlotDto("CHRONO") }
+            repeat(mar)    { s += RoleSlotDto("MAR") }
+            return s
+        }
+
+        return listOf(
+            // ── This month ────────────────────────────────────────────────────
+            MatchDto(
+                id = "m01", divisionId = "div-u17", divisionName = "U17",
+                homeTeam = team("t01"), awayTeam = team("t02"),
+                dateIso = isoDate(y, m, 5, 15),
+                location = "Gymnase Pasteur, Besançon",
+                slots = slots(2),
+                subscriptionStatus = "CONFIRMED_J15", currentUserRole = "ARBITRE_2"
+            ),
+            MatchDto(
+                id = "m02", divisionId = "div-u15", divisionName = "U15",
+                homeTeam = team("t05"), awayTeam = team("t06"),
+                dateIso = isoDate(y, m, 10, 14),
+                location = "Salle Multiplex, Lons",
+                slots = slots(2),
+                subscriptionStatus = "NEUTRAL"
+            ),
+            MatchDto(
+                id = "m03", divisionId = "div-u13", divisionName = "U13",
+                homeTeam = team("t09"), awayTeam = team("t10"),
+                dateIso = isoDate(y, m, 10, 16),
+                location = "Gymnase Arènes, Besançon",
+                slots = slots(2, chrono = 1, mar = 1),
+                subscriptionStatus = "SUBSCRIBED", currentUserRole = "CHRONO"
+            ),
+            MatchDto(
+                id = "m04", divisionId = "div-u17", divisionName = "U17",
+                homeTeam = team("t03"), awayTeam = team("t04"),
+                dateIso = isoDate(y, m, 17, 15),
+                location = "Palais des Sports, Belfort",
+                slots = slots(4),
+                subscriptionStatus = "FULL"
+            ),
+            MatchDto(
+                id = "m05", divisionId = "div-u15", divisionName = "U15",
+                homeTeam = team("t07"), awayTeam = team("t08"),
+                dateIso = isoDate(y, m, 22, 14),
+                location = "Salle Pontarlier",
+                slots = slots(2),
+                subscriptionStatus = "CONFIRMED_J4", currentUserRole = "ARBITRE_1"
+            ),
+            MatchDto(
+                id = "m06", divisionId = "div-u13", divisionName = "U13",
+                homeTeam = team("t11"), awayTeam = team("t12"),
+                dateIso = isoDate(y, m, 28, 10),
+                location = "Gymnase Gray",
+                slots = slots(2),
+                subscriptionStatus = "NEUTRAL"
+            ),
+            // Two matches same day
+            MatchDto(
+                id = "m07", divisionId = "div-u17", divisionName = "U17",
+                homeTeam = team("t02"), awayTeam = team("t03"),
+                dateIso = isoDate(y, m, 22, 17),
+                location = "Salle Dijon Nord",
+                slots = slots(2),
+                subscriptionStatus = "NEUTRAL"
+            ),
+            // ── Next month ────────────────────────────────────────────────────
+            MatchDto(
+                id = "m08", divisionId = "div-u17", divisionName = "U17",
+                homeTeam = team("t01"), awayTeam = team("t04"),
+                dateIso = isoDate(ny, nm, 8, 15),
+                location = "Gymnase Pasteur, Besançon",
+                slots = slots(2),
+                subscriptionStatus = "NEUTRAL"
+            ),
+            MatchDto(
+                id = "m09", divisionId = "div-u15", divisionName = "U15",
+                homeTeam = team("t06"), awayTeam = team("t07"),
+                dateIso = isoDate(ny, nm, 14, 14),
+                location = "Salle Lons",
+                slots = slots(2),
+                emergencyDate = isoDate(ny, nm, 12, 0),
+                emergencyPoints = 5,
+                subscriptionStatus = "NEUTRAL"
+            ),
+            MatchDto(
+                id = "m10", divisionId = "div-u13", divisionName = "U13",
+                homeTeam = team("t09"), awayTeam = team("t12"),
+                dateIso = isoDate(ny, nm, 20, 16),
+                location = "Gymnase Arènes, Besançon",
+                slots = slots(2),
+                subscriptionStatus = "NEUTRAL"
+            ),
         )
     }
 
-    // ProductDto — status PascalCase comme l'enum .NET
-    fun makeProduct(): MockProduct = MockProduct(
-        id          = randomInt(),
-        name        = "${randomOf(companies)} ${randomOf(productSfx)}",
-        description = lorem(20),
-        status      = listOf("Active", "Active", "Active", "Inactive", "Archived").random(),
-        imageUrl    = "https://picsum.photos/seed/${(1..9999).random()}/800/600",
-        price       = randomPrice(49.0, 999.0),
+    // Notifications
+    val notifications = listOf(
+        NotificationDto(
+            id = "n1", type = "J15_REMINDER",
+            title = "Confirmation J-15 requise",
+            body  = "Confirmez votre présence pour U17 Panthers vs Lions le 8 ${currentMonthName()}",
+            matchId = "m08",
+            timestampIso = offsetDate(1),
+            isRead = false
+        ),
+        NotificationDto(
+            id = "n2", type = "J15_REMINDER",
+            title = "Confirmation J-15 requise",
+            body  = "Confirmez votre présence pour U15 Hawks vs Bears le 14 ${currentMonthName()}",
+            matchId = "m09",
+            timestampIso = offsetDate(2),
+            isRead = false
+        ),
+        NotificationDto(
+            id = "n3", type = "J4_REMINDER",
+            title = "Confirmation finale J-4",
+            body  = "Confirmation finale requise pour U15 Titans vs Hawks",
+            matchId = "m05",
+            timestampIso = offsetDate(4),
+            isRead = false
+        ),
+        NotificationDto(
+            id = "n4", type = "GENERAL",
+            title = "Bienvenue sur BasketballRef",
+            body  = "Votre compte arbitre est actif. Bonne saison !",
+            matchId = null,
+            timestampIso = offsetDate(30),
+            isRead = true
+        ),
+        NotificationDto(
+            id = "n5", type = "EMERGENCY",
+            title = "Besoin urgent d'arbitres",
+            body  = "Match U13 Rockets vs Comets le 10 — poste MAR non pourvu",
+            matchId = "m03",
+            timestampIso = offsetDate(5),
+            isRead = true
+        ),
     )
 
-    // OrderItemDto
-    fun makeOrderItem() = MockOrderItem(
-        id                  = randomInt(),
-        productNameSnapshot = "${randomOf(companies)} ${randomOf(productSfx)}",
-        planNameSnapshot    = randomOf(planNames),
-        quantityUsers       = Random.nextInt(1, 50),
-        quantityDevices     = Random.nextInt(0, 200),
+    val settings = AppSettingsDto(
+        confirmationOffsetJ15 = 15,
+        confirmationOffsetJ4  = 4,
     )
 
-    // OrderSummaryDto — status PascalCase
-    private val orderStatuses = listOf("Pending", "Paid", "Failed", "Refunded")
+    val pointRules = OfficialRole.entries.mapIndexed { i, role ->
+        PointRuleDto(
+            id = "pr-$i",
+            role = role.name,
+            pointsOnJ15 = 10,
+            pointsOnJ4  = 5,
+            pointsEmergency = 15,
+        )
+    }
 
-    fun makeOrder(status: String = randomOf(orderStatuses)) = MockOrder(
-        id          = randomInt(),
-        status      = status,
-        totalAmount = randomPrice(49.0, 2400.0),
-        createdAt   = isoDate(Random.nextInt(730)),
-        invoiceUrl  = if (Random.nextDouble() < 0.7) "#" else null,
-        items       = makeMany(Random.nextInt(1, 4)) { makeOrderItem() },
-    )
-
-    // SubscriptionDto — status PascalCase
-    fun makeSubscription(
-        status: String = "Active",
-    ) = MockSubscription(
-        id                 = randomInt(),
-        status             = status,
-        productName        = "${randomOf(companies)} ${randomOf(productSfx)}",
-        planName           = randomOf(planNames),
-        currentPeriodStart = isoDate(30),
-        currentPeriodEnd   = futureDateIso(),
-        autoRenew          = Random.nextBoolean(),
-    )
-
-    fun makeAuthResponse() = MockAuthResponse(
-        token        = "eyJ.${List(64) { ('a'..'z').random() }.joinToString("")}.mock",
-        refreshToken = List(64) { (('a'..'z') + ('0'..'9')).random() }.joinToString(""),
-    )
-
-    fun <T> makeMany(n: Int, factory: () -> T): List<T> = (1..n).map { factory() }
+    private fun currentMonthName(): String =
+        SimpleDateFormat("MMMM", Locale.FRENCH).format(Date())
 }

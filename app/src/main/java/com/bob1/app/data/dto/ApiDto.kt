@@ -3,7 +3,7 @@ package com.bob1.app.data.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ErrorResponse(
+data class ErrorResponseDto(
     val message: String? = null,
     val error: String? = null
 ) {
@@ -11,4 +11,4 @@ data class ErrorResponse(
 }
 
 @Serializable
-data class MessageResponse(val message: String)
+data class MessageResponseDto(val message: String)

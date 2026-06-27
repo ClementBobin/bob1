@@ -1,46 +1,39 @@
 package com.bob1.app.data.dto
 
+import com.bob1.app.domain.model.User
 import kotlinx.serialization.Serializable
 
-/** Corps de la requête `POST /auth/login`. */
 @Serializable
-data class LoginRequest(
-    val email: String,
-    val password: String
-)
+data class LoginRequestDto(val email: String, val password: String)
 
-/** Corps de la requête `POST /auth/register`. */
 @Serializable
-data class RegisterRequest(
-    val firstName: String,
-    val lastName: String,
-    val email: String,
-    val password: String
-)
+data class LoginResponseDto(val token: String, val user: UserDto)
 
-/** Corps de la requête `POST /auth/logout`. */
-@Serializable
-data class RefreshTokenRequest(
-    val refreshToken: String
-)
-
-/**
- * Réponse portant les tokens JWT (non utilisée pour login/register qui passent par cookies).
- * Conservée pour compatibilité avec d'éventuels endpoints futurs.
- */
-@Serializable
-data class AuthResponse(
-    val token: String,
-    val refreshToken: String
-)
-
-/** Profil utilisateur renvoyé par `GET /auth/me`. Persisté dans [com.bob1.app.data.local.SessionManager]. */
 @Serializable
 data class UserDto(
-    val id: Int,
+    val id: String,
     val email: String,
     val firstName: String,
     val lastName: String,
-    val role: String,
-    val isEmailVerified: Boolean = false
-)
+    val role: String, // "OFFICIAL" | "ADMIN"
+) {
+    fun toDomain() = User(
+        id = id,
+        email = email,
+        firstName = firstName,
+        lastName = lastName,
+        role = if (role == "ADMIN") UserRole.ADMIN else UserRole.OFFICIAL,
+    )
+
+    companion object {
+        fun fromDomain(u: User) = UserDto(
+            id        = u.id,
+            email     = u.email,
+            firstName = u.firstName,
+            lastName  = u.lastName,
+            role      = u.role.name,
+        )
+    }
+}
+
+enum class UserRole { OFFICIAL, ADMIN }

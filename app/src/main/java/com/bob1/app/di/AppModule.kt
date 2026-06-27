@@ -1,11 +1,14 @@
 package com.bob1.app.di
 
+import android.annotation.SuppressLint
 import com.bob1.app.BuildConfig
 import com.bob1.app.data.local.SessionManager
-import com.bob1.app.data.remote.*
+import com.bob1.app.data.remote.createHttpClient
 import com.bob1.app.data.repository.*
 import com.bob1.app.domain.repository.*
 import com.bob1.app.mock.registry.buildMockEngine
+import dev.kindling.android.natif.NotificationHelper
+import dev.kindling.android.natif.VibrationHelper
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.cio.CIO
@@ -20,24 +23,16 @@ import javax.net.ssl.X509TrustManager
 
 val appModule = module {
 
+    // ── Native helpers (Kindling) ─────────────────────────────────────────────
     single { SessionManager(androidContext()) }
+    single { NotificationHelper(androidContext()) }
     single { VibrationHelper(androidContext()) }
 
-    /**
-     * Sélection du moteur HTTP selon l'environnement :
-     * - `MOCK_API=true` → [buildMockEngine] (pas de réseau, réponses en mémoire).
-     * - `DEBUG=true`    → OkHttp avec SSL bypass total (nécessaire pour l'émulateur Android
-     *                     qui expose l'API locale via `10.0.2.2` avec un certificat auto-signé).
-     *                     CIO ne permet pas de court-circuiter la vérification d'hostname.
-     * - Production      → CIO (moteur Kotlin natif, pas de dépendance OkHttp).
-     */
+    // ── HTTP engine ───────────────────────────────────────────────────────────
     single<HttpClientEngine> {
         when {
-            BuildConfig.MOCK_API -> buildMockEngine(delayMs = 400L)
-
-            // Debug: OkHttp engine with all-trusting SSL + hostname verifier disabled.
-            // CIO does its own hostname check that can't be bypassed via trust manager alone.
-            BuildConfig.DEBUG -> {
+            false -> buildMockEngine(delayMs = 300L)
+            BuildConfig.DEBUG    -> {
                 val tm = trustAllTrustManager()
                 val sslContext = SSLContext.getInstance("TLS").apply {
                     init(null, arrayOf(tm), SecureRandom())
@@ -55,20 +50,23 @@ val appModule = module {
 
     single<HttpClient> {
         createHttpClient(
-            baseUrl         = BuildConfig.BASE_URL,
-            engine          = get(),
-            vibrationHelper = get(),
-            sessionManager  = get()
+            baseUrl        = BuildConfig.BASE_URL,
+            engine         = get(),
+            sessionManager = get(),
         )
     }
 
-    // ── API layer ─────────────────────────────────────────────────────────────
-    single { AuthAPI(get()) }
-
-    single<AuthRepository>        { AuthRepositoryImpl(get(), get(), get()) }
+    // ── Repositories ──────────────────────────────────────────────────────────
+    single<AuthRepository>         { AuthRepositoryImpl(get(), get()) }
+    single<DivisionRepository>     { DivisionRepositoryImpl(get()) }
+    single<TeamRepository>         { TeamRepositoryImpl(get()) }
+    single<MatchRepository>        { MatchRepositoryImpl(get()) }
+    single<NotificationRepository> { NotificationRepositoryImpl(get()) }
+    single<AdminRepository>        { AdminRepositoryImpl(get(), get()) }
 }
 
-private fun trustAllTrustManager(): X509TrustManager = object : X509TrustManager {
+private fun trustAllTrustManager(): X509TrustManager = @SuppressLint("CustomX509TrustManager")
+object : X509TrustManager {
     override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) = Unit
     override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) = Unit
     override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()

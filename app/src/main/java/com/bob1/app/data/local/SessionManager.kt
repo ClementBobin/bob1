@@ -1,82 +1,70 @@
 package com.bob1.app.data.local
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.bob1.app.data.dto.UserDto
+import com.bob1.app.domain.model.User
+import dev.kindling.android.natif.KeystoreHelper
+import dev.kindling.android.natif.KeystoreConfig
+import dev.kindling.android.natif.EncryptedData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.json.Json
 
 /**
- * Gestionnaire de session utilisateur. Persiste les tokens JWT et le profil dans SharedPreferences
- * et les expose comme [StateFlow] observables.
- *
- * La navigation est pilotée par [token] : `token != null` → utilisateur authentifié.
- * Les cookies Ktor sont synchronisés avec ce gestionnaire via [com.bob1.app.data.remote.SessionManagerCookieStorage].
+ * Session manager backed by Kindling's [KeystoreHelper] for AES-256-GCM token
+ * encryption. Tokens are encrypted before being stored in SharedPreferences and
+ * decrypted on retrieval — keys never leave the Android Keystore hardware.
  */
 class SessionManager(context: Context) {
-    private val prefs = context.getSharedPreferences("bob1_prefs", Context.MODE_PRIVATE)
 
-    private val _user = MutableStateFlow<UserDto?>(null)
-    val user: StateFlow<UserDto?> = _user.asStateFlow()
+    private val prefs: SharedPreferences =
+        context.getSharedPreferences("basketball_secure_prefs", Context.MODE_PRIVATE)
+
+    private val keystore = KeystoreHelper()
+    private val keystoreConfig = KeystoreConfig.default("basketball_session_key")
+
+    private val _user  = MutableStateFlow<User?>(null)
+    val user: StateFlow<User?> = _user.asStateFlow()
 
     private val _token = MutableStateFlow<String?>(null)
     val token: StateFlow<String?> = _token.asStateFlow()
 
-    private val _refreshToken = MutableStateFlow<String?>(null)
-    val refreshToken: StateFlow<String?> = _refreshToken.asStateFlow()
+    init { restoreSession() }
 
-    init {
-        val savedUser = prefs.getString("user", null)
-        val savedToken = prefs.getString("token", null)
-        val savedRefresh = prefs.getString("refreshToken", null)
+    private fun restoreSession() {
+        runCatching {
+            val encCiphertext = prefs.getString("token_ct", null) ?: return
+            val encIv         = prefs.getString("token_iv", null) ?: return
+            val token = keystore.decrypt(keystoreConfig, EncryptedData(encCiphertext, encIv))
+            val userJson = prefs.getString("user_json", null)
+            val user = userJson?.let { Json.decodeFromString<UserDto>(it).toDomain() }
+            _token.value = token
+            _user.value  = user
+        }.onFailure { clearSession() }
+    }
 
-        if (savedToken != null && savedRefresh != null) {
-            _token.value = savedToken
-            _refreshToken.value = savedRefresh
-            if (savedUser != null) {
-                runCatching { _user.value = Json.decodeFromString<UserDto>(savedUser) }
-                    .onFailure { clearSession() }
-            }
+    fun saveSession(user: User, token: String) {
+        runCatching {
+            val encrypted = keystore.encrypt(keystoreConfig, token)
+            prefs.edit()
+                .putString("token_ct",  encrypted.ciphertext)
+                .putString("token_iv",  encrypted.iv)
+                .putString("user_json", Json.encodeToString(UserDto.fromDomain(user)))
+                .apply()
+            _token.value = token
+            _user.value  = user
         }
     }
 
-    /** Persiste [token] et [refreshToken] en mémoire et dans SharedPreferences. */
-    fun saveTokens(token: String, refreshToken: String) {
-        _token.value = token
-        _refreshToken.value = refreshToken
-        prefs.edit().apply {
-            putString("token", token)
-            putString("refreshToken", refreshToken)
-            apply()
-        }
-    }
-
-    /** Persiste le profil utilisateur sérialisé en JSON dans SharedPreferences. */
-    fun saveUser(user: UserDto) {
-        _user.value = user
-        prefs.edit().putString("user", Json.encodeToString(user)).apply()
-    }
-
-    /** Raccourci combinant [saveTokens] et [saveUser] en une seule opération. */
-    fun saveSession(user: UserDto, token: String, refreshToken: String) {
-        saveTokens(token, refreshToken)
-        saveUser(user)
-    }
-
-    /** Efface tous les tokens et le profil — déclenche la navigation vers l'écran de connexion. */
     fun clearSession() {
-        _user.value = null
+        prefs.edit().remove("token_ct").remove("token_iv").remove("user_json").apply()
         _token.value = null
-        _refreshToken.value = null
-        prefs.edit().apply {
-            remove("user")
-            remove("token")
-            remove("refreshToken")
-            apply()
-        }
+        _user.value  = null
     }
 
-    /** Retourne `true` si un token de session est présent en mémoire. */
     fun isAuthenticated(): Boolean = _token.value != null
+    fun currentUser(): User? = _user.value
+    fun currentToken(): String? = _token.value
 }

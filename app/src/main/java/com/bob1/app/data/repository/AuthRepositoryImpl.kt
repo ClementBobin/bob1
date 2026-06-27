@@ -1,61 +1,33 @@
 package com.bob1.app.data.repository
 
-import com.bob1.app.data.dto.LoginRequest
-import com.bob1.app.data.dto.MessageResponse
-import com.bob1.app.data.dto.RegisterRequest
+import com.bob1.app.data.dto.LoginRequestDto
 import com.bob1.app.data.local.SessionManager
 import com.bob1.app.data.remote.AuthAPI
+import com.bob1.app.domain.model.User
 import com.bob1.app.domain.repository.AuthRepository
 
 /**
- * Implémentation de [AuthRepository] qui orchestre les appels à [AuthAPI] et [UserAPI]
+ * Implémentation de [AuthRepository] qui orchestre les appels à [AuthAPI]
  * et gère la session locale via [SessionManager].
  */
 internal class AuthRepositoryImpl(
     private val authAPI: AuthAPI,
-    private val userAPI: UserAPI,
-    private val sessionManager: SessionManager
+    private val session: SessionManager,
 ) : AuthRepository {
 
-    /**
-     * Connecte l'utilisateur et charge son profil.
-     *
-     * En mode production, les cookies `bob1_token` / `bob1_refresh_token` sont stockés
-     * automatiquement par [SessionManagerCookieStorage] pendant la réponse.
-     * En mode mock (pas de `Set-Cookie`), un token fictif est injecté pour que la navigation
-     * fonctionne sans modifier la logique d'authentification.
-     */
-    override suspend fun login(request: LoginRequest): MessageResponse {
-        val response = authAPI.login(request)
-        if (sessionManager.token.value.isNullOrEmpty()) {
-            sessionManager.saveTokens("mock-session-token", "mock-refresh-token")
-        }
-        runCatching { userAPI.getMe() }.getOrNull()?.let { sessionManager.saveUser(it) }
-        return response
+    override suspend fun login(email: String, password: String): Result<User> = runCatching {
+        val response = authAPI.login(LoginRequestDto(email, password))
+        val user = response.user.toDomain()
+        session.saveSession(user, response.token)
+        user
     }
 
-    override suspend fun register(request: RegisterRequest): MessageResponse =
-        authAPI.register(request)
-
-    /** Invalide la session serveur puis efface les tokens locaux. */
-    override suspend fun logout() {
-        val refreshToken = sessionManager.refreshToken.value
-        try {
-            if (refreshToken != null) authAPI.logout(refreshToken)
-        } finally {
-            sessionManager.clearSession()
-        }
+    override suspend fun logout(): Result<Unit> = runCatching {
+        authAPI.logout()
+        session.clearSession()
     }
 
-    override suspend fun forgotPassword(email: String): MessageResponse =
-        authAPI.forgotPassword(email)
-
-    override suspend fun resetPassword(
-        email: String,
-        code: String,
-        newPassword: String
-    ): MessageResponse = authAPI.resetPassword(email, code, newPassword)
-
-    override suspend fun confirmEmail(email: String, code: String): MessageResponse =
-        authAPI.confirmEmail(email, code)
+    override suspend fun getCurrentUser(): Result<User> = runCatching {
+        authAPI.getCurrentUser().toDomain()
+    }
 }

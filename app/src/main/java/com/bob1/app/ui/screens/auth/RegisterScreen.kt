@@ -1,6 +1,7 @@
-package com.bob1.app.ui.screens.auth
+package com.cyna.app.ui.screens.auth
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -270,7 +271,7 @@ private fun RegisterContent(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
                     color = cs.primaryContainer.copy(alpha = 0.6f),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, cs.primary.copy(alpha = 0.25f))
+                    border = BorderStroke(1.dp, cs.primary.copy(alpha = 0.25f))
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
