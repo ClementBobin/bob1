@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.kindling.core)
     implementation(libs.kindling.compose)
     implementation(libs.kindling.utils)
+    implementation(libs.kindling.android)
 
     implementation(libs.coil.compose)
 
