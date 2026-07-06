@@ -31,7 +31,7 @@ internal class AuthRepositoryImpl(
         authAPI.getCurrentUser().toDomain()
     }
 
-    override fun register(registerRequest: Any) {
+    override fun register(firstName: String, lastName: String, email: String, password: String): Result<User> {
         TODO("Not yet implemented")
     }
 }

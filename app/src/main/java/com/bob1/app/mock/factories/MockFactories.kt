@@ -217,11 +217,6 @@ object BasketballMockData {
         ),
     )
 
-    val settings = AppSettingsDto(
-        confirmationOffsetJ15 = 15,
-        confirmationOffsetJ4  = 4,
-    )
-
     val pointRules = OfficialRole.entries.mapIndexed { i, role ->
         PointRuleDto(
             id = "pr-$i",

@@ -50,17 +50,3 @@ data class MatchDto(
         )
     }
 }
-
-@Serializable
-data class CreateMatchRequestDto(
-    val homeTeamId: String,
-    val awayTeamId: String,
-    val divisionId: String,
-    val dateIso: String,
-    val location: String,
-    val arbitreSlots: Int,
-    val chronoSlots: Int,
-    val marSlots: Int,
-    val emergencyDate: String?,
-    val emergencyPoints: Int,
-)

@@ -1,195 +1,168 @@
 package com.bob1.app.ui.screens.auth
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.bob1.app.R
-import com.bob1.app.ui.core.components.ui.AuthCard
-import com.bob1.app.ui.core.components.ui.FieldWithLabel
+import com.bob1.app.ui.core.Destination
+import dev.kindling.android.natif.BiometricConfig
+import dev.kindling.android.natif.BiometricHelper
 import dev.kindling.compose.KScreen
+import dev.kindling.core.ButtonVariant
 import dev.kindling.core.components.KButton
+import org.koin.compose.koinInject
 
 @Composable
-fun LoginScreen(
-    navController: NavController,
-    onNavigateToRegister: () -> Unit,
-    onLoginSuccess: () -> Unit
-) {
+fun LoginScreen(navController: NavController) {
+    val activity  = LocalActivity.current as? FragmentActivity
+    val biometric = koinInject<BiometricHelper>()
+
     KScreen(
-        viewModel = viewModel<AuthViewModel>(),
-        navController = navController
+        viewModel     = viewModel<AuthViewModel>(),
+        navController = navController,
+        onEvent = { _, vm, event ->
+            when (event) {
+                is AuthContracts.UiEvent.LoginSuccess -> navController.navigate(Destination.Calendar.route) {
+                    popUpTo(Destination.Login.route) { inclusive = true }
+                }
+                is AuthContracts.UiEvent.LaunchBiometric -> activity?.let {
+                    biometric.authenticate(
+                        activity = it,
+                        config   = BiometricConfig.strongOrPin("BOB1", "Connectez-vous avec votre biométrie"),
+                        onResult = { result -> vm.onBiometricResult(result) }
+                    )
+                }
+                else -> Unit
+            }
+        }
     ) { state, vm ->
         LoginContent(
-            state = state,
-            onEmailChange = vm::onEmailChanged,
-            onPasswordChange = vm::onPasswordChanged,
-            onLogin = { vm.login(onLoginSuccess) },
-            onNavigateToRegister = onNavigateToRegister,
+            state              = state,
+            onEmailChanged     = vm::onEmailChange,
+            onPasswordChanged  = vm::onPasswordChange,
+            onLogin            = vm::login,
+            onBiometricTap     = {
+                activity?.let {
+                    biometric.authenticate(
+                        activity = it,
+                        config   = BiometricConfig.strongOrPin("BOB1", "Connectez-vous"),
+                        onResult = vm::onBiometricResult,
+                    )
+                }
+            },
+            onShowFallback     = vm::showPasswordFallback,
+            onNavigateRegister = { navController.navigate(Destination.Register.route) },
         )
     }
 }
 
 @Composable
 private fun LoginContent(
-    state: AuthContracts.UiState = AuthContracts.UiState(),
-    onEmailChange: (String) -> Unit = {},
-    onPasswordChange: (String) -> Unit = {},
-    onLogin: () -> Unit = {},
-    onNavigateToRegister: () -> Unit = {}
+    state: AuthContracts.UiState,
+    onEmailChanged: (String) -> Unit    = {},
+    onPasswordChanged: (String) -> Unit = {},
+    onLogin: () -> Unit                 = {},
+    onBiometricTap: () -> Unit          = {},
+    onShowFallback: () -> Unit          = {},
+    onNavigateRegister: () -> Unit      = {},
 ) {
-    var rememberMe by remember { mutableStateOf(false) }
     val cs = MaterialTheme.colorScheme
+    var passwordVisible by remember { mutableStateOf(false) }
 
-    // Full-screen background follows theme (light/dark)
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.systemBars),
-        contentAlignment = Alignment.Center
-    ) {
-        Surface(modifier = Modifier.fillMaxSize(), color = cs.background) {}
-
+    Surface(modifier = Modifier.fillMaxSize(), color = cs.background) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
         ) {
-            // Card — surface color follows theme
-            AuthCard {
+            Icon(Icons.Default.SportsBasketball, null,
+                modifier = Modifier.size(56.dp), tint = cs.primary)
+            Spacer(Modifier.height(8.dp))
+            Text("BOB1", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+            Text("Gestion des officiels", style = MaterialTheme.typography.bodyMedium, color = cs.onSurfaceVariant)
+            Spacer(Modifier.height(40.dp))
 
-                // Lock icon in primary-tinted rounded square
-                Box(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = cs.primaryContainer
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Lock,
-                            contentDescription = null,
-                            tint = cs.onPrimaryContainer,
-                            modifier = Modifier
-                                .padding(12.dp)
-                                .size(24.dp)
-                        )
+            // ── Biometric (primary when available + session exists) ────────────
+            AnimatedVisibility(
+                visible = state.biometricAvailable && !state.showPasswordFallback,
+                enter = fadeIn(), exit = fadeOut(),
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Icon(Icons.Default.Fingerprint, null, modifier = Modifier.size(72.dp), tint = cs.primary)
+                    Text("Authentification biométrique",
+                        style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                    Text("Utilisez votre empreinte ou Face ID pour vous connecter.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = cs.onSurfaceVariant, textAlign = TextAlign.Center)
+                    state.biometricError?.let { err ->
+                        Text(err, color = cs.error, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
                     }
+                    KButton(text = "Déverrouiller", onClick = onBiometricTap, modifier = Modifier.fillMaxWidth())
+                    TextButton(onClick = onShowFallback) { Text("Utiliser mon mot de passe", fontSize = 13.sp) }
                 }
-
-                Spacer(Modifier.height(20.dp))
-
-                // Title
-                Text(
-                    text = "Bon retour",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = cs.onSurface,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(Modifier.height(8.dp))
-
-                // Subtitle with register link
-                val subtitle = buildAnnotatedString {
-                    append("Ou ")
-                    withStyle(SpanStyle(color = cs.primary, fontWeight = FontWeight.SemiBold)) {
-                        append("créez un compte")
-                    }
-                }
-                TextButton(
-                    onClick = onNavigateToRegister,
-                    contentPadding = PaddingValues(0.dp),
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                ) {
-                    Text(subtitle, fontSize = 14.sp, color = cs.onSurfaceVariant)
-                }
-
-                Spacer(Modifier.height(24.dp))
-
-                // Error banner
-                AnimatedVisibility(visible = state.emailError != null || state.passwordError != null) {
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = cs.errorContainer,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = state.emailError ?: state.passwordError ?: "",
-                            fontSize = 13.sp,
-                            color = cs.error,
-                            modifier = Modifier.padding(12.dp)
-                        )
-                    }
-                    Spacer(Modifier.height(12.dp))
-                }
-
-                // Email
-                FieldWithLabel(
-                    label = "Adresse e-mail",
-                    value = state.email,
-                    onValueChange = onEmailChange,
-                    placeholder = "Entrez votre e-mail",
-                    isError = state.emailError != null,
-                    enabled = !state.isLoading,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                if (state.emailError != null) {
-                    Text(
-                        text = state.emailError,
-                        color = cs.error,
-                        fontSize = 11.sp,
-                        modifier = Modifier
-                            .align(Alignment.Start)
-                            .padding(top = 4.dp)
-                    )
-                }
-
-                Spacer(Modifier.height(16.dp))
-
-                // Password
-                FieldWithLabel(
-                    label = "Mot de passe",
-                    value = state.password,
-                    onValueChange = onPasswordChange,
-                    placeholder = "••••••••",
-                    isPassword = true,
-                    isError = state.passwordError != null,
-                    enabled = !state.isLoading,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(Modifier.height(20.dp))
-
-                // Submit button
-                KButton(
-                    text = "Se connecter",
-                    onClick = onLogin,
-                    isLoading = state.isLoading,
-                    modifier = Modifier.fillMaxWidth()
-                )
             }
+
+            // ── Password fallback ─────────────────────────────────────────────
+            AnimatedVisibility(
+                visible = state.showPasswordFallback || !state.biometricAvailable,
+                enter = fadeIn(), exit = fadeOut(),
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                    Text(if (state.biometricAvailable) "Connexion par mot de passe" else "Connexion",
+                        style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                    OutlinedTextField(
+                        value = state.email, onValueChange = onEmailChanged,
+                        label = { Text("Email") }, leadingIcon = { Icon(Icons.Default.Email, null) },
+                        singleLine = true, modifier = Modifier.fillMaxWidth(), isError = state.error != null,
+                    )
+                    OutlinedTextField(
+                        value = state.password, onValueChange = onPasswordChanged,
+                        label = { Text("Mot de passe") }, leadingIcon = { Icon(Icons.Default.Lock, null) },
+                        trailingIcon = {
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility, null)
+                            }
+                        },
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        singleLine = true, modifier = Modifier.fillMaxWidth(), isError = state.error != null,
+                    )
+                    state.error?.let { Text(it, color = cs.error, style = MaterialTheme.typography.bodySmall) }
+                    KButton(text = "Se connecter", onClick = onLogin, isLoading = state.isLoading,
+                        modifier = Modifier.fillMaxWidth())
+                    if (state.biometricAvailable) {
+                        KButton(onClick = onBiometricTap, modifier = Modifier.fillMaxWidth(), variant = ButtonVariant.Ghost) {
+                            Icon(Icons.Default.Fingerprint, null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("Utiliser la biométrie")
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(24.dp))
+            TextButton(onClick = onNavigateRegister) { Text("Pas encore de compte ? S'inscrire") }
         }
     }
 }

@@ -25,7 +25,7 @@ fun CalendarScreen(
             topBar = {
                 CalendarTopBar(
                     unreadCount    = state.unreadCount,
-                    onNotifClicked = viewModel::onNotificationsTapped,
+                    navController
                 )
             },
             bottomBar = { AppBottomBar(navController) }

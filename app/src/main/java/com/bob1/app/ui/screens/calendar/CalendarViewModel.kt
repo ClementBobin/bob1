@@ -28,7 +28,6 @@ object CalendarContracts {
 
     sealed interface UiEvent {
         data class ShowError(val message: String) : UiEvent
-        object NavigateToNotifications : UiEvent
     }
 }
 
@@ -165,6 +164,4 @@ class CalendarViewModel(
     private fun refreshMatchInState(updated: Match) {
         updateState { copy(matches = matches.map { if (it.id == updated.id) updated else it }) }
     }
-
-    fun onNotificationsTapped() = sendEvent(CalendarContracts.UiEvent.NavigateToNotifications)
 }

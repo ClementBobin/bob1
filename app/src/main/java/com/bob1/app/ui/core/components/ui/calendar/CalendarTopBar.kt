@@ -22,10 +22,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.bob1.app.ui.core.Destination
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalendarTopBar(unreadCount: Int, onNotifClicked: () -> Unit) {
+fun CalendarTopBar(unreadCount: Int, navController: NavController) {
     TopAppBar(
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -36,12 +38,12 @@ fun CalendarTopBar(unreadCount: Int, onNotifClicked: () -> Unit) {
                     modifier = Modifier.size(28.dp),
                 )
                 Spacer(Modifier.width(8.dp))
-                Text("BasketballRef", fontWeight = FontWeight.Bold)
+                Text("BOB1-ref", fontWeight = FontWeight.Bold)
             }
         },
         actions = {
             Box {
-                IconButton(onClick = onNotifClicked) {
+                IconButton(onClick = { navController.navigate(Destination.Notifications.route) }) {
                     Icon(Icons.Default.Notifications, contentDescription = "Notifications")
                 }
                 if (unreadCount > 0) {

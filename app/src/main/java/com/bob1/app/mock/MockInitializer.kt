@@ -30,7 +30,6 @@ object MockInitializer {
             +matchHandlers
             +notificationHandlers
             +pointRuleHandlers
-            +settingsHandlers
             +teamHandlers
         )
 

@@ -20,12 +20,6 @@ fun AppBottomBar(navController: NavController) {
         )
         NavigationBarItem(
             selected = false,
-            onClick  = { navController.navigate(Destination.Notifications.route) },
-            icon     = { Icon(Icons.Default.Notifications, contentDescription = null) },
-            label    = { Text("Notifs") },
-        )
-        NavigationBarItem(
-            selected = false,
             onClick  = { navController.navigate(Destination.Profile.route) },
             icon     = { Icon(Icons.Default.Person, contentDescription = null) },
             label    = { Text("Profil") },

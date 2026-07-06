@@ -20,10 +20,10 @@ import kotlinx.serialization.json.Json
 class SessionManager(context: Context) {
 
     private val prefs: SharedPreferences =
-        context.getSharedPreferences("basketball_secure_prefs", Context.MODE_PRIVATE)
+        context.getSharedPreferences("bob1_secure_prefs", Context.MODE_PRIVATE)
 
     private val keystore = KeystoreHelper()
-    private val keystoreConfig = KeystoreConfig.default("basketball_session_key")
+    private val keystoreConfig = KeystoreConfig.default("bob1_session_key")
 
     private val _user  = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user.asStateFlow()

@@ -1,5 +1,6 @@
 package com.bob1.app.ui.core.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -81,15 +82,13 @@ val DarkColorScheme = darkColorScheme(
 
 @Composable
 fun AppTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val useDarkTheme = ThemeManager.isDarkTheme()
-
-    val colorScheme = if (useDarkTheme) DarkColorScheme else LightColorScheme
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography  = bob1Typography,
         content     = content
     )
 }

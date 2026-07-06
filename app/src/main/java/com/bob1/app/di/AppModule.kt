@@ -7,6 +7,7 @@ import com.bob1.app.data.repository.*
 import com.bob1.app.data.remote.*
 import com.bob1.app.domain.repository.*
 import com.bob1.app.mock.registry.buildMockEngine
+import dev.kindling.android.natif.BiometricHelper
 import dev.kindling.android.natif.NotificationHelper
 import dev.kindling.android.natif.VibrationHelper
 import io.ktor.client.HttpClient
@@ -27,6 +28,7 @@ val appModule = module {
     single { SessionManager(androidContext()) }
     single { NotificationHelper(androidContext()) }
     single { VibrationHelper(androidContext()) }
+    single { BiometricHelper(androidContext()) }
 
     // ── HTTP engine ───────────────────────────────────────────────────────────
     single<HttpClientEngine> {
@@ -61,7 +63,6 @@ val appModule = module {
     single { TeamAPI(get()) }
     single { MatchAPI(get()) }
     single { NotificationAPI(get()) }
-    single { AdminAPI(get()) }
 
     // ── Repositories ──────────────────────────────────────────────────────────
     single<AuthRepository>         { AuthRepositoryImpl(get(), get()) }
@@ -69,7 +70,6 @@ val appModule = module {
     single<TeamRepository>         { TeamRepositoryImpl(get()) }
     single<MatchRepository>        { MatchRepositoryImpl(get()) }
     single<NotificationRepository> { NotificationRepositoryImpl(get()) }
-    single<AdminRepository>        { AdminRepositoryImpl(get(), get()) }
 }
 
 private fun trustAllTrustManager(): X509TrustManager = @SuppressLint("CustomX509TrustManager")

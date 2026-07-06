@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.bob1.app.R
+import com.bob1.app.ui.core.Destination
 import com.bob1.app.ui.core.components.ui.AuthCard
 import com.bob1.app.ui.core.components.ui.FieldWithLabel
 import com.bob1.app.ui.core.components.ui.PasswordCriterionRow
@@ -34,19 +35,27 @@ import dev.kindling.core.components.KButton
 @Composable
 fun RegisterScreen(
     navController: NavController,
-    onNavigateToLogin: () -> Unit,
-    onRegisterSuccess: (String) -> Unit,
 ) {
     KScreen(
         viewModel = viewModel<AuthViewModel>(),
-        navController = navController
+        navController = navController,
+        onEvent = { _, _, event ->
+            when (event) {
+                is AuthContracts.UiEvent.RegisterSuccess -> navController.navigate(Destination.Calendar.route) {
+                    popUpTo(Destination.Register.route) { inclusive = true }
+                }
+                else -> Unit
+            }
+        }
     ) { state, vm ->
         RegisterContent(
             state = state,
-            onEmailChange = vm::onEmailChanged,
-            onPasswordChange = vm::onPasswordChanged,
-            onRegister = { vm.register { onRegisterSuccess(state.email) } },
-            onNavigateToLogin = onNavigateToLogin
+            onFirstNameChange = vm::onFirstNameChange,
+            onLastNameChange = vm::onLastNameChange,
+            onEmailChange = vm::onEmailChange,
+            onPasswordChange = vm::onPasswordChange,
+            onRegister = vm::register,
+            onNavigateToLogin = { navController.navigate(Destination.Login.route) }
         )
     }
 }
@@ -54,6 +63,8 @@ fun RegisterScreen(
 @Composable
 private fun RegisterContent(
     state: AuthContracts.UiState = AuthContracts.UiState(),
+    onFirstNameChange: (String) -> Unit = {},
+    onLastNameChange: (String) -> Unit = {},
     onEmailChange: (String) -> Unit = {},
     onPasswordChange: (String) -> Unit = {},
     onRegister: () -> Unit = {},
@@ -104,6 +115,53 @@ private fun RegisterContent(
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
                     Text(subtitle, fontSize = 14.sp, color = cs.onSurfaceVariant)
+                }
+
+                Spacer(Modifier.height(24.dp))
+
+                // First name + Last name side by side (matches web grid)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        FieldWithLabel(
+                            label = "Prénom",
+                            value = state.firstName,
+                            onValueChange = onFirstNameChange,
+                            placeholder = "Entrez votre prénom",
+                            isError = state.firstNameError != null,
+                            enabled = !state.isLoading,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        if (state.firstNameError != null) {
+                            Text(
+                                state.firstNameError,
+                                color = cs.error,
+                                fontSize = 11.sp,
+                                modifier = Modifier.padding(top = 3.dp)
+                            )
+                        }
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        FieldWithLabel(
+                            label = "Nom",
+                            value = state.lastName,
+                            onValueChange = onLastNameChange,
+                            placeholder = "Entrez votre nom",
+                            isError = state.lastNameError != null,
+                            enabled = !state.isLoading,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        if (state.lastNameError != null) {
+                            Text(
+                                state.lastNameError,
+                                color = cs.error,
+                                fontSize = 11.sp,
+                                modifier = Modifier.padding(top = 3.dp)
+                            )
+                        }
+                    }
                 }
 
                 Spacer(Modifier.height(16.dp))
@@ -206,31 +264,6 @@ private fun RegisterContent(
                     isLoading = state.isLoading,
                     modifier = Modifier.fillMaxWidth()
                 )
-
-                Spacer(Modifier.height(16.dp))
-
-                // "Étape suivante" info box — uses primary-tinted surface
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    color = cs.primaryContainer.copy(alpha = 0.6f),
-                    border = BorderStroke(1.dp, cs.primary.copy(alpha = 0.25f))
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = "Étape suivante",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = cs.primary
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = "Après avoir créé votre compte, vous serez invité à vérifier votre adresse e-mail.",
-                            fontSize = 13.sp,
-                            color = cs.onSurfaceVariant
-                        )
-                    }
-                }
             }
         }
     }

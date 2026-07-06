@@ -71,16 +71,6 @@ fun ProfileScreen(navController: NavController) {
                 }
                 Spacer(Modifier.height(32.dp))
                 HorizontalDivider()
-                Spacer(Modifier.height(8.dp))
-                if (state.user?.role == UserRole.ADMIN) {
-                    ListItem(
-                        headlineContent = { Text("Administration") },
-                        leadingContent  = { Icon(Icons.Default.AdminPanelSettings, null) },
-                        trailingContent = { Icon(Icons.Default.ChevronRight, null) },
-                        modifier        = Modifier.clickable { navController.navigate(Destination.Admin.route) },
-                    )
-                    HorizontalDivider()
-                }
                 Spacer(Modifier.weight(1f))
                 OutlinedButton(
                     onClick  = vm::logout,
