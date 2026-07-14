@@ -2,6 +2,7 @@ package com.bob1.app.ui.screens.calendar
 
 import android.app.Application
 import com.bob1.app.data.dto.OfficialRole
+import com.bob1.app.data.local.SessionManager
 import com.bob1.app.domain.model.*
 import com.bob1.app.domain.repository.DivisionRepository
 import com.bob1.app.domain.repository.MatchRepository
@@ -24,6 +25,7 @@ object CalendarContracts {
         val sheetMatch: Match? = null,
         val confirmDialogRole: OfficialRole? = null,
         val confirmDialogAction: ConfirmAction? = null,
+        val currentUserId: String? = null,
     )
 
     sealed interface UiEvent {
@@ -40,8 +42,10 @@ class CalendarViewModel(
     private val matchRepo: MatchRepository        by inject()
     private val divisionRepo: DivisionRepository  by inject()
     private val notifRepo: NotificationRepository by inject()
+    private val session: SessionManager           by inject()
 
     init {
+        updateState { copy(currentUserId = session.currentUser()?.id) }
         loadDivisions()
         loadMatches()
         loadUnreadCount()
@@ -60,9 +64,8 @@ class CalendarViewModel(
         fetchData(
             source = {
                 matchRepo.getMatches(
-                    divisionId = null,
-                    year       = state.value.year,
-                    month      = state.value.month,
+                    year  = state.value.year,
+                    month = state.value.month,
                 ).getOrThrow()
             },
             onResult = {

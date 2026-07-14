@@ -10,8 +10,6 @@ import kotlinx.serialization.json.jsonPrimitive
 
 val json = Json { ignoreUnknownKeys = true }
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
-
 val authHandlers: List<MockHandler> = listOf(
 
     MockHandler(HttpMethod.Post, "/auth/login") { _, body ->
@@ -22,6 +20,20 @@ val authHandlers: List<MockHandler> = listOf(
             "arbitre@club.fr" -> LoginResponseDto("mock-token-official", BasketballMockData.officialUser)
             else -> error("Email ou mot de passe incorrect.")
         }
+    },
+
+    MockHandler(HttpMethod.Post, "/auth/register", HttpStatusCode.Created) { _, body ->
+        val obj   = body?.let { json.parseToJsonElement(it).jsonObject }
+        val email = obj?.get("email")?.jsonPrimitive?.content ?: error("email required")
+        val first = obj["firstName"]?.jsonPrimitive?.content ?: ""
+        val last  = obj["lastName"]?.jsonPrimitive?.content ?: ""
+        UserDto(
+            id        = "u-new-${System.currentTimeMillis()}",
+            email     = email,
+            firstName = first,
+            lastName  = last,
+            role      = "Official",
+        )
     },
 
     MockHandler(HttpMethod.Post, "/auth/logout") { _, _ ->

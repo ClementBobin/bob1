@@ -24,7 +24,7 @@ import javax.net.ssl.X509TrustManager
 
 val appModule = module {
 
-    // ── Native helpers (Kindling) ─────────────────────────────────────────────
+    // ── Native helpers ────────────────────────────────────────────────────────
     single { SessionManager(androidContext()) }
     single { NotificationHelper(androidContext()) }
     single { VibrationHelper(androidContext()) }
@@ -50,19 +50,24 @@ val appModule = module {
         }
     }
 
+    // Bearer token is injected per-request via SessionManager in createHttpClient
     single<HttpClient> {
         createHttpClient(
             baseUrl        = BuildConfig.BASE_URL,
             engine         = get(),
+            vibrationHelper = get(),
             sessionManager = get(),
         )
     }
 
+    // ── API clients ───────────────────────────────────────────────────────────
     single { AuthAPI(get()) }
     single { DivisionAPI(get()) }
     single { TeamAPI(get()) }
     single { MatchAPI(get()) }
     single { NotificationAPI(get()) }
+    single { PenaltyAPI(get()) }
+    single { LocationAPI(get()) }
 
     // ── Repositories ──────────────────────────────────────────────────────────
     single<AuthRepository>         { AuthRepositoryImpl(get(), get()) }
@@ -70,6 +75,8 @@ val appModule = module {
     single<TeamRepository>         { TeamRepositoryImpl(get()) }
     single<MatchRepository>        { MatchRepositoryImpl(get()) }
     single<NotificationRepository> { NotificationRepositoryImpl(get()) }
+    single<PenaltyRepository>      { PenaltyRepositoryImpl(get()) }
+    single<LocationRepository>     { LocationRepositoryImpl(get()) }
 }
 
 private fun trustAllTrustManager(): X509TrustManager = @SuppressLint("CustomX509TrustManager")

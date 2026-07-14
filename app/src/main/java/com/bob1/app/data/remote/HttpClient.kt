@@ -11,20 +11,18 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpCallValidator
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.cookies.CookiesStorage
-import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.header
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
-import io.ktor.http.Cookie
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.Url
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -32,31 +30,30 @@ import kotlinx.serialization.json.Json
 /**
  * Crée et configure le client HTTP Ktor partagé par toutes les API.
  *
- * Comportement :
  * - Ajoute [baseUrl] comme préfixe de toutes les requêtes.
- * - Installe [HttpCookies] uniquement si [sessionManager] est fourni — les cookies
- *   `cyna_token` / `cyna_refresh_token` sont alors lus/écrits via [SessionManagerCookieStorage].
+ * - Injecte `Authorization: Bearer <token>` sur chaque requête via [SessionManager].
  * - Différencie les 401 sur `/auth/login` ou `/auth/register` (identifiants invalides)
  *   des 401 sur les routes protégées (session expirée → [SessionManager.clearSession]).
- *
- * @param baseUrl URL de base de l'API (ex. `"https://api.exemple.com/"`).
- * @param engine Moteur HTTP à utiliser. Défaut : CIO (production). Injecter OkHttp en debug.
- * @param vibrationHelper Retour haptique sur erreur réseau. `null` = pas de vibration.
- * @param sessionManager Gestionnaire de session pour l'auth par cookie. `null` = client non authentifié.
  */
 fun createHttpClient(
     baseUrl: String,
     engine: HttpClientEngine = CIO.create(),
     vibrationHelper: VibrationHelper? = null,
-    sessionManager: SessionManager? = null
+    sessionManager: SessionManager? = null,
 ): HttpClient = HttpClient(engine) {
 
-    defaultRequest { url(baseUrl) }
+    defaultRequest {
+        url(baseUrl)
+        // Inject Bearer token on every request if a session exists
+        sessionManager?.currentToken()?.let { token ->
+            header(HttpHeaders.Authorization, "Bearer $token")
+        }
+    }
 
     install(ContentNegotiation) {
         json(Json {
             ignoreUnknownKeys = true
-            coerceInputValues = true
+            coerceInputValues  = true
         })
     }
 
@@ -84,7 +81,6 @@ fun createHttpClient(
                     val isAuthEndpoint = path.endsWith("/auth/login") ||
                         path.endsWith("/auth/register")
                     if (isAuthEndpoint) {
-                        // Wrong credentials — show API message, don't touch session
                         val msg = runCatching { response.body<ErrorResponseDto>().text }
                             .recoverCatching { response.bodyAsText().take(200) }
                             .getOrDefault("Identifiants invalides.")
@@ -92,7 +88,6 @@ fun createHttpClient(
                         KToastManager.warning("Connexion échouée", msg)
                         throw HttpException.ClientError(status, msg)
                     } else {
-                        // Expired session on a protected endpoint
                         sessionManager?.clearSession()
                         vibrationHelper?.warning()
                         KToastManager.warning("Session expirée", "Veuillez vous reconnecter.")
@@ -130,13 +125,11 @@ fun createHttpClient(
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-/** Sérialise [body] en JSON et applique `Content-Type: application/json`. */
 inline fun <reified T> HttpRequestBuilder.setBodyJson(body: T) {
     contentType(ContentType.Application.Json)
     setBody(body)
 }
 
-/** Vérifie que le statut HTTP est parmi [codes] ; lève [HttpException.NotAccepted] sinon. */
 fun HttpResponse.accept(vararg codes: HttpStatusCode) = apply {
     if (status !in codes) {
         val message     = "Unexpected status: HTTP $status"
@@ -148,15 +141,8 @@ fun HttpResponse.accept(vararg codes: HttpStatusCode) = apply {
 
 // ── Exceptions ────────────────────────────────────────────────────────────────
 
-/**
- * Hiérarchie d'exceptions levées par le client HTTP.
- *
- * - [NotAccepted] : statut HTTP reçu non attendu (via [accept]).
- * - [ClientError] : réponse 4xx (ex. 400, 401, 403, 404).
- * - [ServerError] : réponse 5xx.
- */
 sealed class HttpException(message: String) : Exception(message) {
-    class NotAccepted(message: String)                         : HttpException(message)
-    class ClientError(val statusCode: Int, message: String)    : HttpException(message)
-    class ServerError(val statusCode: Int, message: String)    : HttpException(message)
+    class NotAccepted(message: String)                      : HttpException(message)
+    class ClientError(val statusCode: Int, message: String) : HttpException(message)
+    class ServerError(val statusCode: Int, message: String) : HttpException(message)
 }

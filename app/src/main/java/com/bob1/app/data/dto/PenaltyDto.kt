@@ -12,29 +12,16 @@ data class PenaltyDto(
     val points: Int,
     val kickedOut: Boolean = false,
     val acknowledgedAt: String? = null,
-    val timestampIso: String,
+    val createdAt: String,          // API field name (was timestampIso)
 ) {
     fun toDomain() = Penalty(
-        id = id,
-        userId = userId,
-        matchId = matchId,
-        reason = reason,
-        points = points,
-        kickedOut = kickedOut,
+        id             = id,
+        userId         = userId,
+        matchId        = matchId,
+        reason         = reason,
+        points         = points,
+        kickedOut      = kickedOut,
         acknowledgedAt = acknowledgedAt,
-        timestampIso = timestampIso
+        timestampIso   = createdAt,
     )
-
-    companion object {
-        fun fromDomain(p: Penalty) = PenaltyDto(
-            id = p.id,
-            userId = p.userId,
-            matchId = p.matchId,
-            reason = p.reason,
-            points = p.points,
-            kickedOut = p.kickedOut,
-            acknowledgedAt = p.acknowledgedAt,
-            timestampIso = p.timestampIso
-        )
-    }
 }

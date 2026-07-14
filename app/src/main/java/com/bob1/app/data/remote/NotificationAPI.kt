@@ -7,17 +7,22 @@ import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.statement.HttpResponse
 
-/**
- * Passerelle vers les endpoints de notifications de l'API (/api/notifications)
- */
 internal class NotificationAPI(private val client: HttpClient) {
 
     suspend fun getNotifications(): List<NotificationDto> =
         client.get("/api/notifications").body()
 
+    /** Notifications shown on startup (IsShowAtStart=true, not expired, recursive or unread). */
+    suspend fun getStartupNotifications(): List<NotificationDto> =
+        client.get("/api/notifications/startup").body()
+
     suspend fun markAsRead(notificationId: String): HttpResponse =
         client.post("/api/notifications/$notificationId/read")
 
+    suspend fun markAllRead(): HttpResponse =
+        client.post("/api/notifications/read-all")
+
+    /** API returns a plain Int, not a map. */
     suspend fun getUnreadCount(): Int =
-        client.get("/api/notifications/unread-count").body<Map<String, Int>>()["count"] ?: 0
+        client.get("/api/notifications/unread-count").body()
 }

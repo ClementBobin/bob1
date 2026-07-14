@@ -117,9 +117,10 @@ private fun CalendarContent(
     // Bottom sheet: match detail
     state.sheetMatch?.let { match ->
         MatchDetailSheet(
-            match       = match,
-            onRoleTap   = { role -> onRoleTapped(match, role) },
-            onDismiss   = onDismissSheet,
+            match         = match,
+            currentUserId = state.currentUserId,
+            onRoleTap     = { role -> onRoleTapped(match, role) },
+            onDismiss     = onDismissSheet,
         )
     }
 

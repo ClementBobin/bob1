@@ -128,7 +128,7 @@ class AuthViewModel(application: Application) :
             return
         }
         fetchData(
-            source   = { repo.register(s.firstName.trim(), s.lastName.trim(), s.email.trim(), s.password) },
+            source   = { repo.register(s.firstName.trim(), s.lastName.trim(), s.email.trim(), s.password).getOrThrow() },
             onResult = {
                 onSuccess { updateState { copy(isLoading = false) }; sendEvent(AuthContracts.UiEvent.RegisterSuccess) }
                 onFailure { e -> updateState { copy(isLoading = false, error = e.message) } }

@@ -7,17 +7,13 @@ import kotlinx.serialization.Serializable
 data class TeamDto(
     val id: String,
     val name: String,
-    val divisionId: String,
     val logoUrl: String? = null,
+    val division: DivisionDto,  // API sends nested division object
 ) {
-    fun toDomain() = Team(id = id, name = name, divisionId = divisionId, logoUrl = logoUrl)
-
-    companion object {
-        fun fromDomain(t: Team) = TeamDto(
-            id = t.id,
-            name = t.name,
-            divisionId = t.divisionId,
-            logoUrl = t.logoUrl
-        )
-    }
+    fun toDomain() = Team(
+        id         = id,
+        name       = name,
+        divisionId = division.id,
+        logoUrl    = logoUrl,
+    )
 }

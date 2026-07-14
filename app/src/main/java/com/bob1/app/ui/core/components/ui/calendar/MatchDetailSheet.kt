@@ -2,32 +2,23 @@ package com.bob1.app.ui.core.components.ui.calendar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.bob1.app.data.dto.OfficialRole
 import com.bob1.app.domain.model.Match
+import com.bob1.app.domain.usecase.NavigationHelper
 import com.bob1.app.domain.usecase.dotColor
 import com.bob1.app.domain.usecase.label
 
@@ -35,12 +26,16 @@ import com.bob1.app.domain.usecase.label
 @Composable
 fun MatchDetailSheet(
     match: Match,
+    currentUserId: String?,
     onRoleTap: (OfficialRole) -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val context = LocalContext.current
+
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(Modifier.padding(16.dp)) {
-            // Header
+
+            // ── Status badge ──────────────────────────────────────────────
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     Modifier
@@ -51,29 +46,73 @@ fun MatchDetailSheet(
                 Spacer(Modifier.width(8.dp))
                 Text(match.subscriptionStatus.label(), style = MaterialTheme.typography.labelMedium)
             }
+
             Spacer(Modifier.height(8.dp))
+
+            // ── Title ─────────────────────────────────────────────────────
             Text(
                 "${match.homeTeam.name}  vs  ${match.awayTeam.name}",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
             )
+
+            // ── Division + date ───────────────────────────────────────────
             Text(
-                "${match.divisionName} · ${match.location}",
+                match.divisionName,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                match.dateIso.let { "${it.substring(8, 10)}/${it.substring(5, 7)}/${it.substring(0, 4)} ${it.substring(11, 16)}" },
+                match.dateIso.let {
+                    "${it.substring(8, 10)}/${it.substring(5, 7)}/${it.substring(0, 4)} ${it.substring(11, 16)}"
+                },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
+            Spacer(Modifier.height(8.dp))
+
+            // ── Location row with navigation icon ─────────────────────────
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable { NavigationHelper.launch(context, match) }
+                    .padding(vertical = 6.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Place,
+                    contentDescription = "Ouvrir dans l'application de navigation",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(18.dp),
+                )
+                Spacer(Modifier.width(6.dp))
+                Column {
+                    Text(
+                        match.location,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium,
+                    )
+                    if (match.locationAddress.isNotBlank()) {
+                        Text(
+                            match.locationAddress,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+
             Spacer(Modifier.height(16.dp))
+
+            // ── Role slots ────────────────────────────────────────────────
             Text("Rôles", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(8.dp))
 
             match.slots.forEach { slot ->
-                val isCurrentUser  = slot.assignedUserId == "u-official" // simplified
+                val isCurrentUser  = currentUserId != null && slot.assignedUserId == currentUserId
                 val isTakenByOther = slot.assignedUserId != null && !isCurrentUser
                 val isFree         = slot.assignedUserId == null
                 val bgColor = when {
@@ -97,7 +136,7 @@ fun MatchDetailSheet(
                 ) {
                     Text(
                         slot.role.displayName(),
-                        modifier   = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f),
                         fontWeight = FontWeight.Medium,
                     )
                     Text(
@@ -108,11 +147,16 @@ fun MatchDetailSheet(
                     )
                     if (isCurrentUser) {
                         Spacer(Modifier.width(4.dp))
-                        Icon(Icons.Default.CheckCircle, contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
+                        Icon(
+                            Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(16.dp),
+                        )
                     }
                 }
             }
+
             Spacer(Modifier.height(24.dp))
         }
     }

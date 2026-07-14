@@ -6,47 +6,41 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MatchDto(
     val id: String,
-    val divisionId: String,
-    val divisionName: String,
+    val division: DivisionDto,
     val homeTeam: TeamDto,
     val awayTeam: TeamDto,
-    val dateIso: String,
-    val location: String,
-    val slots: List<RoleSlotDto>,
-    val emergencyDate: String? = null,
+    val dateUtc: String,
+    val emergencyDateUtc: String? = null,
     val emergencyPoints: Int = 0,
-    val subscriptionStatus: String = "NEUTRAL",
-    val currentUserRole: String? = null,
+    val location: LocationDto,
+    val slots: List<RoleSlotDto>,
+    val currentUserStatus: String? = null,
 ) {
     fun toDomain() = Match(
-        id = id,
-        divisionId = divisionId,
-        divisionName = divisionName,
-        homeTeam = homeTeam.toDomain(),
-        awayTeam = awayTeam.toDomain(),
-        dateIso = dateIso,
-        location = location,
-        slots = slots.map { it.toDomain() },
-        emergencyDate = emergencyDate,
-        emergencyPoints = emergencyPoints,
-        subscriptionStatus = MatchSubscriptionStatus.valueOf(subscriptionStatus),
-        currentUserRole = currentUserRole?.let { OfficialRole.valueOf(it) },
+        id                 = id,
+        divisionId         = division.id,
+        divisionName       = division.name,
+        homeTeam           = homeTeam.toDomain(),
+        awayTeam           = awayTeam.toDomain(),
+        dateIso            = dateUtc,
+        location           = location.name,
+        locationAddress    = location.address,
+        locationLat        = location.latitude,
+        locationLng        = location.longitude,
+        slots              = slots.map { it.toDomain() },
+        emergencyDate      = emergencyDateUtc,
+        emergencyPoints    = emergencyPoints,
+        subscriptionStatus = MatchSubscriptionStatus.fromApiString(currentUserStatus ?: "Neutral"),
+        currentUserRole    = null,
     )
-
-    companion object {
-        fun fromDomain(m: Match) = MatchDto(
-            id = m.id,
-            divisionId = m.divisionId,
-            divisionName = m.divisionName,
-            homeTeam = TeamDto.fromDomain(m.homeTeam),
-            awayTeam = TeamDto.fromDomain(m.awayTeam),
-            dateIso = m.dateIso,
-            location = m.location,
-            slots = m.slots.map { RoleSlotDto.fromDomain(it) },
-            emergencyDate = m.emergencyDate,
-            emergencyPoints = m.emergencyPoints,
-            subscriptionStatus = m.subscriptionStatus.name,
-            currentUserRole = m.currentUserRole?.name
-        )
-    }
 }
+
+@Serializable
+data class LocationDto(
+    val id: String,
+    val name: String,
+    val address: String,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val isGeocoded: Boolean = false,
+)

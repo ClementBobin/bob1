@@ -7,6 +7,14 @@ import kotlinx.serialization.Serializable
 data class LoginRequestDto(val email: String, val password: String)
 
 @Serializable
+data class RegisterRequestDto(
+    val email: String,
+    val password: String,
+    val firstName: String,
+    val lastName: String,
+)
+
+@Serializable
 data class LoginResponseDto(val token: String, val user: UserDto)
 
 @Serializable
@@ -15,14 +23,17 @@ data class UserDto(
     val email: String,
     val firstName: String,
     val lastName: String,
-    val role: String, // "OFFICIAL" | "ADMIN"
+    val role: String, // API sends "Official" | "Admin" (Pascal case)
 ) {
     fun toDomain() = User(
-        id = id,
-        email = email,
+        id        = id,
+        email     = email,
         firstName = firstName,
-        lastName = lastName,
-        role = if (role == "ADMIN") UserRole.ADMIN else UserRole.OFFICIAL,
+        lastName  = lastName,
+        role      = when (role.lowercase()) {
+            "admin" -> UserRole.ADMIN
+            else    -> UserRole.OFFICIAL
+        },
     )
 
     companion object {

@@ -1,116 +1,85 @@
 package com.bob1.app.mock.handlers
 
-import com.bob1.app.data.dto.MatchDto
-import com.bob1.app.data.dto.MessageResponseDto
-import com.bob1.app.data.dto.RoleSlotDto
-import com.bob1.app.data.dto.TeamDto
 import com.bob1.app.mock.factories.BasketballMockData
 import com.bob1.app.mock.registry.MockHandler
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import kotlin.text.toIntOrNull
 
 private val mutableMatches = BasketballMockData.matches.toMutableList()
 
 val matchHandlers: List<MockHandler> = listOf(
 
-    MockHandler(HttpMethod.Get, "/matches") { params, _ ->
-        val divId = params["divisionId"]
+    // GET /matches/by-month?year=&month=
+    MockHandler(HttpMethod.Get, "/matches/by-month") { params, _ ->
         val year  = params["year"]?.toIntOrNull()
         val month = params["month"]?.toIntOrNull()
         mutableMatches.filter { m ->
-            (divId == null || m.divisionId == divId) &&
-                    (year == null  || m.dateIso.startsWith("$year-")) &&
-                    (month == null || m.dateIso.substring(5, 7).toIntOrNull() == month)
+            (year  == null || m.dateUtc.startsWith("$year-")) &&
+            (month == null || m.dateUtc.substring(5, 7).toIntOrNull() == month)
         }
     },
 
+    // GET /matches/by-division/:divisionId
+    MockHandler(HttpMethod.Get, "/matches/by-division/:divisionId") { params, _ ->
+        val divId = params["divisionId"] ?: error("divisionId required")
+        mutableMatches.filter { it.division.id == divId }
+    },
+
+    // GET /matches/:id
     MockHandler(HttpMethod.Get, "/matches/:id") { params, _ ->
         val id = params["id"] ?: error("id required")
         mutableMatches.firstOrNull { it.id == id } ?: error("Match non trouvé.")
     },
 
+    // POST /matches/:id/subscribe
     MockHandler(HttpMethod.Post, "/matches/:id/subscribe") { params, body ->
         val id   = params["id"] ?: error("id required")
         val obj  = body?.let { json.parseToJsonElement(it).jsonObject }
         val role = obj?.get("role")?.jsonPrimitive?.content ?: error("role required")
-        val idx  = mutableMatches.indexOfFirst { it.id == id }.takeIf { it >= 0 } ?: error("Match non trouvé.")
+        val idx  = mutableMatches.indexOfFirst { it.id == id }.takeIf { it >= 0 }
+            ?: error("Match non trouvé.")
         val match = mutableMatches[idx]
         val updatedSlots = match.slots.map { slot ->
-            if (slot.role == role && slot.assignedUserId == null)
-                slot.copy(assignedUserId = "u-official", assignedUserName = "Marc Dupuis")
+            if (slot.role == role && slot.assignedUser == null)
+                slot.copy(assignedUser = BasketballMockData.officialUser)
             else slot
         }
         val updated = match.copy(
-            slots              = updatedSlots,
-            subscriptionStatus = "SUBSCRIBED",
-            currentUserRole    = role,
+            slots             = updatedSlots,
+            currentUserStatus = "Subscribed",
         )
         mutableMatches[idx] = updated
         updated
     },
 
+    // POST /matches/:id/unsubscribe
     MockHandler(HttpMethod.Post, "/matches/:id/unsubscribe") { params, _ ->
         val id  = params["id"] ?: error("id required")
-        val idx = mutableMatches.indexOfFirst { it.id == id }.takeIf { it >= 0 } ?: error("Match non trouvé.")
+        val idx = mutableMatches.indexOfFirst { it.id == id }.takeIf { it >= 0 }
+            ?: error("Match non trouvé.")
         val match = mutableMatches[idx]
         val updatedSlots = match.slots.map { slot ->
-            if (slot.assignedUserId == "u-official") slot.copy(assignedUserId = null, assignedUserName = null)
+            if (slot.assignedUser?.id == "u-official") slot.copy(assignedUser = null)
             else slot
         }
         val updated = match.copy(
-            slots              = updatedSlots,
-            subscriptionStatus = "NEUTRAL",
-            currentUserRole    = null,
+            slots             = updatedSlots,
+            currentUserStatus = "Neutral",
         )
         mutableMatches[idx] = updated
         updated
     },
 
+    // POST /matches/:id/confirm
     MockHandler(HttpMethod.Post, "/matches/:id/confirm") { params, _ ->
         val id  = params["id"] ?: error("id required")
-        val idx = mutableMatches.indexOfFirst { it.id == id }.takeIf { it >= 0 } ?: error("Match non trouvé.")
+        val idx = mutableMatches.indexOfFirst { it.id == id }.takeIf { it >= 0 }
+            ?: error("Match non trouvé.")
         val match = mutableMatches[idx]
-        val newStatus = if (match.subscriptionStatus == "CONFIRMED_J15") "CONFIRMED_J4" else "CONFIRMED_J15"
-        val updated = match.copy(subscriptionStatus = newStatus)
+        val newStatus = if (match.currentUserStatus == "ConfirmedJ15") "ConfirmedJ4" else "ConfirmedJ15"
+        val updated = match.copy(currentUserStatus = newStatus)
         mutableMatches[idx] = updated
         updated
-    },
-
-    // Admin: create match
-    MockHandler(HttpMethod.Post, "/matches") { _, body ->
-        val obj = body?.let { json.parseToJsonElement(it).jsonObject }
-        val homeId   = obj?.get("homeTeamId")?.jsonPrimitive?.content ?: error("homeTeamId required")
-        val awayId   = obj["awayTeamId"]?.jsonPrimitive?.content ?: error("awayTeamId required")
-        val divId    = obj["divisionId"]?.jsonPrimitive?.content ?: error("divisionId required")
-        val dateIso  = obj["dateIso"]?.jsonPrimitive?.content ?: error("dateIso required")
-        val location = obj["location"]?.jsonPrimitive?.content ?: ""
-        val home = BasketballMockData.teams.firstOrNull { it.id == homeId }
-            ?: TeamDto(homeId, "Équipe $homeId", divId)
-        val away = BasketballMockData.teams.firstOrNull { it.id == awayId }
-            ?: TeamDto(awayId, "Équipe $awayId", divId)
-        val div  = BasketballMockData.divisions.firstOrNull { it.id == divId }
-        val arbitres = obj["arbitreSlots"]?.jsonPrimitive?.content?.toIntOrNull() ?: 2
-        val slots = buildList {
-            repeat(arbitres) { i -> add(RoleSlotDto("ARBITRE_${i+1}")) }
-            add(RoleSlotDto("CHRONO"))
-            add(RoleSlotDto("MAR"))
-        }
-        val newMatch = MatchDto(
-            id = "m-new-${System.currentTimeMillis()}",
-            divisionId = divId, divisionName = div?.name ?: divId,
-            homeTeam = home, awayTeam = away,
-            dateIso = dateIso, location = location,
-            slots = slots,
-        )
-        mutableMatches.add(newMatch)
-        newMatch
-    },
-
-    MockHandler(HttpMethod.Delete, "/matches/:id") { params, _ ->
-        val id = params["id"] ?: error("id required")
-        mutableMatches.removeAll { it.id == id }
-        MessageResponseDto("Match $id supprimé.")
     },
 )

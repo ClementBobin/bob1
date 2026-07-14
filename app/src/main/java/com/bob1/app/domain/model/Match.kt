@@ -9,9 +9,13 @@ data class Match(
     val divisionName: String,
     val homeTeam: Team,
     val awayTeam: Team,
-    val dateIso: String,        // ISO-8601 e.g. "2026-06-27T15:00:00Z"
-    val location: String,
-    val slots: List<RoleSlot>,  // configurable per match
+    val dateIso: String,
+    // Location — name always present; address + coords populated when API has them
+    val location: String,           // display name, e.g. "Gymnase Pasteur"
+    val locationAddress: String,    // full address for geocoded nav fallback
+    val locationLat: Double?,       // null when not geocoded
+    val locationLng: Double?,
+    val slots: List<RoleSlot>,
     val emergencyDate: String?,
     val emergencyPoints: Int,
     val subscriptionStatus: MatchSubscriptionStatus = MatchSubscriptionStatus.NEUTRAL,

@@ -4,19 +4,6 @@ import android.util.Log
 import com.bob1.app.mock.handlers.*
 import com.bob1.app.mock.registry.MockRegistry
 
-/**
- * Registers all mock handlers into [MockRegistry].
- *
- * Call this **once** during app startup — before any Ktor request is made.
- * In production builds this object should never be referenced.
- *
- * Usage in Application.onCreate:
- * ```kotlin
- * if (BuildConfig.MOCK_API) {
- *     MockInitializer.init(debug = BuildConfig.DEBUG)
- * }
- * ```
- */
 object MockInitializer {
 
     private const val TAG = "MockRegistry"
@@ -26,11 +13,12 @@ object MockInitializer {
 
         MockRegistry.registerMany(
             authHandlers
-            +divisionHandlers
-            +matchHandlers
-            +notificationHandlers
-            +pointRuleHandlers
-            +teamHandlers
+            + divisionHandlers
+            + locationHandlers
+            + matchHandlers
+            + notificationHandlers
+            + pointRuleHandlers
+            + teamHandlers
         )
 
         if (debug) {

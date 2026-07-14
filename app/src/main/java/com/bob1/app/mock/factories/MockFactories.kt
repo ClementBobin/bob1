@@ -7,6 +7,7 @@ import java.util.*
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 private fun uuid() = UUID.randomUUID().toString()
+
 private fun isoDate(year: Int, month: Int, day: Int, hour: Int = 15): String {
     val cal = Calendar.getInstance().apply {
         set(year, month - 1, day, hour, 0, 0)
@@ -16,11 +17,17 @@ private fun isoDate(year: Int, month: Int, day: Int, hour: Int = 15): String {
         .also { it.timeZone = TimeZone.getTimeZone("UTC") }
         .format(cal.time)
 }
+
 private fun offsetDate(daysAgo: Int): String {
     val cal = Calendar.getInstance()
     cal.add(Calendar.DAY_OF_YEAR, -daysAgo)
-    return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).format(cal.time)
+    return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
+        .also { it.timeZone = TimeZone.getTimeZone("UTC") }
+        .format(cal.time)
 }
+
+private fun currentMonthName(): String =
+    SimpleDateFormat("MMMM", Locale.FRENCH).format(Date())
 
 // ── Static mock data ──────────────────────────────────────────────────────────
 
@@ -33,200 +40,221 @@ object BasketballMockData {
         DivisionDto(id = "div-u13", name = "U13"),
     )
 
-    // Teams per division
+    // Teams — now use nested DivisionDto to match API shape
     val teams = listOf(
-        TeamDto(id = "t01", name = "Panthers Besançon",  divisionId = "div-u17"),
-        TeamDto(id = "t02", name = "Lions Dijon",        divisionId = "div-u17"),
-        TeamDto(id = "t03", name = "Eagles Belfort",     divisionId = "div-u17"),
-        TeamDto(id = "t04", name = "Wolves Montbéliard", divisionId = "div-u17"),
-        TeamDto(id = "t05", name = "Titans Besançon",    divisionId = "div-u15"),
-        TeamDto(id = "t06", name = "Hawks Lons",         divisionId = "div-u15"),
-        TeamDto(id = "t07", name = "Bears Pontarlier",   divisionId = "div-u15"),
-        TeamDto(id = "t08", name = "Sharks Dole",        divisionId = "div-u15"),
-        TeamDto(id = "t09", name = "Rockets Besançon",   divisionId = "div-u13"),
-        TeamDto(id = "t10", name = "Comets Vesoul",      divisionId = "div-u13"),
-        TeamDto(id = "t11", name = "Stars Gray",         divisionId = "div-u13"),
-        TeamDto(id = "t12", name = "Jets Lure",          divisionId = "div-u13"),
+        TeamDto("t01", "Panthers Besançon",  null, DivisionDto("div-u17", "U17")),
+        TeamDto("t02", "Lions Dijon",        null, DivisionDto("div-u17", "U17")),
+        TeamDto("t03", "Eagles Belfort",     null, DivisionDto("div-u17", "U17")),
+        TeamDto("t04", "Wolves Montbéliard", null, DivisionDto("div-u17", "U17")),
+        TeamDto("t05", "Titans Besançon",    null, DivisionDto("div-u15", "U15")),
+        TeamDto("t06", "Hawks Lons",         null, DivisionDto("div-u15", "U15")),
+        TeamDto("t07", "Bears Pontarlier",   null, DivisionDto("div-u15", "U15")),
+        TeamDto("t08", "Sharks Dole",        null, DivisionDto("div-u15", "U15")),
+        TeamDto("t09", "Rockets Besançon",   null, DivisionDto("div-u13", "U13")),
+        TeamDto("t10", "Comets Vesoul",      null, DivisionDto("div-u13", "U13")),
+        TeamDto("t11", "Stars Gray",         null, DivisionDto("div-u13", "U13")),
+        TeamDto("t12", "Jets Lure",          null, DivisionDto("div-u13", "U13")),
     )
 
-    // Users
+    // Locations — now a proper LocationDto
+    val locations = listOf(
+        LocationDto("loc-01", "Gymnase Pasteur",   "Rue Pasteur, Besançon",          latitude = 47.2378, longitude = 6.0241),
+        LocationDto("loc-02", "Salle Multiplex",   "Avenue des Sports, Lons",         latitude = 46.6741, longitude = 5.5541),
+        LocationDto("loc-03", "Gymnase Arènes",    "Place des Arènes, Besançon",      latitude = 47.2480, longitude = 6.0170),
+        LocationDto("loc-04", "Palais des Sports", "Boulevard Wilson, Belfort",       latitude = 47.6384, longitude = 6.8628),
+        LocationDto("loc-05", "Salle Pontarlier",  "Rue de la Gare, Pontarlier"),
+        LocationDto("loc-06", "Gymnase Gray",      "Allée du Stade, Gray"),
+        LocationDto("loc-07", "Salle Dijon Nord",  "Avenue Jean Jaurès, Dijon",       latitude = 47.3220, longitude = 5.0415),
+    )
+
+    // Users — role in API PascalCase ("Official" / "Admin")
     val officialUser = UserDto(
         id = "u-official", email = "arbitre@club.fr",
-        firstName = "Marc", lastName = "Dupuis", role = "OFFICIAL"
+        firstName = "Marc", lastName = "Dupuis", role = "Official"
     )
     val adminUser = UserDto(
         id = "u-admin", email = "admin@club.fr",
-        firstName = "Sophie", lastName = "Laurent", role = "ADMIN"
+        firstName = "Sophie", lastName = "Laurent", role = "Admin"
     )
 
-    // Matches — spread across current + next month
+    // Matches
     val matches: List<MatchDto> by lazy { buildMatches() }
 
     private fun buildMatches(): List<MatchDto> {
         val now = Calendar.getInstance()
         val y = now.get(Calendar.YEAR)
-        val m = now.get(Calendar.MONTH) + 1 // 1-based
-
-        // next month
+        val m = now.get(Calendar.MONTH) + 1
         val nm = if (m == 12) 1 else m + 1
         val ny = if (m == 12) y + 1 else y
 
         fun team(id: String) = teams.first { it.id == id }
+        fun location(id: String) = locations.first { it.id == id }
 
-        fun slots(arbitres: Int, chrono: Int = 1, mar: Int = 1): List<RoleSlotDto> {
-            val s = mutableListOf<RoleSlotDto>()
-            if (arbitres >= 1) s += RoleSlotDto("ARBITRE_1")
-            if (arbitres >= 2) s += RoleSlotDto("ARBITRE_2", "u-official", "Marc Dupuis")
-            if (arbitres >= 3) s += RoleSlotDto("ARBITRE_3")
-            if (arbitres >= 4) s += RoleSlotDto("ARBITRE_4")
-            repeat(chrono) { s += RoleSlotDto("CHRONO") }
-            repeat(mar)    { s += RoleSlotDto("MAR") }
-            return s
-        }
+        // RoleSlot now uses nested assignedUser: UserDto?
+        fun slot(role: String, assigned: UserDto? = null) =
+            RoleSlotDto(role = role, assignedUser = assigned)
+
+        fun slots(arbitres: Int, withChrono: Boolean = true, withMar: Boolean = true) =
+            buildList {
+                if (arbitres >= 1) add(slot("Arbitre1"))
+                if (arbitres >= 2) add(slot("Arbitre2", officialUser))
+                if (arbitres >= 3) add(slot("Arbitre3"))
+                if (arbitres >= 4) add(slot("Arbitre4"))
+                if (withChrono) add(slot("Chrono"))
+                if (withMar)    add(slot("Mar"))
+            }
 
         return listOf(
             // ── This month ────────────────────────────────────────────────────
             MatchDto(
-                id = "m01", divisionId = "div-u17", divisionName = "U17",
+                id = "m01",
+                division = DivisionDto("div-u17", "U17"),
                 homeTeam = team("t01"), awayTeam = team("t02"),
-                dateIso = isoDate(y, m, 5, 15),
-                location = "Gymnase Pasteur, Besançon",
+                dateUtc = isoDate(y, m, 5, 15),
+                location = location("loc-01"),
                 slots = slots(2),
-                subscriptionStatus = "CONFIRMED_J15", currentUserRole = "ARBITRE_2"
+                currentUserStatus = "ConfirmedJ15",
             ),
             MatchDto(
-                id = "m02", divisionId = "div-u15", divisionName = "U15",
+                id = "m02",
+                division = DivisionDto("div-u15", "U15"),
                 homeTeam = team("t05"), awayTeam = team("t06"),
-                dateIso = isoDate(y, m, 10, 14),
-                location = "Salle Multiplex, Lons",
+                dateUtc = isoDate(y, m, 10, 14),
+                location = location("loc-02"),
                 slots = slots(2),
-                subscriptionStatus = "NEUTRAL"
+                currentUserStatus = "Neutral",
             ),
             MatchDto(
-                id = "m03", divisionId = "div-u13", divisionName = "U13",
+                id = "m03",
+                division = DivisionDto("div-u13", "U13"),
                 homeTeam = team("t09"), awayTeam = team("t10"),
-                dateIso = isoDate(y, m, 10, 16),
-                location = "Gymnase Arènes, Besançon",
-                slots = slots(2, chrono = 1, mar = 1),
-                subscriptionStatus = "SUBSCRIBED", currentUserRole = "CHRONO"
+                dateUtc = isoDate(y, m, 10, 16),
+                location = location("loc-03"),
+                slots = slots(2),
+                currentUserStatus = "Subscribed",
             ),
             MatchDto(
-                id = "m04", divisionId = "div-u17", divisionName = "U17",
+                id = "m04",
+                division = DivisionDto("div-u17", "U17"),
                 homeTeam = team("t03"), awayTeam = team("t04"),
-                dateIso = isoDate(y, m, 17, 15),
-                location = "Palais des Sports, Belfort",
+                dateUtc = isoDate(y, m, 17, 15),
+                location = location("loc-04"),
                 slots = slots(4),
-                subscriptionStatus = "FULL"
+                currentUserStatus = "Full",
             ),
             MatchDto(
-                id = "m05", divisionId = "div-u15", divisionName = "U15",
+                id = "m05",
+                division = DivisionDto("div-u15", "U15"),
                 homeTeam = team("t07"), awayTeam = team("t08"),
-                dateIso = isoDate(y, m, 22, 14),
-                location = "Salle Pontarlier",
+                dateUtc = isoDate(y, m, 22, 14),
+                location = location("loc-05"),
                 slots = slots(2),
-                subscriptionStatus = "CONFIRMED_J4", currentUserRole = "ARBITRE_1"
+                currentUserStatus = "ConfirmedJ4",
             ),
             MatchDto(
-                id = "m06", divisionId = "div-u13", divisionName = "U13",
+                id = "m06",
+                division = DivisionDto("div-u13", "U13"),
                 homeTeam = team("t11"), awayTeam = team("t12"),
-                dateIso = isoDate(y, m, 28, 10),
-                location = "Gymnase Gray",
+                dateUtc = isoDate(y, m, 28, 10),
+                location = location("loc-06"),
                 slots = slots(2),
-                subscriptionStatus = "NEUTRAL"
+                currentUserStatus = "Neutral",
             ),
-            // Two matches same day
             MatchDto(
-                id = "m07", divisionId = "div-u17", divisionName = "U17",
+                id = "m07",
+                division = DivisionDto("div-u17", "U17"),
                 homeTeam = team("t02"), awayTeam = team("t03"),
-                dateIso = isoDate(y, m, 22, 17),
-                location = "Salle Dijon Nord",
+                dateUtc = isoDate(y, m, 22, 17),
+                location = location("loc-07"),
                 slots = slots(2),
-                subscriptionStatus = "NEUTRAL"
+                currentUserStatus = "Neutral",
             ),
             // ── Next month ────────────────────────────────────────────────────
             MatchDto(
-                id = "m08", divisionId = "div-u17", divisionName = "U17",
+                id = "m08",
+                division = DivisionDto("div-u17", "U17"),
                 homeTeam = team("t01"), awayTeam = team("t04"),
-                dateIso = isoDate(ny, nm, 8, 15),
-                location = "Gymnase Pasteur, Besançon",
+                dateUtc = isoDate(ny, nm, 8, 15),
+                location = location("loc-01"),
                 slots = slots(2),
-                subscriptionStatus = "NEUTRAL"
+                currentUserStatus = "Neutral",
             ),
             MatchDto(
-                id = "m09", divisionId = "div-u15", divisionName = "U15",
+                id = "m09",
+                division = DivisionDto("div-u15", "U15"),
                 homeTeam = team("t06"), awayTeam = team("t07"),
-                dateIso = isoDate(ny, nm, 14, 14),
-                location = "Salle Lons",
-                slots = slots(2),
-                emergencyDate = isoDate(ny, nm, 12, 0),
+                dateUtc = isoDate(ny, nm, 14, 14),
+                emergencyDateUtc = isoDate(ny, nm, 12, 0),
                 emergencyPoints = 5,
-                subscriptionStatus = "NEUTRAL"
+                location = location("loc-02"),
+                slots = slots(2),
+                currentUserStatus = "Neutral",
             ),
             MatchDto(
-                id = "m10", divisionId = "div-u13", divisionName = "U13",
+                id = "m10",
+                division = DivisionDto("div-u13", "U13"),
                 homeTeam = team("t09"), awayTeam = team("t12"),
-                dateIso = isoDate(ny, nm, 20, 16),
-                location = "Gymnase Arènes, Besançon",
+                dateUtc = isoDate(ny, nm, 20, 16),
+                location = location("loc-03"),
                 slots = slots(2),
-                subscriptionStatus = "NEUTRAL"
+                currentUserStatus = "Neutral",
             ),
         )
     }
 
-    // Notifications
-    val notifications = listOf(
+    // Notifications — createdAt instead of timestampIso; new fields
+    val notifications = mutableListOf(
         NotificationDto(
-            id = "n1", type = "J15_REMINDER",
+            id = "n1", type = "J15Reminder",
             title = "Confirmation J-15 requise",
             body  = "Confirmez votre présence pour U17 Panthers vs Lions le 8 ${currentMonthName()}",
             matchId = "m08",
-            timestampIso = offsetDate(1),
-            isRead = false
+            createdAt = offsetDate(1),
+            isRead = false,
         ),
         NotificationDto(
-            id = "n2", type = "J15_REMINDER",
+            id = "n2", type = "J15Reminder",
             title = "Confirmation J-15 requise",
             body  = "Confirmez votre présence pour U15 Hawks vs Bears le 14 ${currentMonthName()}",
             matchId = "m09",
-            timestampIso = offsetDate(2),
-            isRead = false
+            createdAt = offsetDate(2),
+            isRead = false,
         ),
         NotificationDto(
-            id = "n3", type = "J4_REMINDER",
+            id = "n3", type = "J4Reminder",
             title = "Confirmation finale J-4",
             body  = "Confirmation finale requise pour U15 Titans vs Hawks",
             matchId = "m05",
-            timestampIso = offsetDate(4),
-            isRead = false
+            createdAt = offsetDate(4),
+            isRead = false,
         ),
         NotificationDto(
-            id = "n4", type = "GENERAL",
+            id = "n4", type = "General",
             title = "Bienvenue sur BasketballRef",
             body  = "Votre compte arbitre est actif. Bonne saison !",
             matchId = null,
-            timestampIso = offsetDate(30),
-            isRead = true
+            createdAt = offsetDate(30),
+            isRead = true,
+            isShowAtStart = true,
+            isRecursif = false,
         ),
         NotificationDto(
-            id = "n5", type = "EMERGENCY",
+            id = "n5", type = "Emergency",
             title = "Besoin urgent d'arbitres",
             body  = "Match U13 Rockets vs Comets le 10 — poste MAR non pourvu",
             matchId = "m03",
-            timestampIso = offsetDate(5),
-            isRead = true
+            createdAt = offsetDate(5),
+            isRead = true,
         ),
     )
 
     val pointRules = OfficialRole.entries.mapIndexed { i, role ->
         PointRuleDto(
             id = "pr-$i",
-            role = role.name,
+            role = role.toApiString(),   // "Arbitre1", "Chrono", etc.
             pointsOnJ15 = 10,
             pointsOnJ4  = 5,
             pointsEmergency = 15,
         )
     }
-
-    private fun currentMonthName(): String =
-        SimpleDateFormat("MMMM", Locale.FRENCH).format(Date())
 }

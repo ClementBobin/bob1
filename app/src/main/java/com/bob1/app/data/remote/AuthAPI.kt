@@ -8,13 +8,16 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
-/**
- * Passerelle vers les endpoints d'authentification de l'API (/api/auth/)
- */
 internal class AuthAPI(private val client: HttpClient) {
 
     suspend fun login(request: LoginRequestDto): LoginResponseDto =
         client.post("/api/auth/login") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+
+    suspend fun register(request: RegisterRequestDto): UserDto =
+        client.post("/api/auth/register") {
             contentType(ContentType.Application.Json)
             setBody(request)
         }.body()

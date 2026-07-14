@@ -10,4 +10,7 @@ data class AppNotification(
     val matchId: String?,
     val timestampIso: String,
     val isRead: Boolean = false,
+    val isRecursif: Boolean = false,
+    val isShowAtStart: Boolean = false,
+    val expiresAt: String? = null,
 )
