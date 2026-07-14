@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/ClementBobin/bob1/compare/v1.0.0...v1.1.0) (2026-07-14)
+
+
+### Features
+
+* enhance notification and location handling, add new APIs and update repositories ([3611cf0](https://github.com/ClementBobin/bob1/commit/3611cf08d9f98e6e9f20afe8be85c8c06483583c))
+
 # 1.0.0 (2026-07-06)
 
 
