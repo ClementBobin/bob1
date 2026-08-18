@@ -34,7 +34,7 @@ android {
         buildConfigField(
             "String",
             "BASE_URL",
-            "\"${localProps.getProperty("BASE_URL", "https://api.staging.projet-bob1.fr")}\""
+            "\"${localProps.getProperty("BASE_URL", "https://bob-1-api.vercel.app")}\""
         )
     }
 
@@ -74,7 +74,6 @@ android {
         release {
             val releaseConfig = signingConfigs.findByName("release")
             signingConfig = releaseConfig ?: signingConfigs.getByName("debug")
-            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
