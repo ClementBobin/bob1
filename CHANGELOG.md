@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/ClementBobin/bob1/compare/v1.1.0...v1.2.0) (2026-08-18)
+
+
+### Features
+
+* implement signing configuration for release APK and update build workflow ([4a25e08](https://github.com/ClementBobin/bob1/commit/4a25e08fd4fa237a50cee84e3a802095ed351982))
+
 # [1.1.0](https://github.com/ClementBobin/bob1/compare/v1.0.0...v1.1.0) (2026-07-14)
 
 
