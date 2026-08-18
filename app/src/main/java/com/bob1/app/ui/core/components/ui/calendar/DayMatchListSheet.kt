@@ -60,8 +60,14 @@ fun DayMatchListSheet(
                         )
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
+                            // homeTeam/awayTeam are empty when match comes from list view (MinMatchDto);
+                            // fall back to divisionName in that case.
+                            val title = if (match.homeTeam.name.isNotBlank() && match.awayTeam.name.isNotBlank())
+                                "${match.homeTeam.name} vs ${match.awayTeam.name}"
+                            else
+                                match.divisionName
                             Text(
-                                "${match.homeTeam.name} vs ${match.awayTeam.name}",
+                                title,
                                 fontWeight = FontWeight.SemiBold,
                                 style = MaterialTheme.typography.bodyMedium,
                             )

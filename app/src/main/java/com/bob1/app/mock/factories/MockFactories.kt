@@ -77,8 +77,22 @@ object BasketballMockData {
         firstName = "Sophie", lastName = "Laurent", role = 1
     )
 
-    // Matches
+    // Matches — full MatchDto list (used by /matches/:id, /matches/by-division)
     val matches: List<MatchDto> by lazy { buildMatches() }
+
+    // MinMatchDto list — used by /matches/by-month and /matches (list)
+    val minMatches: List<MinMatchDto> by lazy {
+        matches.map { m ->
+            MinMatchDto(
+                id                = m.id,
+                dateUtc           = m.dateUtc,
+                division          = m.division,
+                location          = m.location,
+                areSlotsAvailable = m.slots.any { it.assignedUser == null },
+                currentUserStatus = m.currentUserStatus,
+            )
+        }
+    }
 
     private fun buildMatches(): List<MatchDto> {
         val now = Calendar.getInstance()
@@ -184,8 +198,6 @@ object BasketballMockData {
                 division = DivisionDto("div-u15", "U15"),
                 homeTeam = team("t06"), awayTeam = team("t07"),
                 dateUtc = isoDate(ny, nm, 14, 14),
-                emergencyDateUtc = isoDate(ny, nm, 12, 0),
-                emergencyPoints = 5,
                 location = location("loc-02"),
                 slots = slots(2),
                 currentUserStatus = 0,
@@ -202,10 +214,10 @@ object BasketballMockData {
         )
     }
 
-    // Notifications — createdAt instead of timestampIso; new fields
+    // Notifications — type is now integer (NotificationType as int): 0=J15Reminder, 1=J4Reminder, 2=Emergency, 3=General
     val notifications = mutableListOf(
         NotificationDto(
-            id = "n1", type = "J15Reminder",
+            id = "n1", type = 0, // J15Reminder
             title = "Confirmation J-15 requise",
             body  = "Confirmez votre présence pour U17 Panthers vs Lions le 8 ${currentMonthName()}",
             matchId = "m08",
@@ -213,7 +225,7 @@ object BasketballMockData {
             isRead = false,
         ),
         NotificationDto(
-            id = "n2", type = "J15Reminder",
+            id = "n2", type = 0, // J15Reminder
             title = "Confirmation J-15 requise",
             body  = "Confirmez votre présence pour U15 Hawks vs Bears le 14 ${currentMonthName()}",
             matchId = "m09",
@@ -221,7 +233,7 @@ object BasketballMockData {
             isRead = false,
         ),
         NotificationDto(
-            id = "n3", type = "J4Reminder",
+            id = "n3", type = 1, // J4Reminder
             title = "Confirmation finale J-4",
             body  = "Confirmation finale requise pour U15 Titans vs Hawks",
             matchId = "m05",
@@ -229,7 +241,7 @@ object BasketballMockData {
             isRead = false,
         ),
         NotificationDto(
-            id = "n4", type = "General",
+            id = "n4", type = 3, // General
             title = "Bienvenue sur BasketballRef",
             body  = "Votre compte arbitre est actif. Bonne saison !",
             matchId = null,
@@ -239,7 +251,7 @@ object BasketballMockData {
             isRecursif = false,
         ),
         NotificationDto(
-            id = "n5", type = "Emergency",
+            id = "n5", type = 2, // Emergency
             title = "Besoin urgent d'arbitres",
             body  = "Match U13 Rockets vs Comets le 10 — poste MAR non pourvu",
             matchId = "m03",
