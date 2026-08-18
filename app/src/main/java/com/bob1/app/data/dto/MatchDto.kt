@@ -14,7 +14,7 @@ data class MatchDto(
     val emergencyPoints: Int = 0,
     val location: LocationDto,
     val slots: List<RoleSlotDto>,
-    val currentUserStatus: String? = null,
+    val currentUserStatus: Int? = null, // API now sends MatchSubscriptionStatus as integer
 ) {
     fun toDomain() = Match(
         id                 = id,
@@ -30,10 +30,21 @@ data class MatchDto(
         slots              = slots.map { it.toDomain() },
         emergencyDate      = emergencyDateUtc,
         emergencyPoints    = emergencyPoints,
-        subscriptionStatus = MatchSubscriptionStatus.fromApiString(currentUserStatus ?: "Neutral"),
+        subscriptionStatus = MatchSubscriptionStatus.fromApiInt(currentUserStatus ?: 0),
         currentUserRole    = null,
     )
 }
+
+/** Lightweight match DTO returned by GET /api/matches (list view). */
+@Serializable
+data class MinMatchDto(
+    val id: String,
+    val dateUtc: String,
+    val division: DivisionDto,
+    val location: LocationDto,
+    val areSlotsAvailable: Boolean,
+    val currentUserStatus: Int? = null, // MatchSubscriptionStatus as integer
+)
 
 @Serializable
 data class LocationDto(
@@ -43,4 +54,5 @@ data class LocationDto(
     val latitude: Double? = null,
     val longitude: Double? = null,
     val isGeocoded: Boolean = false,
+    val geocodedAt: String? = null, // New field in API v1
 )

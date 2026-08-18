@@ -32,7 +32,7 @@ val authHandlers: List<MockHandler> = listOf(
             email     = email,
             firstName = first,
             lastName  = last,
-            role      = "Official",
+            role      = 0, // Official
         )
     },
 

@@ -5,11 +5,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RoleSlotDto(
-    val role: String,
+    val role: Int,                     // API sends OfficialRole as integer
     val assignedUser: UserDto? = null, // API sends nested user object
 ) {
     fun toDomain() = RoleSlot(
-        role             = OfficialRole.fromApiString(role),
+        role             = OfficialRole.fromApiInt(role),
         assignedUserId   = assignedUser?.id,
         assignedUserName = assignedUser?.let { "${it.firstName} ${it.lastName}" },
     )

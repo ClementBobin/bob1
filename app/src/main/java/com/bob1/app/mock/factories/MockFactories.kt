@@ -67,14 +67,14 @@ object BasketballMockData {
         LocationDto("loc-07", "Salle Dijon Nord",  "Avenue Jean Jaurès, Dijon",       latitude = 47.3220, longitude = 5.0415),
     )
 
-    // Users — role in API PascalCase ("Official" / "Admin")
+    // Users — role now sent as integer: 0=Official, 1=Admin
     val officialUser = UserDto(
         id = "u-official", email = "arbitre@club.fr",
-        firstName = "Marc", lastName = "Dupuis", role = "Official"
+        firstName = "Marc", lastName = "Dupuis", role = 0
     )
     val adminUser = UserDto(
         id = "u-admin", email = "admin@club.fr",
-        firstName = "Sophie", lastName = "Laurent", role = "Admin"
+        firstName = "Sophie", lastName = "Laurent", role = 1
     )
 
     // Matches
@@ -90,18 +90,18 @@ object BasketballMockData {
         fun team(id: String) = teams.first { it.id == id }
         fun location(id: String) = locations.first { it.id == id }
 
-        // RoleSlot now uses nested assignedUser: UserDto?
-        fun slot(role: String, assigned: UserDto? = null) =
-            RoleSlotDto(role = role, assignedUser = assigned)
+        // RoleSlot now uses integer role (OfficialRole as int) and nested assignedUser: UserDto?
+        fun slot(role: OfficialRole, assigned: UserDto? = null) =
+            RoleSlotDto(role = role.toApiInt(), assignedUser = assigned)
 
         fun slots(arbitres: Int, withChrono: Boolean = true, withMar: Boolean = true) =
             buildList {
-                if (arbitres >= 1) add(slot("Arbitre1"))
-                if (arbitres >= 2) add(slot("Arbitre2", officialUser))
-                if (arbitres >= 3) add(slot("Arbitre3"))
-                if (arbitres >= 4) add(slot("Arbitre4"))
-                if (withChrono) add(slot("Chrono"))
-                if (withMar)    add(slot("Mar"))
+                if (arbitres >= 1) add(slot(OfficialRole.ARBITRE_1))
+                if (arbitres >= 2) add(slot(OfficialRole.ARBITRE_2, officialUser))
+                if (arbitres >= 3) add(slot(OfficialRole.ARBITRE_3))
+                if (arbitres >= 4) add(slot(OfficialRole.ARBITRE_4))
+                if (withChrono) add(slot(OfficialRole.CHRONO))
+                if (withMar)    add(slot(OfficialRole.MAR))
             }
 
         return listOf(
@@ -113,7 +113,7 @@ object BasketballMockData {
                 dateUtc = isoDate(y, m, 5, 15),
                 location = location("loc-01"),
                 slots = slots(2),
-                currentUserStatus = "ConfirmedJ15",
+                currentUserStatus = 2,
             ),
             MatchDto(
                 id = "m02",
@@ -122,7 +122,7 @@ object BasketballMockData {
                 dateUtc = isoDate(y, m, 10, 14),
                 location = location("loc-02"),
                 slots = slots(2),
-                currentUserStatus = "Neutral",
+                currentUserStatus = 0,
             ),
             MatchDto(
                 id = "m03",
@@ -131,7 +131,7 @@ object BasketballMockData {
                 dateUtc = isoDate(y, m, 10, 16),
                 location = location("loc-03"),
                 slots = slots(2),
-                currentUserStatus = "Subscribed",
+                currentUserStatus = 1,
             ),
             MatchDto(
                 id = "m04",
@@ -140,7 +140,7 @@ object BasketballMockData {
                 dateUtc = isoDate(y, m, 17, 15),
                 location = location("loc-04"),
                 slots = slots(4),
-                currentUserStatus = "Full",
+                currentUserStatus = 4,
             ),
             MatchDto(
                 id = "m05",
@@ -149,7 +149,7 @@ object BasketballMockData {
                 dateUtc = isoDate(y, m, 22, 14),
                 location = location("loc-05"),
                 slots = slots(2),
-                currentUserStatus = "ConfirmedJ4",
+                currentUserStatus = 3,
             ),
             MatchDto(
                 id = "m06",
@@ -158,7 +158,7 @@ object BasketballMockData {
                 dateUtc = isoDate(y, m, 28, 10),
                 location = location("loc-06"),
                 slots = slots(2),
-                currentUserStatus = "Neutral",
+                currentUserStatus = 0,
             ),
             MatchDto(
                 id = "m07",
@@ -167,7 +167,7 @@ object BasketballMockData {
                 dateUtc = isoDate(y, m, 22, 17),
                 location = location("loc-07"),
                 slots = slots(2),
-                currentUserStatus = "Neutral",
+                currentUserStatus = 0,
             ),
             // ── Next month ────────────────────────────────────────────────────
             MatchDto(
@@ -177,7 +177,7 @@ object BasketballMockData {
                 dateUtc = isoDate(ny, nm, 8, 15),
                 location = location("loc-01"),
                 slots = slots(2),
-                currentUserStatus = "Neutral",
+                currentUserStatus = 0,
             ),
             MatchDto(
                 id = "m09",
@@ -188,7 +188,7 @@ object BasketballMockData {
                 emergencyPoints = 5,
                 location = location("loc-02"),
                 slots = slots(2),
-                currentUserStatus = "Neutral",
+                currentUserStatus = 0,
             ),
             MatchDto(
                 id = "m10",
@@ -197,7 +197,7 @@ object BasketballMockData {
                 dateUtc = isoDate(ny, nm, 20, 16),
                 location = location("loc-03"),
                 slots = slots(2),
-                currentUserStatus = "Neutral",
+                currentUserStatus = 0,
             ),
         )
     }
@@ -251,10 +251,9 @@ object BasketballMockData {
     val pointRules = OfficialRole.entries.mapIndexed { i, role ->
         PointRuleDto(
             id = "pr-$i",
-            role = role.toApiString(),   // "Arbitre1", "Chrono", etc.
+            role = role.toApiInt(),  // API now sends integer
             pointsOnJ15 = 10,
             pointsOnJ4  = 5,
-            pointsEmergency = 15,
         )
     }
 }

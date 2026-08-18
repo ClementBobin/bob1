@@ -47,7 +47,7 @@ val matchHandlers: List<MockHandler> = listOf(
         }
         val updated = match.copy(
             slots             = updatedSlots,
-            currentUserStatus = "Subscribed",
+            currentUserStatus = 1, // Subscribed
         )
         mutableMatches[idx] = updated
         updated
@@ -65,7 +65,7 @@ val matchHandlers: List<MockHandler> = listOf(
         }
         val updated = match.copy(
             slots             = updatedSlots,
-            currentUserStatus = "Neutral",
+            currentUserStatus = 0, // Neutral
         )
         mutableMatches[idx] = updated
         updated
@@ -77,7 +77,8 @@ val matchHandlers: List<MockHandler> = listOf(
         val idx = mutableMatches.indexOfFirst { it.id == id }.takeIf { it >= 0 }
             ?: error("Match non trouvé.")
         val match = mutableMatches[idx]
-        val newStatus = if (match.currentUserStatus == "ConfirmedJ15") "ConfirmedJ4" else "ConfirmedJ15"
+        // 2 = ConfirmedJ15, 3 = ConfirmedJ4
+        val newStatus = if (match.currentUserStatus == 2) 3 else 2
         val updated = match.copy(currentUserStatus = newStatus)
         mutableMatches[idx] = updated
         updated

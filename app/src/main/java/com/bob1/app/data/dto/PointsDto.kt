@@ -6,26 +6,23 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PointRuleDto(
     val id: String,
-    val role: String,
+    val role: Int,              // API now sends OfficialRole as integer
     val pointsOnJ15: Int,
     val pointsOnJ4: Int,
-    val pointsEmergency: Int,
 ) {
     fun toDomain() = PointRule(
         id = id,
-        role = OfficialRole.valueOf(role),
+        role = OfficialRole.fromApiInt(role),
         pointsOnJ15 = pointsOnJ15,
         pointsOnJ4 = pointsOnJ4,
-        pointsEmergency = pointsEmergency,
     )
 
     companion object {
         fun fromDomain(pr: PointRule) = PointRuleDto(
             id = pr.id,
-            role = pr.role.name,
+            role = pr.role.toApiInt(),
             pointsOnJ15 = pr.pointsOnJ15,
             pointsOnJ4 = pr.pointsOnJ4,
-            pointsEmergency = pr.pointsEmergency
         )
     }
 }
