@@ -55,17 +55,25 @@ android {
         kotlinCompilerExtensionVersion = "..."
     }
 
+    val keystorePath = (project.findProperty("KEYSTORE_PATH") as? String)?.takeIf { it.isNotBlank() }
+    val keystorePassword = project.findProperty("KEYSTORE_PASSWORD") as? String
+    val keyAlias = project.findProperty("KEY_ALIAS") as? String
+    val keyPassword = project.findProperty("KEY_PASSWORD") as? String
+
     signingConfigs {
-        create("release") {
-            storeFile = file(System.getenv("KEYSTORE_PATH") ?: "")
-            storePassword = System.getenv("KEYSTORE_PASSWORD")
-            keyAlias = System.getenv("KEY_ALIAS")
-            keyPassword = System.getenv("KEY_PASSWORD")
+        if (keystorePath != null && keystorePassword != null && keyAlias != null && keyPassword != null) {
+            create("release") {
+                storeFile = file(keystorePath)
+                storePassword = keystorePassword
+                this.keyAlias = keyAlias
+                this.keyPassword = keyPassword
+            }
         }
     }
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            val releaseConfig = signingConfigs.findByName("release")
+            signingConfig = releaseConfig ?: signingConfigs.getByName("debug")
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
