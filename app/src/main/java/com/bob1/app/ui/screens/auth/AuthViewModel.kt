@@ -22,6 +22,7 @@ object AuthContracts {
         val isLoading: Boolean = false,
         val error: String? = null,
         val biometricAvailable: Boolean = false,
+        val biometricEnabled: Boolean = false,
         val showPasswordFallback: Boolean = false,
         val biometricError: String? = null,
     ) {
@@ -46,7 +47,7 @@ class AuthViewModel(application: Application) :
     private val session: SessionManager    by inject()
     private val biometric: BiometricHelper by inject()
 
-    private val biometricConfig = BiometricConfig.strong(
+    val biometricConfig = BiometricConfig.strong(
         title    = "bob1",
         subtitle = "Connectez-vous avec votre biométrie",
     )
@@ -54,25 +55,60 @@ class AuthViewModel(application: Application) :
     init { checkBiometric() }
 
     private fun checkBiometric() {
-        val available  = biometric.canAuthenticate(biometricConfig)
-        val hasSession = session.isAuthenticated()
+        val hardwareAvailable = biometric.canAuthenticate(biometricConfig)
+        val biometricEnabled  = session.isBiometricEnabled()
+        val hasCredentials    = session.hasBiometricCredentials()
+
+        // Show biometric prompt automatically if:
+        //  - hardware is available
+        //  - user has opted in
+        //  - credentials are saved (user logged in with password at least once)
+        val canUseBiometric = hardwareAvailable && biometricEnabled && hasCredentials
+
         updateState {
             copy(
-                biometricAvailable   = available,
-                showPasswordFallback = !available || !hasSession,
+                biometricAvailable   = hardwareAvailable,
+                biometricEnabled     = biometricEnabled,
+                showPasswordFallback = !canUseBiometric,
             )
         }
-        if (hasSession && available) sendEvent(AuthContracts.UiEvent.LaunchBiometric)
+        if (canUseBiometric) sendEvent(AuthContracts.UiEvent.LaunchBiometric)
+    }
+
+    /**
+     * Called after the biometric prompt succeeds.
+     * Triggers a real API login using the stored (encrypted) credentials.
+     */
+    fun onBiometricAuthSucceeded() {
+        updateState { copy(isLoading = true, biometricError = null) }
+        fetchData(
+            source   = { repo.loginWithBiometric() },
+            onResult = {
+                onSuccess { updateState { copy(isLoading = false) }; sendEvent(AuthContracts.UiEvent.LoginSuccess) }
+                onFailure { e ->
+                    updateState {
+                        copy(
+                            isLoading           = false,
+                            biometricError      = "Connexion échouée : ${e.message}",
+                            showPasswordFallback = true,
+                        )
+                    }
+                }
+            }
+        )
     }
 
     fun onBiometricResult(result: BiometricResult) {
         when (result) {
-            BiometricResult.Success      -> sendEvent(AuthContracts.UiEvent.LoginSuccess)
+            // BiometricResult.Success means the hardware gate passed — now call the API
+            BiometricResult.Success,
+            is BiometricResult.SuccessWithEncrypted,
+            is BiometricResult.SuccessWithDecrypted -> onBiometricAuthSucceeded()
+
             is BiometricResult.Error     -> updateState { copy(biometricError = result.message, showPasswordFallback = true) }
             BiometricResult.Failed       -> updateState { copy(biometricError = "Biométrie non reconnue. Réessayez ou utilisez votre mot de passe.") }
             BiometricResult.NoneEnrolled -> updateState { copy(biometricAvailable = false, showPasswordFallback = true) }
             BiometricResult.Unavailable  -> updateState { copy(biometricAvailable = false, showPasswordFallback = true) }
-            else                         -> sendEvent(AuthContracts.UiEvent.LoginSuccess)
         }
     }
 
@@ -106,9 +142,19 @@ class AuthViewModel(application: Application) :
         }
         updateState { copy(isLoading = true, error = null) }
         fetchData(
-            source   = { repo.login(s.email.trim(), s.password) },
+            source = { repo.login(s.email.trim(), s.password) },
             onResult = {
-                onSuccess { updateState { copy(isLoading = false) }; sendEvent(AuthContracts.UiEvent.LoginSuccess) }
+                onSuccess {
+                    // Always persist the credentials so the user can later enable
+                    // biometric from the Profile page without re-entering their password.
+                    // Credentials are encrypted with AES-256-GCM via KeystoreHelper and
+                    // never stored in plaintext.
+                    if (state.value.biometricAvailable) {
+                        session.saveBiometricCredentials(s.email.trim(), s.password)
+                    }
+                    updateState { copy(isLoading = false) }
+                    sendEvent(AuthContracts.UiEvent.LoginSuccess)
+                }
                 onFailure { e -> updateState { copy(isLoading = false, error = e.message) } }
             }
         )
@@ -128,6 +174,7 @@ class AuthViewModel(application: Application) :
             updateState { copy(firstNameError = firstNameError, lastNameError = lastNameError, emailError = emailError, passwordError = passwordError) }
             return
         }
+        updateState { copy(isLoading = true, error = null) }
         fetchData(
             source   = { repo.register(s.firstName.trim(), s.lastName.trim(), s.email.trim(), s.password).getOrThrow() },
             onResult = {
