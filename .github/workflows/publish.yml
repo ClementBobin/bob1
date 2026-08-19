@@ -243,7 +243,7 @@ jobs:
                   "label": "Android APK v${{ env.VERSION }} (universal)"
                 },
                 {
-                  "path": "${{ env.ENV_AAB_PATH }}",
+                  "path": "${{ env.AAB_PATH }}",
                   "name": "app-release-v${{ env.VERSION }}.aab",
                   "label": "Android App Bundle v${{ env.VERSION }} (Play Store)"
                 }
