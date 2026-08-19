@@ -14,7 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.bob1.app.ui.core.Destination
 import dev.kindling.compose.KScreen
-import dev.kindling.core.components.KButton
+import dev.kindling.core.components.ui.KButton
 
 @Composable
 fun PenaltyAckScreen(navController: NavController) {

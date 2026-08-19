@@ -30,7 +30,7 @@ import com.bob1.app.ui.core.components.ui.AuthCard
 import com.bob1.app.ui.core.components.ui.FieldWithLabel
 import com.bob1.app.ui.core.components.ui.PasswordCriterionRow
 import dev.kindling.compose.KScreen
-import dev.kindling.core.components.KButton
+import dev.kindling.core.components.ui.KButton
 
 @Composable
 fun RegisterScreen(

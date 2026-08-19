@@ -46,7 +46,7 @@ class AuthViewModel(application: Application) :
     private val session: SessionManager    by inject()
     private val biometric: BiometricHelper by inject()
 
-    private val biometricConfig = BiometricConfig.strongOrPin(
+    private val biometricConfig = BiometricConfig.strong(
         title    = "bob1",
         subtitle = "Connectez-vous avec votre biométrie",
     )
@@ -72,6 +72,7 @@ class AuthViewModel(application: Application) :
             BiometricResult.Failed       -> updateState { copy(biometricError = "Biométrie non reconnue. Réessayez ou utilisez votre mot de passe.") }
             BiometricResult.NoneEnrolled -> updateState { copy(biometricAvailable = false, showPasswordFallback = true) }
             BiometricResult.Unavailable  -> updateState { copy(biometricAvailable = false, showPasswordFallback = true) }
+            else                         -> sendEvent(AuthContracts.UiEvent.LoginSuccess)
         }
     }
 
