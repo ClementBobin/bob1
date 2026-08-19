@@ -180,14 +180,24 @@ jobs:
       env:
         VERSION: ${{ needs.resolve-version.outputs.version }}
       run: |
+        # Debug: show what was actually produced
+        echo "📂 Build outputs:"
+        find app/build/outputs -type f 2>/dev/null || echo "  (nothing found)"
+
         APK_SRC="app/build/outputs/apk/release/app-release.apk"
         AAB_SRC="app/build/outputs/bundle/release/app-release.aab"
 
         [ ! -f "$APK_SRC" ] && APK_SRC=$(find app/build/outputs -name "*release*.apk" -type f | head -1)
         [ ! -f "$AAB_SRC" ] && AAB_SRC=$(find app/build/outputs -name "*release*.aab" -type f | head -1)
 
-        if [ -z "$APK_SRC" ] || [ ! -f "$APK_SRC" ]; then echo "❌ APK release non trouvé"; exit 1; fi
-        if [ -z "$AAB_SRC" ] || [ ! -f "$AAB_SRC" ]; then echo "❌ AAB release non trouvé"; exit 1; fi
+        if [ -z "$APK_SRC" ] || [ ! -f "$APK_SRC" ]; then
+          echo "❌ APK release non trouvé"
+          exit 1
+        fi
+        if [ -z "$AAB_SRC" ] || [ ! -f "$AAB_SRC" ]; then
+          echo "❌ AAB release non trouvé"
+          exit 1
+        fi
 
         APK_OUT="app/build/outputs/apk/release/app-release-v${VERSION}.apk"
         AAB_OUT="app/build/outputs/bundle/release/app-release-v${VERSION}.aab"
@@ -262,7 +272,7 @@ jobs:
     #     status: completed
 
     - name: Upload APK artifact
-      if: always()
+      if: steps.outputs.outputs.APK_PATH != ''
       uses: actions/upload-artifact@v4
       with:
         name: bob1-apk
@@ -270,7 +280,7 @@ jobs:
         retention-days: 30
 
     - name: Upload AAB artifact
-      if: always()
+      if: steps.outputs.outputs.AAB_PATH != ''
       uses: actions/upload-artifact@v4
       with:
         name: bob1-aab
