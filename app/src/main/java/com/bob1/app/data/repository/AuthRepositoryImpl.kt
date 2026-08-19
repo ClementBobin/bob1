@@ -51,6 +51,9 @@ internal class AuthRepositoryImpl(
         val response = authAPI.login(LoginRequestDto(email, password))
         val user = response.user.toDomain()
         session.saveSession(user, response.token)
+        // Persist credentials so the user can enable biometric from the Profile
+        // page right after registering, without needing to re-enter their password.
+        session.saveBiometricCredentials(email, password)
         user
     }
 

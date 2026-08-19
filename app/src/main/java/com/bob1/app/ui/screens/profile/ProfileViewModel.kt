@@ -58,12 +58,16 @@ class ProfileViewModel(application: Application) :
                 updateState { copy(biometricStatusMessage = "La biométrie n'est pas disponible sur cet appareil.") }
                 return
             }
+            // Credentials are saved on every successful password login or register.
+            // If missing, the user somehow has a session without ever entering a password
+            // (edge case: manual data wipe). Ask them to re-authenticate.
             if (!session.hasBiometricCredentials()) {
                 updateState {
-                    copy(biometricStatusMessage = "Connectez-vous d'abord avec votre mot de passe pour enregistrer vos identifiants.")
+                    copy(biometricStatusMessage = "Déconnectez-vous puis reconnectez-vous avec votre mot de passe pour activer la biométrie.")
                 }
                 return
             }
+            // Ask the user to confirm with biometrics before enabling
             sendEvent(ProfileContracts.UiEvent.ConfirmBiometricEnable)
         } else {
             session.setBiometricEnabled(false)

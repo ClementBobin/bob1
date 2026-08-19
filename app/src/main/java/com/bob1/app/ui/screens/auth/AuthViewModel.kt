@@ -145,9 +145,11 @@ class AuthViewModel(application: Application) :
             source = { repo.login(s.email.trim(), s.password) },
             onResult = {
                 onSuccess {
-                    // If biometric is enabled, persist the credentials so future
-                    // biometric logins can replay them against the API.
-                    if (session.isBiometricEnabled()) {
+                    // Always persist the credentials so the user can later enable
+                    // biometric from the Profile page without re-entering their password.
+                    // Credentials are encrypted with AES-256-GCM via KeystoreHelper and
+                    // never stored in plaintext.
+                    if (state.value.biometricAvailable) {
                         session.saveBiometricCredentials(s.email.trim(), s.password)
                     }
                     updateState { copy(isLoading = false) }
@@ -172,6 +174,7 @@ class AuthViewModel(application: Application) :
             updateState { copy(firstNameError = firstNameError, lastNameError = lastNameError, emailError = emailError, passwordError = passwordError) }
             return
         }
+        updateState { copy(isLoading = true, error = null) }
         fetchData(
             source   = { repo.register(s.firstName.trim(), s.lastName.trim(), s.email.trim(), s.password).getOrThrow() },
             onResult = {
