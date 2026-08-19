@@ -23,16 +23,18 @@ data class UserDto(
     val email: String,
     val firstName: String,
     val lastName: String,
-    val role: String, // API sends "Official" | "Admin" (Pascal case)
+    // API now sends UserRole as integer (0 = Official, 1 = Admin).
+    // coerceInputValues=true in HttpClient lets us fall back gracefully on unknown values.
+    val role: Int = 0,
 ) {
     fun toDomain() = User(
         id        = id,
         email     = email,
         firstName = firstName,
         lastName  = lastName,
-        role      = when (role.lowercase()) {
-            "admin" -> UserRole.ADMIN
-            else    -> UserRole.OFFICIAL
+        role      = when (role) {
+            1    -> UserRole.ADMIN
+            else -> UserRole.OFFICIAL
         },
     )
 
@@ -42,7 +44,10 @@ data class UserDto(
             email     = u.email,
             firstName = u.firstName,
             lastName  = u.lastName,
-            role      = u.role.name,
+            role      = when (u.role) {
+                UserRole.ADMIN    -> 1
+                UserRole.OFFICIAL -> 0
+            },
         )
     }
 }

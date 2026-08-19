@@ -103,16 +103,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: resolve-version
 
+    needs: resolve-version
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
-    - name: Set up JDK 17
+    - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
-        java-version: '17'
+        java-version: '21'
         distribution: 'temurin'
         cache: gradle
 
@@ -164,9 +166,20 @@ jobs:
         KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         KEY_ALIAS:         ${{ secrets.KEY_ALIAS }}
         KEY_PASSWORD:      ${{ secrets.KEYSTORE_PASSWORD }}
+    - name: Build Release APK + AAB (signed, versioned)
+      env:
+        VERSION:           ${{ needs.resolve-version.outputs.version }}
+        VERSION_CODE:      ${{ needs.resolve-version.outputs.version_code }}
+        KEYSTORE_PATH:     ${{ runner.temp }}/release.keystore
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_ALIAS:         ${{ secrets.KEY_ALIAS }}
+        KEY_PASSWORD:      ${{ secrets.KEYSTORE_PASSWORD }}
       run: |
         echo "🏗️  Building v$VERSION (code $VERSION_CODE)"
+        echo "🏗️  Building v$VERSION (code $VERSION_CODE)"
         ./gradlew assembleRelease bundleRelease \
+          -PversionName="$VERSION" \
+          -PversionCode="$VERSION_CODE" \
           -PversionName="$VERSION" \
           -PversionCode="$VERSION_CODE" \
           -Pandroid.injected.signing.store.file=$RUNNER_TEMP/release.keystore \
@@ -179,7 +192,29 @@ jobs:
       id: outputs
       env:
         VERSION: ${{ needs.resolve-version.outputs.version }}
+    - name: Rename and verify outputs
+      id: outputs
+      env:
+        VERSION: ${{ needs.resolve-version.outputs.version }}
       run: |
+        APK_SRC="app/build/outputs/apk/release/app-release.apk"
+        AAB_SRC="app/build/outputs/bundle/release/app-release.aab"
+
+        [ ! -f "$APK_SRC" ] && APK_SRC=$(find app/build/outputs -name "*release*.apk" -type f | head -1)
+        [ ! -f "$AAB_SRC" ] && AAB_SRC=$(find app/build/outputs -name "*release*.aab" -type f | head -1)
+
+        if [ -z "$APK_SRC" ] || [ ! -f "$APK_SRC" ]; then echo "❌ APK release non trouvé"; exit 1; fi
+        if [ -z "$AAB_SRC" ] || [ ! -f "$AAB_SRC" ]; then echo "❌ AAB release non trouvé"; exit 1; fi
+
+        APK_OUT="app/build/outputs/apk/release/app-release-v${VERSION}.apk"
+        AAB_OUT="app/build/outputs/bundle/release/app-release-v${VERSION}.aab"
+        mv "$APK_SRC" "$APK_OUT"
+        mv "$AAB_SRC" "$AAB_OUT"
+
+        echo "APK_PATH=$APK_OUT" >> $GITHUB_OUTPUT
+        echo "AAB_PATH=$AAB_OUT" >> $GITHUB_OUTPUT
+        echo "✅ APK: $APK_OUT"
+        echo "✅ AAB: $AAB_OUT"
         APK_SRC="app/build/outputs/apk/release/app-release.apk"
         AAB_SRC="app/build/outputs/bundle/release/app-release.aab"
 
@@ -248,6 +283,42 @@ jobs:
         EOF
 
     - name: Run semantic-release
+    - name: Write .releaserc.json (real release with assets)
+      env:
+        APK_PATH: ${{ steps.outputs.outputs.APK_PATH }}
+        AAB_PATH: ${{ steps.outputs.outputs.AAB_PATH }}
+        VERSION:  ${{ needs.resolve-version.outputs.version }}
+      run: |
+        cat > .releaserc.json << EOF
+        {
+          "branches": ["main"],
+          "plugins": [
+            ["@semantic-release/commit-analyzer", { "preset": "conventionalcommits" }],
+            ["@semantic-release/release-notes-generator", { "preset": "conventionalcommits" }],
+            "@semantic-release/changelog",
+            ["@semantic-release/github", {
+              "assets": [
+                {
+                  "path": "${APK_PATH}",
+                  "name": "app-release-v${VERSION}.apk",
+                  "label": "Android APK v${VERSION} (universal)"
+                },
+                {
+                  "path": "${AAB_PATH}",
+                  "name": "app-release-v${VERSION}.aab",
+                  "label": "Android App Bundle v${VERSION} (Play Store)"
+                }
+              ]
+            }],
+            ["@semantic-release/git", {
+              "assets": ["CHANGELOG.md"],
+              "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+            }]
+          ]
+        }
+        EOF
+
+    - name: Run semantic-release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: npx semantic-release
@@ -256,6 +327,8 @@ jobs:
     #   uses: r0adkll/upload-google-play@v1
     #   with:
     #     serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+    #     packageName: com.bob1.app
+    #     releaseFiles: ${{ steps.outputs.outputs.AAB_PATH }}
     #     packageName: com.bob1.app
     #     releaseFiles: ${{ steps.outputs.outputs.AAB_PATH }}
     #     track: internal
@@ -267,6 +340,8 @@ jobs:
       with:
         name: bob1-apk
         path: ${{ steps.outputs.outputs.APK_PATH }}
+        name: bob1-apk
+        path: ${{ steps.outputs.outputs.APK_PATH }}
         retention-days: 30
 
     - name: Upload AAB artifact
@@ -274,5 +349,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: bob1-aab
+        path: ${{ steps.outputs.outputs.AAB_PATH }}
         path: ${{ steps.outputs.outputs.AAB_PATH }}
         retention-days: 30

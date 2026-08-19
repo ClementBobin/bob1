@@ -1,3 +1,19 @@
+# [1.4.0](https://github.com/ClementBobin/bob1/compare/v1.3.0...v1.4.0) (2026-08-18)
+
+
+### Features
+
+* remove androidx.compose.bom dependency from build.gradle.kts ([784803a](https://github.com/ClementBobin/bob1/commit/784803acfd4622f9bc4f7544d050d1cc86a05fd3))
+* update BASE_URL in build.gradle.kts and remove minification for release build ([3c4edc4](https://github.com/ClementBobin/bob1/commit/3c4edc4e7410a3fb5bf56bdd07cc8b72f81ece20))
+
+# [1.3.0](https://github.com/ClementBobin/bob1/compare/v1.2.0...v1.3.0) (2026-08-18)
+
+
+### Features
+
+* improve signing configuration handling in build.gradle.kts ([6897e80](https://github.com/ClementBobin/bob1/commit/6897e803073e112c52eb918cc5b062898ded16ee))
+* update build workflow to support APK and AAB signing, improve artifact handling ([80b5041](https://github.com/ClementBobin/bob1/commit/80b5041af95c500f455d6b6523fe71e544fc5e22))
+
 # [1.2.0](https://github.com/ClementBobin/bob1/compare/v1.1.0...v1.2.0) (2026-08-18)
 
 

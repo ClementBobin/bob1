@@ -1,6 +1,7 @@
 package com.bob1.app.data.remote
 
 import com.bob1.app.data.dto.MatchDto
+import com.bob1.app.data.dto.MinMatchDto
 import com.bob1.app.data.dto.OfficialRole
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -10,7 +11,8 @@ import io.ktor.http.contentType
 
 internal class MatchAPI(private val client: HttpClient) {
 
-    suspend fun getMatches(year: Int, month: Int): List<MatchDto> =
+    /** GET /api/matches/by-month — returns MinMatchDto (no homeTeam/awayTeam/slots). */
+    suspend fun getMatches(year: Int, month: Int): List<MinMatchDto> =
         client.get("/api/matches/by-month") {
             parameter("year", year)
             parameter("month", month)
@@ -25,7 +27,7 @@ internal class MatchAPI(private val client: HttpClient) {
     suspend fun subscribeToMatch(matchId: String, role: OfficialRole): MatchDto =
         client.post("/api/matches/$matchId/subscribe") {
             contentType(ContentType.Application.Json)
-            setBody(mapOf("role" to role.toApiString()))
+            setBody(mapOf("role" to role.toApiInt()))  // API now sends OfficialRole as integer
         }.body()
 
     suspend fun unsubscribeFromMatch(matchId: String): MatchDto =

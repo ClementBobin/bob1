@@ -13,6 +13,11 @@ val localProps = Properties().apply {
     if (f.exists()) load(f.inputStream())
 }
 
+// Accept version injection from CI via -PversionName=x.y.z -PversionCode=N
+// Falls back to local defaults when building outside CI.
+val ciVersionName: String = findProperty("versionName") as String? ?: "1.0.0"
+val ciVersionCode: Int    = (findProperty("versionCode") as String?)?.toInt() ?: 1
+
 android {
     namespace = "com.bob1.app"
     compileSdk = 36
@@ -21,8 +26,8 @@ android {
         applicationId = "com.bob1.app"
         minSdk = 29
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = ciVersionCode
+        versionName = ciVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -34,7 +39,7 @@ android {
         buildConfigField(
             "String",
             "BASE_URL",
-            "\"${localProps.getProperty("BASE_URL", "https://api.staging.projet-bob1.fr")}\""
+            "\"${localProps.getProperty("BASE_URL", "https://bob-1-api.vercel.app")}\""
         )
     }
 
@@ -55,18 +60,25 @@ android {
         kotlinCompilerExtensionVersion = "..."
     }
 
+    val keystorePath = (project.findProperty("KEYSTORE_PATH") as? String)?.takeIf { it.isNotBlank() }
+    val keystorePassword = project.findProperty("KEYSTORE_PASSWORD") as? String
+    val keyAlias = project.findProperty("KEY_ALIAS") as? String
+    val keyPassword = project.findProperty("KEY_PASSWORD") as? String
+
     signingConfigs {
-        create("release") {
-            storeFile = file(System.getenv("KEYSTORE_PATH") ?: "")
-            storePassword = System.getenv("KEYSTORE_PASSWORD")
-            keyAlias = System.getenv("KEY_ALIAS")
-            keyPassword = System.getenv("KEY_PASSWORD")
+        if (keystorePath != null && keystorePassword != null && keyAlias != null && keyPassword != null) {
+            create("release") {
+                storeFile = file(keystorePath)
+                storePassword = keystorePassword
+                this.keyAlias = keyAlias
+                this.keyPassword = keyPassword
+            }
         }
     }
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = true
+            val releaseConfig = signingConfigs.findByName("release")
+            signingConfig = releaseConfig ?: signingConfigs.getByName("debug")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -77,7 +89,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
 
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)

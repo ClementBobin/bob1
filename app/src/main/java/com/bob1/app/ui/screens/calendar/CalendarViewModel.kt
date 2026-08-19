@@ -118,8 +118,20 @@ class CalendarViewModel(
         if (dayMatches.isNotEmpty()) updateState { copy(selectedDayMatches = dayMatches) }
     }
 
-    fun selectMatchFromSheet(match: Match) = updateState {
-        copy(sheetMatch = match, selectedDayMatches = emptyList())
+    /**
+     * Called when the user taps a match in the day-list bottom sheet.
+     * The calendar list uses MinMatchDto (no homeTeam/awayTeam/slots), so we
+     * immediately show the stub for a snappy UX and then fetch the full MatchDto.
+     */
+    fun selectMatchFromSheet(match: Match) {
+        updateState { copy(sheetMatch = match, selectedDayMatches = emptyList()) }
+        fetchData(
+            source   = { matchRepo.getMatch(match.id).getOrThrow() },
+            onResult = {
+                onSuccess { full -> updateState { copy(sheetMatch = full) } }
+                onFailure { /* stub already shown; silently fail */ }
+            }
+        )
     }
 
     fun dismissSheet() = updateState {

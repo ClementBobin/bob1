@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +33,8 @@ fun MatchDetailSheet(
 ) {
     val context = LocalContext.current
 
+    val isLoadingFullMatch = match.homeTeam.name.isBlank()
+
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(Modifier.padding(16.dp)) {
 
@@ -49,12 +52,16 @@ fun MatchDetailSheet(
 
             Spacer(Modifier.height(8.dp))
 
-            // ── Title ─────────────────────────────────────────────────────
-            Text(
-                "${match.homeTeam.name}  vs  ${match.awayTeam.name}",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-            )
+            // ── Title — shows spinner until full MatchDto is loaded ────────
+            if (isLoadingFullMatch) {
+                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+            } else {
+                Text(
+                    "${match.homeTeam.name}  vs  ${match.awayTeam.name}",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
 
             // ── Division + date ───────────────────────────────────────────
             Text(
