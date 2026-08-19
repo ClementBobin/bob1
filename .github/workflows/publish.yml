@@ -228,7 +228,7 @@ jobs:
         AAB_PATH: ${{ steps.outputs.outputs.AAB_PATH }}
         VERSION:  ${{ needs.resolve-version.outputs.version }}
       run: |
-        cat > .releaserc.json << EOF
+        cat << 'EOF' > .releaserc.json
         {
           "branches": ["main"],
           "plugins": [
@@ -238,14 +238,14 @@ jobs:
             ["@semantic-release/github", {
               "assets": [
                 {
-                  "path": "${APK_PATH}",
-                  "name": "app-release-v${VERSION}.apk",
-                  "label": "Android APK v${VERSION} (universal)"
+                  "path": "${{ env.APK_PATH }}",
+                  "name": "app-release-v${{ env.VERSION }}.apk",
+                  "label": "Android APK v${{ env.VERSION }} (universal)"
                 },
                 {
-                  "path": "${AAB_PATH}",
-                  "name": "app-release-v${VERSION}.aab",
-                  "label": "Android App Bundle v${VERSION} (Play Store)"
+                  "path": "${{ env.ENV_AAB_PATH }}",
+                  "name": "app-release-v${{ env.VERSION }}.aab",
+                  "label": "Android App Bundle v${{ env.VERSION }} (Play Store)"
                 }
               ]
             }],
