@@ -18,6 +18,7 @@ import com.bob1.app.data.dto.UserRole
 import com.bob1.app.ui.core.Destination
 import com.bob1.app.ui.core.components.ui.AppBottomBar
 import dev.kindling.compose.KScreen
+import androidx.compose.material.icons.automirrored.filled.Logout
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,7 +78,7 @@ fun ProfileScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     colors   = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
                 ) {
-                    Icon(Icons.Default.Logout, null)
+                    Icon(Icons.AutoMirrored.Filled.Logout, null)
                     Spacer(Modifier.width(8.dp))
                     Text("Se déconnecter")
                 }

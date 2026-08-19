@@ -9,10 +9,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import dev.kindling.core.components.KInput
-import dev.kindling.core.components.KLabel
-import dev.kindling.core.components.KMaskPattern
-import dev.kindling.core.components.MaskInput
+import dev.kindling.core.components.ui.KInput
+import dev.kindling.core.components.ui.KLabel
+import dev.kindling.core.components.ui.maskInput.KMaskPattern
+import dev.kindling.core.components.ui.maskInput.KMaskInput
 
 // ── Labeled field ─────────────────────────────────────────────────────────────
 
@@ -89,7 +89,7 @@ fun FieldMaskWithLabel(
         KLabel(label)
         if (trailingContent != null) {
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                MaskInput(
+                KMaskInput(
                     value = value,
                     onValueChange = onValueChange,
                     mask = mask,
@@ -106,7 +106,7 @@ fun FieldMaskWithLabel(
                 trailingContent()
             }
         } else {
-            MaskInput(
+            KMaskInput(
                 value = value,
                 onValueChange = onValueChange,
                 mask = mask,

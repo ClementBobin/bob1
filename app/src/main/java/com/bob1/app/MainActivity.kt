@@ -12,7 +12,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.rememberNavController
 import com.bob1.app.ui.core.AppNavHost
 import com.bob1.app.ui.core.theme.AppTheme
-import dev.kindling.core.components.Toaster
+import dev.kindling.core.components.ui.toast.Toaster
 
 class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

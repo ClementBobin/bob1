@@ -26,8 +26,8 @@ import com.bob1.app.ui.core.Destination
 import dev.kindling.android.natif.BiometricConfig
 import dev.kindling.android.natif.BiometricHelper
 import dev.kindling.compose.KScreen
-import dev.kindling.core.ButtonVariant
-import dev.kindling.core.components.KButton
+import dev.kindling.core.components.ui.KButtonVariant
+import dev.kindling.core.components.ui.KButton
 import org.koin.compose.koinInject
 
 @Composable
@@ -46,7 +46,7 @@ fun LoginScreen(navController: NavController) {
                 is AuthContracts.UiEvent.LaunchBiometric -> activity?.let {
                     biometric.authenticate(
                         activity = it,
-                        config   = BiometricConfig.strongOrPin("BOB1", "Connectez-vous avec votre biométrie"),
+                        config   = BiometricConfig.strong("BOB1", "Connectez-vous avec votre biométrie"),
                         onResult = { result -> vm.onBiometricResult(result) }
                     )
                 }
@@ -63,7 +63,7 @@ fun LoginScreen(navController: NavController) {
                 activity?.let {
                     biometric.authenticate(
                         activity = it,
-                        config   = BiometricConfig.strongOrPin("BOB1", "Connectez-vous"),
+                        config   = BiometricConfig.strong("BOB1", "Connectez-vous"),
                         onResult = vm::onBiometricResult,
                     )
                 }
@@ -152,7 +152,7 @@ private fun LoginContent(
                     KButton(text = "Se connecter", onClick = onLogin, isLoading = state.isLoading,
                         modifier = Modifier.fillMaxWidth())
                     if (state.biometricAvailable) {
-                        KButton(onClick = onBiometricTap, modifier = Modifier.fillMaxWidth(), variant = ButtonVariant.Ghost) {
+                        KButton(onClick = onBiometricTap, modifier = Modifier.fillMaxWidth(), variant = KButtonVariant.Ghost) {
                             Icon(Icons.Default.Fingerprint, null, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(8.dp))
                             Text("Utiliser la biométrie")

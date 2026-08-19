@@ -19,3 +19,14 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Koin - prevent R8 from crashing on Kotlin metadata rewriting (AGP 8.13 / R8 8.13.6)
+-keep class org.koin.** { *; }
+-keepclassmembers class org.koin.** { *; }
+-dontwarn org.koin.**
+
+# Prevent R8 from rewriting Kotlin metadata entirely for Koin
+-keepattributes RuntimeVisibleAnnotations,AnnotationDefault
+
+-keep class dev.kindling.** { *; }
+-keepclassmembers class dev.kindling.** { *; }

@@ -15,8 +15,9 @@ import com.bob1.app.ui.screens.penalty.PenaltyAckScreen
 import com.bob1.app.ui.screens.profile.ProfileScreen
 import dev.kindling.compose.KNavHost
 import org.koin.compose.koinInject
+import dev.kindling.compose.KDestination 
 
-sealed class Destination(override val route: String) : dev.kindling.compose.Destination {
+sealed class Destination(override val route: String) : KDestination  {
     object Login         : Destination("login")
     object Register      : Destination("register")
     object Calendar      : Destination("calendar")

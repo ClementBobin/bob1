@@ -1,3 +1,41 @@
+# [1.5.0](https://github.com/ClementBobin/bob1/compare/v1.4.0...v1.5.0) (2026-08-19)
+
+
+### Bug Fixes
+
+* add debug output for build artifacts and improve artifact upload conditions ([e3cbde1](https://github.com/ClementBobin/bob1/commit/e3cbde1f2305118387b1c3905d1db2850f867b01))
+* enable core library desugaring and add dependency for desugar_jdk_libs ([ca399cb](https://github.com/ClementBobin/bob1/commit/ca399cb8c062ebf80f6ac1ac9459ba334694832a))
+* remove redundant 'needs' declaration in build-and-release job ([99711a2](https://github.com/ClementBobin/bob1/commit/99711a2abb2e4715b547806d8cac47621fbb781a))
+* revert JDK version to 17 and clean up build steps in publish workflow ([407aab4](https://github.com/ClementBobin/bob1/commit/407aab418da9ae4a7058ceea9f6666b07c8e8ca4))
+* update .releaserc.json to use environment variables for APK and AAB paths ([8b44d60](https://github.com/ClementBobin/bob1/commit/8b44d60e3931e5c8ca75d53afdf098f6f9782f4e))
+* update AAB path environment variable in publish workflow ([fc2c744](https://github.com/ClementBobin/bob1/commit/fc2c74429c45910fcca424d1a50471d2288bf627))
+* update imports and ProGuard rules for Koin and Kindling components ([79f8a4e](https://github.com/ClementBobin/bob1/commit/79f8a4ee1def4e02135c9b1f803f50c7bce6d884))
+* update semantic-release plugins to use angular preset ([55f71de](https://github.com/ClementBobin/bob1/commit/55f71dec3859524a7619549733ab0a8fc9963c35))
+
+
+### Features
+
+* enhance build workflow with semantic versioning and artifact handling for APK and AAB ([59806d4](https://github.com/ClementBobin/bob1/commit/59806d402f70fd77c79fcf12b08f131d1c01318d))
+* enhance CI versioning by injecting versionName and versionCode from build parameters ([2bb9b4b](https://github.com/ClementBobin/bob1/commit/2bb9b4beb99c6e51c7d6531a4a5cadea6e1a4344))
+* implement SeasonPoint feature with API integration and update user roles to integer representation ([3948555](https://github.com/ClementBobin/bob1/commit/3948555f5b61933ea808a191820d5a321fcd3d44))
+* update Match and Notification DTOs to handle integer-based API responses, enhance mock data, and improve UI handling for match details ([b99fee3](https://github.com/ClementBobin/bob1/commit/b99fee38fb97033883b4a00579658abc9b37480d))
+
+# [1.4.0](https://github.com/ClementBobin/bob1/compare/v1.3.0...v1.4.0) (2026-08-18)
+
+
+### Features
+
+* remove androidx.compose.bom dependency from build.gradle.kts ([784803a](https://github.com/ClementBobin/bob1/commit/784803acfd4622f9bc4f7544d050d1cc86a05fd3))
+* update BASE_URL in build.gradle.kts and remove minification for release build ([3c4edc4](https://github.com/ClementBobin/bob1/commit/3c4edc4e7410a3fb5bf56bdd07cc8b72f81ece20))
+
+# [1.3.0](https://github.com/ClementBobin/bob1/compare/v1.2.0...v1.3.0) (2026-08-18)
+
+
+### Features
+
+* improve signing configuration handling in build.gradle.kts ([6897e80](https://github.com/ClementBobin/bob1/commit/6897e803073e112c52eb918cc5b062898ded16ee))
+* update build workflow to support APK and AAB signing, improve artifact handling ([80b5041](https://github.com/ClementBobin/bob1/commit/80b5041af95c500f455d6b6523fe71e544fc5e22))
+
 # [1.2.0](https://github.com/ClementBobin/bob1/compare/v1.1.0...v1.2.0) (2026-08-18)
 
 
