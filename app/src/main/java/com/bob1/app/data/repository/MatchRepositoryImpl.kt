@@ -10,7 +10,7 @@ internal class MatchRepositoryImpl(
 ) : MatchRepository {
 
     override suspend fun getMatches(year: Int, month: Int): Result<List<Match>> = runCatching {
-        matchAPI.getMatches(year, month).map { it.toDomain() }
+        matchAPI.getMatches(year, month).map { it.toDomain() }  // MinMatchDto.toDomain()
     }
 
     override suspend fun getMatchesByDivision(divisionId: String): Result<List<Match>> = runCatching {

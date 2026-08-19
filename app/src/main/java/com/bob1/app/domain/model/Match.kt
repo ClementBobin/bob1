@@ -16,8 +16,8 @@ data class Match(
     val locationLat: Double?,       // null when not geocoded
     val locationLng: Double?,
     val slots: List<RoleSlot>,
-    val emergencyDate: String?,
-    val emergencyPoints: Int,
+    /** True when at least one role slot is still open. Populated from MinMatchDto (list view). */
+    val areSlotsAvailable: Boolean = false,
     val subscriptionStatus: MatchSubscriptionStatus = MatchSubscriptionStatus.NEUTRAL,
     val currentUserRole: OfficialRole? = null,
 )

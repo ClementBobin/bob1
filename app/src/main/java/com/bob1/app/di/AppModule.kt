@@ -6,6 +6,7 @@ import com.bob1.app.data.local.SessionManager
 import com.bob1.app.data.repository.*
 import com.bob1.app.data.remote.*
 import com.bob1.app.domain.repository.*
+import com.bob1.app.domain.repository.SeasonPointRepository
 import com.bob1.app.mock.registry.buildMockEngine
 import dev.kindling.android.natif.BiometricHelper
 import dev.kindling.android.natif.NotificationHelper
@@ -68,6 +69,7 @@ val appModule = module {
     single { NotificationAPI(get()) }
     single { PenaltyAPI(get()) }
     single { LocationAPI(get()) }
+    single { SeasonPointAPI(get()) }
 
     // ── Repositories ──────────────────────────────────────────────────────────
     single<AuthRepository>         { AuthRepositoryImpl(get(), get()) }
@@ -77,6 +79,7 @@ val appModule = module {
     single<NotificationRepository> { NotificationRepositoryImpl(get()) }
     single<PenaltyRepository>      { PenaltyRepositoryImpl(get()) }
     single<LocationRepository>     { LocationRepositoryImpl(get()) }
+    single<SeasonPointRepository>  { SeasonPointRepositoryImpl(get()) }
 }
 
 private fun trustAllTrustManager(): X509TrustManager = @SuppressLint("CustomX509TrustManager")

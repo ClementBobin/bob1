@@ -13,6 +13,11 @@ val localProps = Properties().apply {
     if (f.exists()) load(f.inputStream())
 }
 
+// Accept version injection from CI via -PversionName=x.y.z -PversionCode=N
+// Falls back to local defaults when building outside CI.
+val ciVersionName: String = findProperty("versionName") as String? ?: "1.0.0"
+val ciVersionCode: Int    = (findProperty("versionCode") as String?)?.toInt() ?: 1
+
 android {
     namespace = "com.bob1.app"
     compileSdk = 36
@@ -21,8 +26,8 @@ android {
         applicationId = "com.bob1.app"
         minSdk = 29
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = ciVersionCode
+        versionName = ciVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

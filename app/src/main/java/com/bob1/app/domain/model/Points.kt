@@ -7,5 +7,4 @@ data class PointRule(
     val role: OfficialRole,
     val pointsOnJ15: Int,
     val pointsOnJ4: Int,
-    val pointsEmergency: Int,
 )
