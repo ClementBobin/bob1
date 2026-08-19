@@ -214,13 +214,12 @@ jobs:
       with:
         node-version: "lts/*"
 
-    - name: Install semantic-release and plugins
+    - name: Install semantic-release
       run: |
         npm install --save-dev semantic-release \
           @semantic-release/changelog \
           @semantic-release/git \
-          @semantic-release/github \
-          conventional-changelog-conventionalcommits
+          @semantic-release/github
 
     - name: Write .releaserc.json (real release with assets)
       env:
@@ -232,8 +231,8 @@ jobs:
         {
           "branches": ["main"],
           "plugins": [
-            ["@semantic-release/commit-analyzer", { "preset": "conventionalcommits" }],
-            ["@semantic-release/release-notes-generator", { "preset": "conventionalcommits" }],
+            ["@semantic-release/commit-analyzer", { "preset": "angular" }],
+            ["@semantic-release/release-notes-generator", { "preset": "angular" }],
             "@semantic-release/changelog",
             ["@semantic-release/github", {
               "assets": [
