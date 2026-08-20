@@ -39,7 +39,7 @@ android {
         buildConfigField(
             "String",
             "BASE_URL",
-            "\"${localProps.getProperty("BASE_URL", "https://bob-1-api-git-dev-clementbobins-projects.vercel.app")}\""
+            "\"${localProps.getProperty("BASE_URL", "https://zany-adventure-r9rjp499jx72x4w7-8080.app.github.dev")}\""
         )
     }
 
