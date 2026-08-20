@@ -1,6 +1,5 @@
 package com.bob1.app.data.repository
 
-import com.bob1.app.data.dto.BiometricLoginRequestDto
 import com.bob1.app.data.dto.LoginRequestDto
 import com.bob1.app.data.dto.RegisterRequestDto
 import com.bob1.app.data.local.SessionManager
