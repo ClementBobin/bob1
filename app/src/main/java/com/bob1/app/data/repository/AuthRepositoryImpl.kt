@@ -19,13 +19,27 @@ internal class AuthRepositoryImpl(
         user
     }
 
+    /**
+     * Replays the last saved credentials against the real API.
+     * Called after a successful biometric prompt — the biometric gate proves
+     * the user's identity; the API call obtains a fresh token.
+     */
+    override suspend fun loginWithBiometric(): Result<User> = runCatching {
+        val (email, password) = session.getBiometricCredentials()
+            ?: error("Aucun identifiant biométrique enregistré. Connectez-vous d'abord avec votre mot de passe.")
+        val response = authAPI.login(LoginRequestDto(email, password))
+        val user = response.user.toDomain()
+        session.saveSession(user, response.token)
+        user
+    }
+
     override suspend fun register(
         firstName: String,
         lastName: String,
         email: String,
         password: String,
     ): Result<User> = runCatching {
-        val userDto = authAPI.register(
+        authAPI.register(
             RegisterRequestDto(
                 email     = email,
                 password  = password,
@@ -37,6 +51,9 @@ internal class AuthRepositoryImpl(
         val response = authAPI.login(LoginRequestDto(email, password))
         val user = response.user.toDomain()
         session.saveSession(user, response.token)
+        // Persist credentials so the user can enable biometric from the Profile
+        // page right after registering, without needing to re-enter their password.
+        session.saveBiometricCredentials(email, password)
         user
     }
 

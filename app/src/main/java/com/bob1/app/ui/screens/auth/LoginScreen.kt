@@ -23,7 +23,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.bob1.app.ui.core.Destination
-import dev.kindling.android.natif.BiometricConfig
 import dev.kindling.android.natif.BiometricHelper
 import dev.kindling.compose.KScreen
 import dev.kindling.core.components.ui.KButtonVariant
@@ -40,16 +39,20 @@ fun LoginScreen(navController: NavController) {
         navController = navController,
         onEvent = { _, vm, event ->
             when (event) {
-                is AuthContracts.UiEvent.LoginSuccess -> navController.navigate(Destination.Calendar.route) {
-                    popUpTo(Destination.Login.route) { inclusive = true }
-                }
-                is AuthContracts.UiEvent.LaunchBiometric -> activity?.let {
-                    biometric.authenticate(
-                        activity = it,
-                        config   = BiometricConfig.strong("BOB1", "Connectez-vous avec votre biométrie"),
-                        onResult = { result -> vm.onBiometricResult(result) }
-                    )
-                }
+                is AuthContracts.UiEvent.LoginSuccess ->
+                    navController.navigate(Destination.Calendar.route) {
+                        popUpTo(Destination.Login.route) { inclusive = true }
+                    }
+
+                is AuthContracts.UiEvent.LaunchBiometric ->
+                    activity?.let {
+                        biometric.authenticate(
+                            activity = it,
+                            config   = vm.biometricConfig,
+                            onResult = { result -> vm.onBiometricResult(result) },
+                        )
+                    }
+
                 else -> Unit
             }
         }
@@ -63,7 +66,7 @@ fun LoginScreen(navController: NavController) {
                 activity?.let {
                     biometric.authenticate(
                         activity = it,
-                        config   = BiometricConfig.strong("BOB1", "Connectez-vous"),
+                        config   = vm.biometricConfig,
                         onResult = vm::onBiometricResult,
                     )
                 }
@@ -103,35 +106,54 @@ private fun LoginContent(
             Text("Gestion des officiels", style = MaterialTheme.typography.bodyMedium, color = cs.onSurfaceVariant)
             Spacer(Modifier.height(40.dp))
 
-            // ── Biometric (primary when available + session exists) ────────────
+            // ── Biometric primary view ────────────────────────────────────────
+            // Shown when hardware is present, user has opted in, and credentials exist.
             AnimatedVisibility(
-                visible = state.biometricAvailable && !state.showPasswordFallback,
+                visible = state.biometricAvailable && state.biometricEnabled && !state.showPasswordFallback,
                 enter = fadeIn(), exit = fadeOut(),
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Icon(Icons.Default.Fingerprint, null, modifier = Modifier.size(72.dp), tint = cs.primary)
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Icon(Icons.Default.Fingerprint, null,
+                        modifier = Modifier.size(72.dp), tint = cs.primary)
                     Text("Authentification biométrique",
                         style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                    Text("Utilisez votre empreinte ou Face ID pour vous connecter.",
+                    Text(
+                        "Utilisez votre empreinte ou Face ID pour vous connecter.",
                         style = MaterialTheme.typography.bodySmall,
-                        color = cs.onSurfaceVariant, textAlign = TextAlign.Center)
+                        color = cs.onSurfaceVariant, textAlign = TextAlign.Center,
+                    )
                     state.biometricError?.let { err ->
-                        Text(err, color = cs.error, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
+                        Text(err, color = cs.error, style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Center)
                     }
-                    KButton(text = "Déverrouiller", onClick = onBiometricTap, modifier = Modifier.fillMaxWidth())
-                    TextButton(onClick = onShowFallback) { Text("Utiliser mon mot de passe", fontSize = 13.sp) }
+                    if (state.isLoading) {
+                        CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                    } else {
+                        KButton(text = "Déverrouiller", onClick = onBiometricTap,
+                            modifier = Modifier.fillMaxWidth())
+                    }
+                    TextButton(onClick = onShowFallback) {
+                        Text("Utiliser mon mot de passe", fontSize = 13.sp)
+                    }
                 }
             }
 
             // ── Password fallback ─────────────────────────────────────────────
             AnimatedVisibility(
-                visible = state.showPasswordFallback || !state.biometricAvailable,
+                visible = state.showPasswordFallback || !state.biometricAvailable || !state.biometricEnabled,
                 enter = fadeIn(), exit = fadeOut(),
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                    Text(if (state.biometricAvailable) "Connexion par mot de passe" else "Connexion",
-                        style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        if (state.biometricAvailable && state.biometricEnabled)
+                            "Connexion par mot de passe"
+                        else
+                            "Connexion",
+                        style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold,
+                    )
                     OutlinedTextField(
                         value = state.email, onValueChange = onEmailChanged,
                         label = { Text("Email") }, leadingIcon = { Icon(Icons.Default.Email, null) },
@@ -151,8 +173,11 @@ private fun LoginContent(
                     state.error?.let { Text(it, color = cs.error, style = MaterialTheme.typography.bodySmall) }
                     KButton(text = "Se connecter", onClick = onLogin, isLoading = state.isLoading,
                         modifier = Modifier.fillMaxWidth())
-                    if (state.biometricAvailable) {
-                        KButton(onClick = onBiometricTap, modifier = Modifier.fillMaxWidth(), variant = KButtonVariant.Ghost) {
+
+                    // Only show biometric shortcut if enabled
+                    if (state.biometricAvailable && state.biometricEnabled) {
+                        KButton(onClick = onBiometricTap, modifier = Modifier.fillMaxWidth(),
+                            variant = KButtonVariant.Ghost) {
                             Icon(Icons.Default.Fingerprint, null, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(8.dp))
                             Text("Utiliser la biométrie")

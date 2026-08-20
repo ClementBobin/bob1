@@ -41,7 +41,7 @@ fun RegisterScreen(
         navController = navController,
         onEvent = { _, _, event ->
             when (event) {
-                is AuthContracts.UiEvent.RegisterSuccess -> navController.navigate(Destination.Calendar.route) {
+                is AuthContracts.UiEvent.RegisterSuccess -> navController.navigate(Destination.PenaltyAck.route) {
                     popUpTo(Destination.Register.route) { inclusive = true }
                 }
                 else -> Unit
