@@ -1,5 +1,5 @@
 # Documentation bob1 Android — Index
- 
+
 > Documentation technique complète de l'application Android bob1.  
 > Architecture : Clean Architecture · MVI · Jetpack Compose · Ktor · Koin
 

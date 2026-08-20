@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/ClementBobin/bob1/compare/v1.7.0...v1.7.1) (2026-08-20)
+
+
+### Bug Fixes
+
+* Update README with project documentation details ([36fa3c0](https://github.com/ClementBobin/bob1/commit/36fa3c0183ad46d4f65df52e3ad013b82451c524))
+
 # [1.7.0](https://github.com/ClementBobin/bob1/compare/v1.6.1...v1.7.0) (2026-08-20)
 
 
