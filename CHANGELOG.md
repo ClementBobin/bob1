@@ -1,3 +1,11 @@
+# [1.7.0](https://github.com/ClementBobin/bob1/compare/v1.6.1...v1.7.0) (2026-08-20)
+
+
+### Features
+
+* enhance biometric authentication flow with token management and loading states ([0206ca7](https://github.com/ClementBobin/bob1/commit/0206ca72ba1b28e2ce596fac24d4de055174eb11))
+* implement biometric authentication flow with token management ([f62cc20](https://github.com/ClementBobin/bob1/commit/f62cc2055137edb4e2b62fa0383b7e1dc1daa2bc))
+
 ## [1.6.1](https://github.com/ClementBobin/bob1/compare/v1.6.0...v1.6.1) (2026-08-20)
 
 
