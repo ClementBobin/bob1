@@ -17,10 +17,6 @@ data class RegisterRequestDto(
 @Serializable
 data class LoginResponseDto(val token: String, val user: UserDto)
 
-/** Sent to POST /api/auth/biometric-login */
-@Serializable
-data class BiometricLoginRequestDto(val bioToken: String)
-
 /** Returned by GET /api/auth/generate-biometric-token */
 @Serializable
 data class BiometricTokenResponseDto(val token: String)

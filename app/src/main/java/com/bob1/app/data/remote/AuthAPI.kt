@@ -40,10 +40,9 @@ internal class AuthAPI(private val client: HttpClient) {
      * Exchanges a previously issued biometric token for a fresh session JWT.
      * Called after the local hardware biometric prompt succeeds.
      */
-    suspend fun biometricLogin(request: BiometricLoginRequestDto): LoginResponseDto =
+    suspend fun biometricLogin(bioToken: String): LoginResponseDto =
         client.post("/api/auth/biometric-login") {
-            contentType(ContentType.Application.Json)
-            setBody(request)
+            header("X-Bio-Token", bioToken)
         }.body()
 
     /** Revokes the biometric token server-side (called on disable or logout). */

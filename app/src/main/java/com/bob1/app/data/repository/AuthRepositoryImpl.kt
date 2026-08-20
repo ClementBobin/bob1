@@ -27,8 +27,8 @@ internal class AuthRepositoryImpl(
      */
     override suspend fun loginWithBiometric(): Result<User> = runCatching {
         val bioToken = session.getBiometricToken()
-            ?: error("Aucun token biométrique enregistré. Activez la biométrie dans votre profil.")
-        val response = authAPI.biometricLogin(BiometricLoginRequestDto(bioToken))
+            ?: error("Aucun token biométrique enregistré.")
+        val response = authAPI.biometricLogin(bioToken)
         val user = response.user.toDomain()
         session.saveSession(user, response.token)
         user
