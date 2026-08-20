@@ -57,13 +57,9 @@ class AuthViewModel(application: Application) :
     private fun checkBiometric() {
         val hardwareAvailable = biometric.canAuthenticate(biometricConfig)
         val biometricEnabled  = session.isBiometricEnabled()
-        val hasCredentials    = session.hasBiometricCredentials()
-
-        // Show biometric prompt automatically if:
-        //  - hardware is available
-        //  - user has opted in
-        //  - credentials are saved (user logged in with password at least once)
-        val canUseBiometric = hardwareAvailable && biometricEnabled && hasCredentials
+        // A server-issued token must exist — not just the preference flag
+        val hasToken          = session.hasBiometricToken()
+        val canUseBiometric   = hardwareAvailable && biometricEnabled && hasToken
 
         updateState {
             copy(
@@ -76,8 +72,8 @@ class AuthViewModel(application: Application) :
     }
 
     /**
-     * Called after the biometric prompt succeeds.
-     * Triggers a real API login using the stored (encrypted) credentials.
+     * Called after the system biometric prompt succeeds.
+     * Exchanges the stored server biometric token for a fresh session JWT.
      */
     fun onBiometricAuthSucceeded() {
         updateState { copy(isLoading = true, biometricError = null) }
@@ -88,8 +84,8 @@ class AuthViewModel(application: Application) :
                 onFailure { e ->
                     updateState {
                         copy(
-                            isLoading           = false,
-                            biometricError      = "Connexion échouée : ${e.message}",
+                            isLoading            = false,
+                            biometricError       = "Connexion échouée : ${e.message}",
                             showPasswordFallback = true,
                         )
                     }
@@ -100,7 +96,6 @@ class AuthViewModel(application: Application) :
 
     fun onBiometricResult(result: BiometricResult) {
         when (result) {
-            // BiometricResult.Success means the hardware gate passed — now call the API
             BiometricResult.Success,
             is BiometricResult.SuccessWithEncrypted,
             is BiometricResult.SuccessWithDecrypted -> onBiometricAuthSucceeded()
@@ -145,13 +140,6 @@ class AuthViewModel(application: Application) :
             source = { repo.login(s.email.trim(), s.password) },
             onResult = {
                 onSuccess {
-                    // Always persist the credentials so the user can later enable
-                    // biometric from the Profile page without re-entering their password.
-                    // Credentials are encrypted with AES-256-GCM via KeystoreHelper and
-                    // never stored in plaintext.
-                    if (state.value.biometricAvailable) {
-                        session.saveBiometricCredentials(s.email.trim(), s.password)
-                    }
                     updateState { copy(isLoading = false) }
                     sendEvent(AuthContracts.UiEvent.LoginSuccess)
                 }
@@ -169,7 +157,7 @@ class AuthViewModel(application: Application) :
             !android.util.Patterns.EMAIL_ADDRESS.matcher(s.email).matches() -> "Adresse e-mail invalide"
             else -> null
         }
-        val passwordError  = if (!s.isPasswordStrong) "Le mot de passe ne respecte pas les critères" else null
+        val passwordError = if (!s.isPasswordStrong) "Le mot de passe ne respecte pas les critères" else null
         if (listOfNotNull(firstNameError, lastNameError, emailError, passwordError).isNotEmpty()) {
             updateState { copy(firstNameError = firstNameError, lastNameError = lastNameError, emailError = emailError, passwordError = passwordError) }
             return

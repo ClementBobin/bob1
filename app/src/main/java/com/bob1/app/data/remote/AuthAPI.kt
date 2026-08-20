@@ -27,4 +27,26 @@ internal class AuthAPI(private val client: HttpClient) {
 
     suspend fun getCurrentUser(): UserDto =
         client.get("/api/auth/me").body()
+
+    /**
+     * Requests a long-lived biometric token from the server (requires a valid
+     * session JWT). The returned token is stored encrypted on-device and later
+     * replayed at [biometricLogin] — credentials never touch the client again.
+     */
+    suspend fun generateBiometricToken(): BiometricTokenResponseDto =
+        client.get("/api/auth/generate-biometric-token").body()
+
+    /**
+     * Exchanges a previously issued biometric token for a fresh session JWT.
+     * Called after the local hardware biometric prompt succeeds.
+     */
+    suspend fun biometricLogin(request: BiometricLoginRequestDto): LoginResponseDto =
+        client.post("/api/auth/biometric-login") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+
+    /** Revokes the biometric token server-side (called on disable or logout). */
+    suspend fun removeBiometricToken(): HttpResponse =
+        client.post("/api/auth/biometric-remove")
 }

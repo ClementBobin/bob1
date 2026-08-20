@@ -17,14 +17,21 @@ data class RegisterRequestDto(
 @Serializable
 data class LoginResponseDto(val token: String, val user: UserDto)
 
+/** Sent to POST /api/auth/biometric-login */
+@Serializable
+data class BiometricLoginRequestDto(val bioToken: String)
+
+/** Returned by GET /api/auth/generate-biometric-token */
+@Serializable
+data class BiometricTokenResponseDto(val token: String)
+
 @Serializable
 data class UserDto(
     val id: String,
     val email: String,
     val firstName: String,
     val lastName: String,
-    // API now sends UserRole as integer (0 = Official, 1 = Admin).
-    // coerceInputValues=true in HttpClient lets us fall back gracefully on unknown values.
+    // API sends UserRole as integer (0 = Official, 1 = Admin).
     val role: Int = 0,
 ) {
     fun toDomain() = User(

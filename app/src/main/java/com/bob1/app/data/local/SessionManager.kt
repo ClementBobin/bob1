@@ -14,20 +14,24 @@ import kotlinx.serialization.json.Json
 
 /**
  * Session manager backed by Kindling's [KeystoreHelper] for AES-256-GCM token
- * encryption. Tokens are encrypted before being stored in SharedPreferences and
- * decrypted on retrieval — keys never leave the Android Keystore hardware.
+ * encryption. Both the session JWT and the biometric token are encrypted before
+ * being stored in SharedPreferences — keys never leave Android Keystore hardware.
  *
- * Biometric credentials (email + password) are stored encrypted under a separate
- * key alias so [BiometricHelper] can trigger a real API login transparently.
+ * ## Biometric flow (no credentials stored)
+ * After a successful password login the server issues a dedicated biometric token
+ * via GET /api/auth/generate-biometric-token. That token is stored here encrypted.
+ * On the next launch the app shows the system biometric prompt; on success it
+ * calls POST /api/auth/biometric-login with the stored token to obtain a fresh JWT.
+ * Credentials (email/password) are never persisted on the device.
  */
 class SessionManager(context: Context) {
 
     private val prefs: SharedPreferences =
         context.getSharedPreferences("bob1_secure_prefs", Context.MODE_PRIVATE)
 
-    private val keystore        = KeystoreHelper()
-    private val keystoreConfig  = KeystoreConfig.default("bob1_session_key")
-    private val credConfig      = KeystoreConfig.default("bob1_biometric_creds_key")
+    private val keystore       = KeystoreHelper()
+    private val sessionConfig  = KeystoreConfig.default("bob1_session_key")
+    private val bioTokenConfig = KeystoreConfig.default("bob1_bio_token_key")
 
     private val _user  = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user.asStateFlow()
@@ -44,18 +48,20 @@ class SessionManager(context: Context) {
         runCatching {
             val encCiphertext = prefs.getString("token_ct", null) ?: return
             val encIv         = prefs.getString("token_iv", null) ?: return
-            val token = keystore.decrypt(keystoreConfig, EncryptedData(encCiphertext, encIv))
+            val token = keystore.decrypt(sessionConfig, EncryptedData(encCiphertext, encIv))
             val userJson = prefs.getString("user_json", null)
             val user = userJson?.let { Json.decodeFromString<UserDto>(it).toDomain() }
-            _token.value          = token
-            _user.value           = user
+            _token.value            = token
+            _user.value             = user
             _biometricEnabled.value = prefs.getBoolean("biometric_enabled", false)
         }.onFailure { clearSession() }
     }
 
+    // ── Session JWT ───────────────────────────────────────────────────────────
+
     fun saveSession(user: User, token: String) {
         runCatching {
-            val encrypted = keystore.encrypt(keystoreConfig, token)
+            val encrypted = keystore.encrypt(sessionConfig, token)
             prefs.edit()
                 .putString("token_ct",  encrypted.ciphertext)
                 .putString("token_iv",  encrypted.iv)
@@ -66,49 +72,40 @@ class SessionManager(context: Context) {
         }
     }
 
-    // ── Biometric credential storage ──────────────────────────────────────────
+    // ── Biometric token (server-issued, not credentials) ──────────────────────
 
     /**
-     * Persists the user's email + password encrypted under a dedicated AES key
-     * so biometric login can replay a real API call transparently.
+     * Stores the server-issued biometric token encrypted with AES-256-GCM.
+     * This token is used at the next launch to obtain a fresh session JWT
+     * from POST /api/auth/biometric-login — no email/password needed.
      */
-    fun saveBiometricCredentials(email: String, password: String) {
+    fun saveBiometricToken(bioToken: String) {
         runCatching {
-            val encEmail    = keystore.encrypt(credConfig, email)
-            val encPassword = keystore.encrypt(credConfig, password)
+            val encrypted = keystore.encrypt(bioTokenConfig, bioToken)
             prefs.edit()
-                .putString("bio_email_ct",    encEmail.ciphertext)
-                .putString("bio_email_iv",    encEmail.iv)
-                .putString("bio_password_ct", encPassword.ciphertext)
-                .putString("bio_password_iv", encPassword.iv)
+                .putString("bio_token_ct", encrypted.ciphertext)
+                .putString("bio_token_iv", encrypted.iv)
                 .apply()
         }
     }
 
-    fun getBiometricCredentials(): Pair<String, String>? = runCatching {
-        val emailCt    = prefs.getString("bio_email_ct",    null) ?: return null
-        val emailIv    = prefs.getString("bio_email_iv",    null) ?: return null
-        val passwordCt = prefs.getString("bio_password_ct", null) ?: return null
-        val passwordIv = prefs.getString("bio_password_iv", null) ?: return null
-        val email    = keystore.decrypt(credConfig, EncryptedData(emailCt,    emailIv))    ?: return null
-        val password = keystore.decrypt(credConfig, EncryptedData(passwordCt, passwordIv)) ?: return null
-        email to password
+    fun getBiometricToken(): String? = runCatching {
+        val ct = prefs.getString("bio_token_ct", null) ?: return null
+        val iv = prefs.getString("bio_token_iv", null) ?: return null
+        keystore.decrypt(bioTokenConfig, EncryptedData(ct, iv))
     }.getOrNull()
 
-    fun hasBiometricCredentials(): Boolean =
-        prefs.getString("bio_email_ct", null) != null
+    fun hasBiometricToken(): Boolean =
+        prefs.getString("bio_token_ct", null) != null
 
     fun setBiometricEnabled(enabled: Boolean) {
         prefs.edit().putBoolean("biometric_enabled", enabled).apply()
         _biometricEnabled.value = enabled
-        if (!enabled) clearBiometricCredentials()
+        if (!enabled) clearBiometricToken()
     }
 
-    private fun clearBiometricCredentials() {
-        prefs.edit()
-            .remove("bio_email_ct").remove("bio_email_iv")
-            .remove("bio_password_ct").remove("bio_password_iv")
-            .apply()
+    fun clearBiometricToken() {
+        prefs.edit().remove("bio_token_ct").remove("bio_token_iv").apply()
     }
 
     // ── Session lifecycle ─────────────────────────────────────────────────────
@@ -119,8 +116,8 @@ class SessionManager(context: Context) {
             .apply()
         _token.value = null
         _user.value  = null
-        // Note: biometric_enabled + credentials are intentionally preserved so
-        // the user can re-authenticate biometrically after a session expiry.
+        // biometric_enabled + token are preserved so the user can re-authenticate
+        // biometrically after a session expiry without re-entering their password.
     }
 
     fun isAuthenticated(): Boolean = _token.value != null

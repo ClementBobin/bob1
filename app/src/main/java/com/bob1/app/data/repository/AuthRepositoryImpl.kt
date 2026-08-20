@@ -1,5 +1,6 @@
 package com.bob1.app.data.repository
 
+import com.bob1.app.data.dto.BiometricLoginRequestDto
 import com.bob1.app.data.dto.LoginRequestDto
 import com.bob1.app.data.dto.RegisterRequestDto
 import com.bob1.app.data.local.SessionManager
@@ -20,17 +21,35 @@ internal class AuthRepositoryImpl(
     }
 
     /**
-     * Replays the last saved credentials against the real API.
-     * Called after a successful biometric prompt — the biometric gate proves
-     * the user's identity; the API call obtains a fresh token.
+     * Exchanges the stored server-issued biometric token for a fresh session JWT.
+     * The hardware biometric prompt has already succeeded before this is called —
+     * it acts as the local authentication gate.
      */
     override suspend fun loginWithBiometric(): Result<User> = runCatching {
-        val (email, password) = session.getBiometricCredentials()
-            ?: error("Aucun identifiant biométrique enregistré. Connectez-vous d'abord avec votre mot de passe.")
-        val response = authAPI.login(LoginRequestDto(email, password))
+        val bioToken = session.getBiometricToken()
+            ?: error("Aucun token biométrique enregistré. Activez la biométrie dans votre profil.")
+        val response = authAPI.biometricLogin(BiometricLoginRequestDto(bioToken))
         val user = response.user.toDomain()
         session.saveSession(user, response.token)
         user
+    }
+
+    /**
+     * Calls the server to generate a long-lived biometric token, then stores it
+     * encrypted on-device. Must be called while a valid session JWT exists
+     * (i.e. right after a successful password login or from the Profile page).
+     */
+    override suspend fun generateAndSaveBiometricToken(): Result<Unit> = runCatching {
+        val response = authAPI.generateBiometricToken()
+        session.saveBiometricToken(response.token)
+    }
+
+    /**
+     * Revokes the biometric token server-side and clears the local copy.
+     */
+    override suspend fun removeBiometricToken(): Result<Unit> = runCatching {
+        authAPI.removeBiometricToken()
+        session.clearBiometricToken()
     }
 
     override suspend fun register(
@@ -47,17 +66,19 @@ internal class AuthRepositoryImpl(
                 lastName  = lastName,
             )
         )
-        // Auto-login: fetch a token by logging in immediately after register
+        // Auto-login to get a session token right after registering
         val response = authAPI.login(LoginRequestDto(email, password))
         val user = response.user.toDomain()
         session.saveSession(user, response.token)
-        // Persist credentials so the user can enable biometric from the Profile
-        // page right after registering, without needing to re-enter their password.
-        session.saveBiometricCredentials(email, password)
         user
     }
 
     override suspend fun logout(): Result<Unit> = runCatching {
+        // Best-effort: revoke biometric token server-side on logout
+        if (session.hasBiometricToken()) {
+            runCatching { authAPI.removeBiometricToken() }
+            session.clearBiometricToken()
+        }
         authAPI.logout()
         session.clearSession()
     }
