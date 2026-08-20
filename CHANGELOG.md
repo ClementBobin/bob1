@@ -1,3 +1,11 @@
+# [1.6.0](https://github.com/ClementBobin/bob1/compare/v1.5.0...v1.6.0) (2026-08-20)
+
+
+### Features
+
+* enhance biometric credential management during login and registration ([48bbe7a](https://github.com/ClementBobin/bob1/commit/48bbe7a2f0fcf041dcca63c2b678fbd3731c14e4))
+* implement biometric authentication for login and credential management ([add4587](https://github.com/ClementBobin/bob1/commit/add45876d215823a68936cf148aed8657d2fe05b))
+
 # [1.5.0](https://github.com/ClementBobin/bob1/compare/v1.4.0...v1.5.0) (2026-08-19)
 
 
