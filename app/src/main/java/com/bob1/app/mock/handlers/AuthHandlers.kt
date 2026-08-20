@@ -16,9 +16,17 @@ val authHandlers: List<MockHandler> = listOf(
         val obj   = body?.let { json.parseToJsonElement(it).jsonObject }
         val email = obj?.get("email")?.jsonPrimitive?.content ?: ""
         when (email) {
-            "admin@club.fr"   -> LoginResponseDto("mock-token-admin",   BasketballMockData.adminUser)
-            "arbitre@club.fr" -> LoginResponseDto("mock-token-official", BasketballMockData.officialUser)
+            "admin@club.fr"   -> LoginResponseDto("mock-token-admin")
+            "arbitre@club.fr" -> LoginResponseDto("mock-token-official")
             else -> error("Email ou mot de passe incorrect.")
+        }
+    },
+
+    MockHandler(HttpMethod.Get, "/auth/me") { headers, _ ->
+        when (headers["Authorization"]) {
+            "Bearer mock-token-admin"    -> BasketballMockData.adminUser
+            "Bearer mock-token-official" -> BasketballMockData.officialUser
+            else                         -> BasketballMockData.officialUser
         }
     },
 
@@ -40,7 +48,5 @@ val authHandlers: List<MockHandler> = listOf(
         MessageResponseDto("Déconnecté.")
     },
 
-    MockHandler(HttpMethod.Get, "/auth/me") { _, _ ->
-        BasketballMockData.officialUser
-    },
+
 )

@@ -33,12 +33,13 @@ internal class AuthAPI(private val client: HttpClient) {
      * session JWT). The returned token is stored encrypted on-device and later
      * replayed at [biometricLogin] — credentials never touch the client again.
      */
-    suspend fun generateBiometricToken(): BiometricTokenResponseDto =
+    suspend fun generateBiometricToken(): LoginResponseDto =
         client.get("/api/auth/generate-biometric-token").body()
 
     /**
      * Exchanges a previously issued biometric token for a fresh session JWT.
      * Called after the local hardware biometric prompt succeeds.
+     * The token is sent via the X-Bio-Token header instead of the request body.
      */
     suspend fun biometricLogin(bioToken: String): LoginResponseDto =
         client.post("/api/auth/biometric-login") {

@@ -14,8 +14,8 @@ internal class AuthRepositoryImpl(
 
     override suspend fun login(email: String, password: String): Result<User> = runCatching {
         val response = authAPI.login(LoginRequestDto(email, password))
-        val user = response.user.toDomain()
-        session.saveSession(user, response.token)
+        val user = getCurrentUser()
+        session.saveSession(user, response.token, response.expiresTime)
         user
     }
 
@@ -28,10 +28,10 @@ internal class AuthRepositoryImpl(
         val bioToken = session.getBiometricToken()
             ?: error("Aucun token biométrique enregistré.")
         val response = authAPI.biometricLogin(bioToken)
-        val user = response.user.toDomain()
-        session.saveSession(user, response.token)
+        val user = getCurrentUser()
+        session.saveSession(user, response.token, response.expiresTime)
         user
-    }
+}
 
     /**
      * Calls the server to generate a long-lived biometric token, then stores it
@@ -66,9 +66,9 @@ internal class AuthRepositoryImpl(
             )
         )
         // Auto-login to get a session token right after registering
-        val response = authAPI.login(LoginRequestDto(email, password))
-        val user = response.user.toDomain()
-        session.saveSession(user, response.token)
+        val response = login(LoginRequestDto(email, password))
+        val user = getCurrentUser()
+        session.saveSession(user, response.token, response.expiresTime)
         user
     }
 
