@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/ClementBobin/bob1/compare/v1.6.0...v1.6.1) (2026-08-20)
+
+
+### Bug Fixes
+
+* formatting in README.md ([99ba638](https://github.com/ClementBobin/bob1/commit/99ba638364dfd365d61609e9dfce7b4ec405bc6b))
+
 # [1.6.0](https://github.com/ClementBobin/bob1/compare/v1.5.0...v1.6.0) (2026-08-20)
 
 
