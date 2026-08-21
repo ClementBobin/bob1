@@ -3,23 +3,32 @@ package com.bob1.app.ui.screens.profile
 import android.app.Application
 import com.bob1.app.data.local.SessionManager
 import com.bob1.app.domain.model.User
+import dev.kindling.android.natif.BiometricConfig
+import dev.kindling.android.natif.BiometricHelper
 import dev.kindling.compose.KViewModel
 import org.koin.core.component.inject
 
 object ProfileContracts {
     data class UiState(
         val user: User? = null,
+        val biometricAvailable: Boolean = false,
+        val biometricEnabled: Boolean = false,
+        val showBiometricEnableDialog: Boolean = false,
+        val biometricStatusMessage: String? = null,
     )
 
     sealed interface UiEvent {
         object LoggedOut : UiEvent
+        /** Ask the UI layer to show a biometric prompt to confirm enrollment. */
+        object ConfirmBiometricEnable : UiEvent
     }
 }
 
 class ProfileViewModel(application: Application) :
     KViewModel<ProfileContracts.UiState>(ProfileContracts.UiState(), application) {
 
-    private val session: SessionManager by inject()
+    private val session: SessionManager    by inject()
+    private val biometric: BiometricHelper by inject()
 
     val biometricConfig = BiometricConfig.strong(
         title    = "Activer la biométrie",
@@ -32,26 +41,17 @@ class ProfileViewModel(application: Application) :
             copy(
                 user               = session.currentUser(),
                 biometricAvailable = biometric.canAuthenticate(biometricConfig),
-                biometricEnabled   = session.isBiometricEnabled() && session.hasBiometricToken(),
+                biometricEnabled   = session.isBiometricEnabled(),
             )
         }
-        // Refresh from server in background (picks up role changes etc.)
-        fetchData(
-            source   = { repo.getCurrentUser() },
-            onResult = {
-                onSuccess { user -> updateState { copy(user = user) } }
-                onFailure { /* silent — keep local cache */ }
-            }
-        )
     }
 
     /**
      * Called when the user toggles the biometric switch on the profile page.
      *
      * - Enabling  → fires [ProfileContracts.UiEvent.ConfirmBiometricEnable] so the
-     *               UI can show the biometric prompt. The server token is generated
-     *               and stored only after the prompt succeeds.
-     * - Disabling → revokes the server token then clears the local flag.
+     *               UI can show the biometric prompt. Only persists after confirmation.
+     * - Disabling → immediately clears the flag + stored credentials.
      */
     fun onBiometricToggle(enabled: Boolean) {
         if (enabled) {
@@ -59,44 +59,27 @@ class ProfileViewModel(application: Application) :
                 updateState { copy(biometricStatusMessage = "La biométrie n'est pas disponible sur cet appareil.") }
                 return
             }
-            // Ask the user to confirm with biometrics before calling the server
+            // Credentials are saved on every successful password login or register.
+            // If missing, the user somehow has a session without ever entering a password
+            // (edge case: manual data wipe). Ask them to re-authenticate.
+            if (!session.hasBiometricCredentials()) {
+                updateState {
+                    copy(biometricStatusMessage = "Déconnectez-vous puis reconnectez-vous avec votre mot de passe pour activer la biométrie.")
+                }
+                return
+            }
+            // Ask the user to confirm with biometrics before enabling
             sendEvent(ProfileContracts.UiEvent.ConfirmBiometricEnable)
         } else {
-            disableBiometric()
+            session.setBiometricEnabled(false)
+            updateState { copy(biometricEnabled = false, biometricStatusMessage = "Connexion biométrique désactivée.") }
         }
     }
 
-    /**
-     * Called after the confirmation biometric prompt succeeds.
-     * Calls the server to generate a long-lived biometric token, then stores it
-     * encrypted on-device and enables the biometric login flag.
-     */
+    /** Called after the confirmation biometric prompt succeeds. */
     fun onBiometricEnableConfirmed() {
-        updateState { copy(isLoading = true, biometricStatusMessage = null) }
-        fetchData(
-            source   = { repo.generateAndSaveBiometricToken() },
-            onResult = {
-                onSuccess {
-                    session.setBiometricEnabled(true)
-                    updateState {
-                        copy(
-                            isLoading              = false,
-                            biometricEnabled       = true,
-                            biometricStatusMessage = "Connexion biométrique activée !",
-                        )
-                    }
-                }
-                onFailure { e ->
-                    updateState {
-                        copy(
-                            isLoading              = false,
-                            biometricEnabled       = false,
-                            biometricStatusMessage = "Échec de l'activation : ${e.message}",
-                        )
-                    }
-                }
-            }
-        )
+        session.setBiometricEnabled(true)
+        updateState { copy(biometricEnabled = true, biometricStatusMessage = "Connexion biométrique activée !") }
     }
 
     /** Called if the biometric confirmation prompt fails or is cancelled. */
@@ -105,39 +88,6 @@ class ProfileViewModel(application: Application) :
     }
 
     fun dismissStatusMessage() = updateState { copy(biometricStatusMessage = null) }
-
-    /**
-     * Revokes the server-side biometric token then clears the local copy + flag.
-     */
-    private fun disableBiometric() {
-        updateState { copy(isLoading = true) }
-        fetchData(
-            source   = { repo.removeBiometricToken() },
-            onResult = {
-                onSuccess {
-                    updateState {
-                        copy(
-                            isLoading              = false,
-                            biometricEnabled       = false,
-                            biometricStatusMessage = "Connexion biométrique désactivée.",
-                        )
-                    }
-                }
-                onFailure { e ->
-                    // Still disable locally even if the server call failed
-                    session.setBiometricEnabled(false)
-                    session.clearBiometricToken()
-                    updateState {
-                        copy(
-                            isLoading              = false,
-                            biometricEnabled       = false,
-                            biometricStatusMessage = "Désactivée localement (erreur serveur : ${e.message}).",
-                        )
-                    }
-                }
-            }
-        )
-    }
 
     fun logout() {
         session.clearSession()
