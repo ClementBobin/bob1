@@ -26,7 +26,6 @@ import javax.net.ssl.X509TrustManager
 val appModule = module {
 
     // ── Native helpers ────────────────────────────────────────────────────────
-    single { SessionManager(androidContext()) }
     single { NotificationHelper(androidContext()) }
     single { VibrationHelper(androidContext()) }
     single { BiometricHelper(androidContext()) }
@@ -51,13 +50,12 @@ val appModule = module {
         }
     }
 
-    // Bearer token is injected per-request via SessionManager in createHttpClient
     single<HttpClient> {
         createHttpClient(
-            baseUrl        = BuildConfig.BASE_URL,
-            engine         = get(),
+            baseUrl         = BuildConfig.BASE_URL,
+            engine          = get(),
             vibrationHelper = get(),
-            sessionManager = get(),
+            sessionManager  = get(),
         )
     }
 
@@ -70,6 +68,14 @@ val appModule = module {
     single { PenaltyAPI(get()) }
     single { LocationAPI(get()) }
     single { SeasonPointAPI(get()) }
+
+    // ── SessionManager — wired with fetchRemoteUser after AuthAPI is ready ────
+    single {
+        SessionManager(
+            context          = androidContext(),
+            fetchRemoteUser  = { get<AuthAPI>().getCurrentUser().toDomain().let { Result.success(it) } },
+        )
+    }
 
     // ── Repositories ──────────────────────────────────────────────────────────
     single<AuthRepository>         { AuthRepositoryImpl(get(), get()) }
