@@ -261,14 +261,14 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: npx semantic-release
 
-    # - name: Publish AAB to Play Store
-    #   uses: r0adkll/upload-google-play@v1
-    #   with:
-    #     serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
-    #     packageName: com.bob1.app
-    #     releaseFiles: ${{ steps.outputs.outputs.AAB_PATH }}
-    #     track: internal
-    #     status: completed
+    - name: Publish AAB to Play Store
+      uses: r0adkll/upload-google-play@v1
+      with:
+        serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        packageName: com.mirage.bob1
+        releaseFiles: ${{ steps.outputs.outputs.AAB_PATH }}
+        track: internal
+        status: completed
 
     - name: Upload APK artifact
       if: steps.outputs.outputs.APK_PATH != ''
