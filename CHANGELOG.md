@@ -1,3 +1,16 @@
+# [1.8.0](https://github.com/ClementBobin/bob1/compare/v1.7.1...v1.8.0) (2026-08-23)
+
+
+### Bug Fixes
+
+* Change application namespace and ID to com.mirage.bob1 ([d18026b](https://github.com/ClementBobin/bob1/commit/d18026b32d5879d2deb9ff20501664d14aaedd29))
+
+
+### Features
+
+* update BuildConfig references and improve login handling in AuthRepositoryImpl ([3df7ede](https://github.com/ClementBobin/bob1/commit/3df7ede82fbbd4cc306614783a50b15969b9ab8c))
+* Update Play Store publish step with new package name ([ca79c38](https://github.com/ClementBobin/bob1/commit/ca79c383faa68af80035690bda2699e025211c57))
+
 ## [1.7.1](https://github.com/ClementBobin/bob1/compare/v1.7.0...v1.7.1) (2026-08-20)
 
 
