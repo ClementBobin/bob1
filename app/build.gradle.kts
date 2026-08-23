@@ -19,11 +19,11 @@ val ciVersionName: String = findProperty("versionName") as String? ?: "1.0.0"
 val ciVersionCode: Int    = (findProperty("versionCode") as String?)?.toInt() ?: 1
 
 android {
-    namespace = "com.bob1.app"
+    namespace = "com.mirage.bob1"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.bob1.app"
+        applicationId = "com.mirage.bob1"
         minSdk = 29
         targetSdk = 36
         versionCode = ciVersionCode
