@@ -28,11 +28,11 @@ data class UserDto(
     val role: Int = 0,
 ) {
     fun toDomain() = User(
-        id        = id,
-        email     = email,
+        id = id,
+        email = email,
         firstName = firstName,
-        lastName  = lastName,
-        role      = when (role) {
+        lastName = lastName,
+        role = when (role) {
             1    -> UserRole.ADMIN
             else -> UserRole.OFFICIAL
         },

@@ -3,6 +3,7 @@ package com.bob1.app
 import android.app.Application
 import com.bob1.app.di.appModule
 import com.bob1.app.mock.MockInitializer
+import com.mirage.bob1.BuildConfig
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin

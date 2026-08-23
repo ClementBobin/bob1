@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.bob1.app.R
 import com.bob1.app.ui.core.Destination
 import com.bob1.app.ui.core.components.ui.AuthCard
 import com.bob1.app.ui.core.components.ui.FieldWithLabel

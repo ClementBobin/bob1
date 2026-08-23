@@ -16,8 +16,14 @@ val authHandlers: List<MockHandler> = listOf(
         val obj   = body?.let { json.parseToJsonElement(it).jsonObject }
         val email = obj?.get("email")?.jsonPrimitive?.content ?: ""
         when (email) {
-            "admin@club.fr"   -> LoginResponseDto("mock-token-admin")
-            "arbitre@club.fr" -> LoginResponseDto("mock-token-official")
+            "admin@club.fr"   -> LoginResponseDto(
+                "mock-token-admin",
+                expiresTime = TODO()
+            )
+            "arbitre@club.fr" -> LoginResponseDto(
+                "mock-token-official",
+                expiresTime = TODO()
+            )
             else -> error("Email ou mot de passe incorrect.")
         }
     },

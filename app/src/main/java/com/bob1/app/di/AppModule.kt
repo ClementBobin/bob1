@@ -1,13 +1,13 @@
 package com.bob1.app.di
 
 import android.annotation.SuppressLint
-import com.bob1.app.BuildConfig
 import com.bob1.app.data.local.SessionManager
 import com.bob1.app.data.repository.*
 import com.bob1.app.data.remote.*
 import com.bob1.app.domain.repository.*
 import com.bob1.app.domain.repository.SeasonPointRepository
 import com.bob1.app.mock.registry.buildMockEngine
+import com.mirage.bob1.BuildConfig
 import dev.kindling.android.natif.BiometricHelper
 import dev.kindling.android.natif.NotificationHelper
 import dev.kindling.android.natif.VibrationHelper
