@@ -1,0 +1,47 @@
+package com.mirage.bob1.ui.core
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.composable
+import com.mirage.bob1.data.local.SessionManager
+import com.mirage.bob1.ui.screens.auth.LoginScreen
+import com.mirage.bob1.ui.screens.auth.RegisterScreen
+import com.mirage.bob1.ui.screens.calendar.CalendarScreen
+import com.mirage.bob1.ui.screens.notifications.NotificationsScreen
+import com.mirage.bob1.ui.screens.penalty.PenaltyAckScreen
+import com.mirage.bob1.ui.screens.profile.ProfileScreen
+import dev.kindling.compose.KNavHost
+import org.koin.compose.koinInject
+import dev.kindling.compose.KDestination 
+
+sealed class Destination(override val route: String) : KDestination  {
+    object Login         : Destination("login")
+    object Register      : Destination("register")
+    object Calendar      : Destination("calendar")
+    object Notifications : Destination("notifications")
+    object Profile       : Destination("profile")
+    object PenaltyAck    : Destination("penalty_ack")
+}
+
+@Composable
+fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
+    val session: SessionManager = koinInject()
+    val token by session.token.collectAsState()
+
+    val start = when {
+        token != null -> Destination.PenaltyAck
+        else          -> Destination.Login
+    }
+
+    KNavHost(navController = navController, startDestination = start, modifier = modifier) {
+        composable(Destination.Login.route)         { LoginScreen(navController) }
+        composable(Destination.Register.route)      { RegisterScreen(navController) }
+        composable(Destination.PenaltyAck.route)    { PenaltyAckScreen(navController) }
+        composable(Destination.Calendar.route)      { CalendarScreen(navController) }
+        composable(Destination.Notifications.route) { NotificationsScreen(navController) }
+        composable(Destination.Profile.route)       { ProfileScreen(navController) }
+    }
+}
