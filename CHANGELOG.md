@@ -1,3 +1,10 @@
+## [1.8.1](https://github.com/ClementBobin/bob1/compare/v1.8.0...v1.8.1) (2026-08-25)
+
+
+### Bug Fixes
+
+* Update BASE_URL in build.gradle.kts ([505d8d9](https://github.com/ClementBobin/bob1/commit/505d8d95540d20fdef32dbf9d77919c4fd0e9fe7))
+
 # [1.8.0](https://github.com/ClementBobin/bob1/compare/v1.7.1...v1.8.0) (2026-08-23)
 
 
