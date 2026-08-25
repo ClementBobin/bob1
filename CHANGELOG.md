@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/ClementBobin/bob1/compare/v1.8.1...v1.9.0) (2026-08-25)
+
+
+### Features
+
+* add calendar and notifications screens with view models ([e09fca1](https://github.com/ClementBobin/bob1/commit/e09fca16a69d2e9572a63f450ecf7cb475625629))
+
 ## [1.8.1](https://github.com/ClementBobin/bob1/compare/v1.8.0...v1.8.1) (2026-08-25)
 
 
