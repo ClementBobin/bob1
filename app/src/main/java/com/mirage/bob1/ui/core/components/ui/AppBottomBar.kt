@@ -1,4 +1,4 @@
-package com.mirage.bob1ob1.ui.core.components.ui
+package com.mirage.bob1.ui.core.components.ui
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -7,7 +7,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-import com.mirage.bob1ob1.ui.core.Destination
+import com.mirage.bob1.ui.core.Destination
 
 @Composable
 fun AppBottomBar(navController: NavController) {

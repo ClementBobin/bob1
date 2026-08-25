@@ -1,4 +1,4 @@
-package com.mirage.bob1ob1.ui.core.components.ui.calendar
+package com.mirage.bob1.ui.core.components.ui.calendar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,11 +17,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.mirage.bob1ob1.data.dto.OfficialRole
-import com.mirage.bob1ob1.domain.model.Match
-import com.mirage.bob1ob1.domain.usecase.NavigationHelper
-import com.mirage.bob1ob1.domain.usecase.dotColor
-import com.mirage.bob1ob1.domain.usecase.label
+import com.mirage.bob1.data.dto.OfficialRole
+import com.mirage.bob1.domain.model.Match
+import com.mirage.bob1.domain.usecase.NavigationHelper
+import com.mirage.bob1.domain.usecase.dotColor
+import com.mirage.bob1.domain.usecase.label
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

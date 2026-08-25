@@ -1,6 +1,6 @@
-package com.mirage.bob1ob1.domain.model
+package com.mirage.bob1.domain.model
 
-import com.mirage.bob1ob1.data.dto.UserRole
+import com.mirage.bob1.data.dto.UserRole
 
 data class User(
     val id: String,

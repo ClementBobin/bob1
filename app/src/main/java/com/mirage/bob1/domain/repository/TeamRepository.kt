@@ -1,6 +1,6 @@
-package com.mirage.bob1ob1.domain.repository
+package com.mirage.bob1.domain.repository
 
-import com.mirage.bob1ob1.domain.model.Team
+import com.mirage.bob1.domain.model.Team
 
 interface TeamRepository {
     suspend fun getTeams(divisionId: String? = null): Result<List<Team>>

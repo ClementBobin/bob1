@@ -1,4 +1,4 @@
-package com.mirage.bob1ob1.ui.screens.profile
+package com.mirage.bob1.ui.screens.profile
 
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedVisibility
@@ -19,9 +19,9 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.mirage.bob1ob1.data.dto.UserRole
-import com.mirage.bob1ob1.ui.core.Destination
-import com.mirage.bob1ob1.ui.core.components.ui.AppBottomBar
+import com.mirage.bob1.data.dto.UserRole
+import com.mirage.bob1.ui.core.Destination
+import com.mirage.bob1.ui.core.components.ui.AppBottomBar
 import dev.kindling.android.natif.BiometricHelper
 import dev.kindling.android.natif.BiometricResult
 import dev.kindling.compose.KScreen

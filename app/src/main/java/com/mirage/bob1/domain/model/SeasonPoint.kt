@@ -1,4 +1,4 @@
-package com.mirage.bob1ob1.domain.model
+package com.mirage.bob1.domain.model
 
 data class SeasonPointRanking(
     val rank: Int,

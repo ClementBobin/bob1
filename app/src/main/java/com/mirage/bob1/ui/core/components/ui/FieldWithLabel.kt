@@ -1,4 +1,4 @@
-package com.mirage.bob1ob1.ui.core.components.ui
+package com.mirage.bob1.ui.core.components.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

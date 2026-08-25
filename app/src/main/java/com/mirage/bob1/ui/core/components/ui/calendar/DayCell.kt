@@ -1,4 +1,4 @@
-package com.mirage.bob1ob1.ui.core.components.ui.calendar
+package com.mirage.bob1.ui.core.components.ui.calendar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,8 +23,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mirage.bob1ob1.domain.model.Match
-import com.mirage.bob1ob1.domain.usecase.dotColor
+import com.mirage.bob1.domain.model.Match
+import com.mirage.bob1.domain.usecase.dotColor
 import java.util.Calendar
 
 @Composable

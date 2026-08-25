@@ -1,4 +1,4 @@
-package com.mirage.bob1ob1.domain.usecase
+package com.mirage.bob1.domain.usecase
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -7,7 +7,7 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.mirage.bob1ob1.data.dto.NotificationType
+import com.mirage.bob1.data.dto.NotificationType
 
 @Composable
 fun NotificationType.icon() = when (this) {

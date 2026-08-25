@@ -1,6 +1,6 @@
-package com.mirage.bob1ob1.data.remote
+package com.mirage.bob1.data.remote
 
-import com.mirage.bob1ob1.data.dto.*
+import com.mirage.bob1.data.dto.*
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.*

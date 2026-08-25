@@ -1,8 +1,8 @@
-package com.mirage.bob1ob1.data.repository
+package com.mirage.bob1.data.repository
 
-import com.mirage.bob1ob1.data.remote.LocationAPI
-import com.mirage.bob1ob1.domain.model.Location
-import com.mirage.bob1ob1.domain.repository.LocationRepository
+import com.mirage.bob1.data.remote.LocationAPI
+import com.mirage.bob1.domain.model.Location
+import com.mirage.bob1.domain.repository.LocationRepository
 
 internal class LocationRepositoryImpl(
     private val locationAPI: LocationAPI

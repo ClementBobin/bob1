@@ -1,6 +1,6 @@
-package com.mirage.bob1ob1.domain.repository
+package com.mirage.bob1.domain.repository
 
-import com.mirage.bob1ob1.domain.model.Penalty
+import com.mirage.bob1.domain.model.Penalty
 
 interface PenaltyRepository {
     suspend fun getMyPenalties(): Result<List<Penalty>>

@@ -1,4 +1,4 @@
-package com.mirage.bob1ob1.ui.core.theme
+package com.mirage.bob1.ui.core.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

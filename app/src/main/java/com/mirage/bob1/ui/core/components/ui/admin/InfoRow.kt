@@ -1,4 +1,4 @@
-package com.mirage.bob1ob1.ui.core.components.ui.admin
+package com.mirage.bob1.ui.core.components.ui.admin
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth

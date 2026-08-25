@@ -1,7 +1,7 @@
-package com.mirage.bob1ob1.domain.repository
+package com.mirage.bob1.domain.repository
 
-import com.mirage.bob1ob1.data.dto.OfficialRole
-import com.mirage.bob1ob1.domain.model.Match
+import com.mirage.bob1.data.dto.OfficialRole
+import com.mirage.bob1.domain.model.Match
 
 interface MatchRepository {
     suspend fun getMatches(year: Int, month: Int): Result<List<Match>>

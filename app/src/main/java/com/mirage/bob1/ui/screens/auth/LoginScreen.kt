@@ -1,4 +1,4 @@
-package com.mirage.bob1ob1.ui.screens.auth
+package com.mirage.bob1.ui.screens.auth
 
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedVisibility
@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.mirage.bob1ob1.ui.core.Destination
+import com.mirage.bob1.ui.core.Destination
 import dev.kindling.android.natif.BiometricHelper
 import dev.kindling.compose.KScreen
 import dev.kindling.core.components.ui.KButtonVariant

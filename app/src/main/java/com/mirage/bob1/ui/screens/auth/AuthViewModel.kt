@@ -1,8 +1,8 @@
-package com.mirage.bob1ob1.ui.screens.auth
+package com.mirage.bob1.ui.screens.auth
 
 import android.app.Application
-import com.mirage.bob1ob1.data.local.SessionManager
-import com.mirage.bob1ob1.domain.repository.AuthRepository
+import com.mirage.bob1.data.local.SessionManager
+import com.mirage.bob1.domain.repository.AuthRepository
 import dev.kindling.android.natif.BiometricConfig
 import dev.kindling.android.natif.BiometricHelper
 import dev.kindling.android.natif.BiometricResult

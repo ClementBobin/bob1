@@ -1,4 +1,4 @@
-package com.mirage.bob1ob1.ui.core.components.ui.calendar
+package com.mirage.bob1.ui.core.components.ui.calendar
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.mirage.bob1ob1.domain.model.Match
+import com.mirage.bob1.domain.model.Match
 import java.util.Calendar
 
 @Composable

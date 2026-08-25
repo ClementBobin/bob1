@@ -1,4 +1,4 @@
-package com.mirage.bob1ob1.ui.core.components.ui
+package com.mirage.bob1.ui.core.components.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,10 +26,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.mirage.bob1ob1.data.dto.NotificationType
-import com.mirage.bob1ob1.domain.model.AppNotification
-import com.mirage.bob1ob1.domain.usecase.icon
-import com.mirage.bob1ob1.domain.usecase.iconBg
+import com.mirage.bob1.data.dto.NotificationType
+import com.mirage.bob1.domain.model.AppNotification
+import com.mirage.bob1.domain.usecase.icon
+import com.mirage.bob1.domain.usecase.iconBg
 
 @Composable
 fun NotificationCard(notification: AppNotification, onTap: () -> Unit) {

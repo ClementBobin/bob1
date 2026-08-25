@@ -1,8 +1,8 @@
-package com.mirage.bob1ob1.mock.handlers
+package com.mirage.bob1.mock.handlers
 
-import com.mirage.bob1ob1.data.dto.*
-import com.mirage.bob1ob1.mock.factories.BasketballMockData
-import com.mirage.bob1ob1.mock.registry.MockHandler
+import com.mirage.bob1.data.dto.*
+import com.mirage.bob1.mock.factories.BasketballMockData
+import com.mirage.bob1.mock.registry.MockHandler
 import io.ktor.http.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject

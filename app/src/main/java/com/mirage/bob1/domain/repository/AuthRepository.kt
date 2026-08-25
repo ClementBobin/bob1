@@ -1,6 +1,6 @@
-package com.mirage.bob1ob1.domain.repository
+package com.mirage.bob1.domain.repository
 
-import com.mirage.bob1ob1.domain.model.User
+import com.mirage.bob1.domain.model.User
 
 interface AuthRepository {
     suspend fun login(email: String, password: String): Result<User>

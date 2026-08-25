@@ -1,4 +1,4 @@
-package com.mirage.bob1ob1.ui.core.components.ui.admin
+package com.mirage.bob1.ui.core.components.ui.admin
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,7 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.mirage.bob1ob1.domain.model.Division
+import com.mirage.bob1.domain.model.Division
 
 @Composable
 fun DivisionRow(division: Division, onDelete: () -> Unit) {
