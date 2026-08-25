@@ -69,7 +69,8 @@ class SessionManager(
                     runCatching {
                         fetchRemoteUser()?.onSuccess { freshUser ->
                             // Keep the existing expiresTime when updating the session profile
-                            saveSession(freshUser, token, expiresTime)
+                            saveToken(token, expiresTime)
+                            saveSession(freshUser)
                         }
                     }
                 }
@@ -77,20 +78,23 @@ class SessionManager(
         }.onFailure { clearSession() }
     }
 
-    fun saveToken(token: String) {
-        _token.value = token
-    }
-
-    fun saveSession(user: User, token: String, expiresTime: Long) {
+    fun saveToken(token: String, expiresTime: Long) {
         runCatching {
             val encrypted = keystore.encrypt(sessionConfig, token)
             prefs.edit()
                 .putString("token_ct", encrypted.ciphertext)
                 .putString("token_iv", encrypted.iv)
                 .putLong("token_expires_at", expiresTime)
-                .putString("user_json", Json.encodeToString(UserDto.fromDomain(user)))
                 .apply()
             _token.value = token
+        }
+    }
+
+    fun saveSession(user: User) {
+        runCatching {
+            prefs.edit()
+                .putString("user_json", Json.encodeToString(UserDto.fromDomain(user)))
+                .apply()
             _user.value  = user
         }
     }

@@ -14,8 +14,9 @@ internal class AuthRepositoryImpl(
 
     override suspend fun login(email: String, password: String): Result<User> = runCatching {
         val response = authAPI.login(LoginRequestDto(email, password))
-        val user = authAPI.getCurrentUser().toDomain()
-        session.saveSession(user, response.token, response.expiresTime)
+        session.saveToken(response.token, response.expiresTime)
+        val user = authAPI.getCurrentUser(response.token).toDomain()
+        session.saveSession(user)
         user
     }
 
@@ -23,8 +24,9 @@ internal class AuthRepositoryImpl(
         val bioToken = session.getBiometricToken()
             ?: error("Aucun token biométrique enregistré.")
         val response = authAPI.biometricLogin(bioToken)
-        val user = authAPI.getCurrentUser().toDomain()
-        session.saveSession(user, response.token, response.expiresTime)
+        session.saveToken(response.token, response.expiresTime)
+        val user = authAPI.getCurrentUser(response.token).toDomain()
+        session.saveSession(user)
         user
     }
 
@@ -54,21 +56,19 @@ internal class AuthRepositoryImpl(
         )
         // Auto-login after registering
         val response = authAPI.login(LoginRequestDto(email, password))
-        val user = authAPI.getCurrentUser().toDomain()
-        session.saveSession(user, response.token, response.expiresTime)
+        session.saveToken(response.token, response.expiresTime)
+        val user = authAPI.getCurrentUser(response.token).toDomain()
+        session.saveSession(user)
         user
     }
 
     override suspend fun logout(): Result<Unit> = runCatching {
-        if (session.hasBiometricToken()) {
-            runCatching { authAPI.removeBiometricToken() }
-            session.clearBiometricToken()
-        }
         authAPI.logout()
         session.clearSession()
     }
 
     override suspend fun getCurrentUser(): Result<User> = runCatching {
-        authAPI.getCurrentUser().toDomain()
+        val token = session.currentToken() ?: error("Aucun token de session disponible.")
+        authAPI.getCurrentUser(token).toDomain()
     }
 }

@@ -18,6 +18,11 @@ data class RegisterRequestDto(
 @Serializable
 data class LoginResponseDto(val token: String, val expiresTime: Long)
 
+/** Returned by POST /api/auth/generate-biometric-token */
+@Serializable
+data class bioTokenGenerateResponseDto(val token: String)
+
+
 @Serializable
 data class UserDto(
     val id: String,
