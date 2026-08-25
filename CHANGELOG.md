@@ -1,3 +1,16 @@
+# [1.10.0](https://github.com/ClementBobin/bob1/compare/v1.9.0...v1.10.0) (2026-08-25)
+
+
+### Bug Fixes
+
+* updated icon launcher ([9665281](https://github.com/ClementBobin/bob1/commit/9665281778e7262124ec43752f1add818c52f77f))
+
+
+### Features
+
+* add various icon assets for iOS and web ([95bdbca](https://github.com/ClementBobin/bob1/commit/95bdbca0e2e583191f68747fecb190227d6ff729))
+* update getCurrentUser method to require token and refactor session handling ([0215a9a](https://github.com/ClementBobin/bob1/commit/0215a9a89350db410e617208dd8badbdcdf32605))
+
 # [1.9.0](https://github.com/ClementBobin/bob1/compare/v1.8.1...v1.9.0) (2026-08-25)
 
 
