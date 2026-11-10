@@ -11,7 +11,11 @@ plugins {
 }
 
 // Push is optional while developing: without google-services.json the app builds and runs, it just has no FCM token.
-if (file("google-services.json").exists()) apply(plugin = "com.google.gms.google-services")
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+    apply(plugin = "com.google.firebase.crashlytics")
+    apply(plugin = "com.google.firebase.firebase-perf")
+}
 
 val localProps = Properties().apply {
     val f = rootProject.file("local.properties")
