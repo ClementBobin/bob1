@@ -13,10 +13,10 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import com.mirage.bob1.BuildConfig
 import com.mirage.bob1.data.remote.AuthApi
 import com.mirage.bob1.data.remote.AuthInterceptor
 import com.mirage.bob1.data.remote.Bob1Api
+import com.mirage.bob1.data.remote.RemoteConfigBaseUrlInterceptor
 import com.mirage.bob1.data.remote.TokenAuthenticator
 import com.mirage.bob1.data.repository.*
 import com.mirage.bob1.domain.repository.*
@@ -66,7 +66,10 @@ object AppModule {
     }
 
     @Provides @Singleton @AnonymousClient
-    fun anonymousClient(): OkHttpClient = OkHttpClient.Builder().addInterceptor(logging()).build()
+    fun anonymousClient(): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(RemoteConfigBaseUrlInterceptor())
+        .addInterceptor(logging())
+        .build()
 
     @Provides @Singleton
     fun authApi(@AnonymousClient client: OkHttpClient, json: Json): AuthApi = retrofit(client, json).create(AuthApi::class.java)
@@ -75,6 +78,7 @@ object AppModule {
     fun authenticatedClient(session: SecureSession, authApi: AuthApi): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(AuthInterceptor(session))
         .authenticator(TokenAuthenticator(session, authApi))
+        .addInterceptor(RemoteConfigBaseUrlInterceptor())
         .addInterceptor(logging())
         .build()
 
@@ -82,7 +86,8 @@ object AppModule {
     fun bob1Api(@AuthenticatedClient client: OkHttpClient, json: Json): Bob1Api = retrofit(client, json).create(Bob1Api::class.java)
 
     private fun retrofit(client: OkHttpClient, json: Json) = Retrofit.Builder()
-        .baseUrl(BuildConfig.API_BASE_URL)
+        // Base URL is rewritten at runtime by RemoteConfigBaseUrlInterceptor.
+        .baseUrl("https://remote-config.invalid/")
         .client(client)
         .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
         .build()

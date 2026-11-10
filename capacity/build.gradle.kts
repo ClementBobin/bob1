@@ -17,6 +17,9 @@ android {
 dependencies {
     // Everything native comes from Kindling :android (also brings firebase-messaging as `api`).
     api(libs.kindling.android)
+    // Firebase Remote Config is exposed to :app through :capacity, like FCM.
+    api(platform(libs.firebase.bom))
+    api(libs.firebase.config)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.fragment.ktx)   // PermissionHelper.registerLauncher needs a FragmentActivity
     implementation(libs.kotlinx.coroutines.android)
