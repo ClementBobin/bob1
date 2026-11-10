@@ -1,4 +1,4 @@
-package org.bob1.app.ui.screens.calendar
+package com.mirage.bob1.ui.screens.calendar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,11 +34,11 @@ import dev.kindling.core.components.ui.card.KCard
 import dev.kindling.core.components.ui.card.KCardContent
 import java.time.LocalDate
 import java.time.YearMonth
-import org.bob1.app.domain.model.Match
-import org.bob1.app.ui.core.components.*
-import org.bob1.app.ui.core.formatLong
-import org.bob1.app.ui.core.formatTitle
-import org.bob1.app.ui.core.navigation.rememberUiEventHandler
+import com.mirage.bob1.domain.model.Match
+import com.mirage.bob1.ui.core.components.*
+import com.mirage.bob1.ui.core.formatLong
+import com.mirage.bob1.ui.core.formatTitle
+import com.mirage.bob1.ui.core.navigation.rememberUiEventHandler
 
 @Composable
 fun CalendarScreen(navController: NavController, viewModel: CalendarViewModel = hiltViewModel()) {

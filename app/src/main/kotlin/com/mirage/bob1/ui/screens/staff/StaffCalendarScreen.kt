@@ -1,4 +1,4 @@
-package org.bob1.app.ui.screens.staff
+package com.mirage.bob1.ui.screens.staff
 
 import android.app.Application
 import androidx.compose.foundation.clickable
@@ -25,19 +25,19 @@ import dev.kindling.compose.KScreen
 import java.time.LocalDate
 import javax.inject.Inject
 import kotlinx.coroutines.launch
-import org.bob1.app.domain.model.OpenStaffMatch
-import org.bob1.app.domain.usecase.GetAssignmentsUseCase
-import org.bob1.app.domain.usecase.GetOpenStaffMatchesUseCase
-import org.bob1.app.domain.usecase.ObserveUnreadCountUseCase
-import org.bob1.app.ui.core.Bob1ViewModel
-import org.bob1.app.ui.core.components.*
-import org.bob1.app.ui.core.formatLong
-import org.bob1.app.ui.core.formatTime
-import org.bob1.app.ui.core.navigation.NotificationsDestination
-import org.bob1.app.ui.core.navigation.StaffMatchDestination
-import org.bob1.app.ui.core.navigation.rememberUiEventHandler
-import org.bob1.app.ui.core.toLocalDate
-import org.bob1.app.ui.core.userMessage
+import com.mirage.bob1.domain.model.OpenStaffMatch
+import com.mirage.bob1.domain.usecase.GetAssignmentsUseCase
+import com.mirage.bob1.domain.usecase.GetOpenStaffMatchesUseCase
+import com.mirage.bob1.domain.usecase.ObserveUnreadCountUseCase
+import com.mirage.bob1.ui.core.Bob1ViewModel
+import com.mirage.bob1.ui.core.components.*
+import com.mirage.bob1.ui.core.formatLong
+import com.mirage.bob1.ui.core.formatTime
+import com.mirage.bob1.ui.core.navigation.NotificationsDestination
+import com.mirage.bob1.ui.core.navigation.StaffMatchDestination
+import com.mirage.bob1.ui.core.navigation.rememberUiEventHandler
+import com.mirage.bob1.ui.core.toLocalDate
+import com.mirage.bob1.ui.core.userMessage
 
 data class StaffCalendarState(
     val loading: Boolean = true,

@@ -1,4 +1,4 @@
-package org.bob1.app.ui.screens.calendar
+package com.mirage.bob1.ui.screens.calendar
 
 import android.app.Application
 import androidx.lifecycle.viewModelScope
@@ -13,14 +13,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
-import org.bob1.app.domain.model.Division
-import org.bob1.app.domain.model.FamilyMember
-import org.bob1.app.domain.model.Match
-import org.bob1.app.domain.usecase.*
-import org.bob1.app.ui.core.Bob1ViewModel
-import org.bob1.app.ui.core.navigation.MatchDestination
-import org.bob1.app.ui.core.navigation.NotificationsDestination
-import org.bob1.app.ui.core.toLocalDate
+import com.mirage.bob1.domain.model.Division
+import com.mirage.bob1.domain.model.FamilyMember
+import com.mirage.bob1.domain.model.Match
+import com.mirage.bob1.domain.usecase.*
+import com.mirage.bob1.ui.core.Bob1ViewModel
+import com.mirage.bob1.ui.core.navigation.MatchDestination
+import com.mirage.bob1.ui.core.navigation.NotificationsDestination
+import com.mirage.bob1.ui.core.toLocalDate
 
 data class CalendarState(
     val firstName: String = "",

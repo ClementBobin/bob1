@@ -1,4 +1,4 @@
-package org.bob1.app.ui.screens.match
+package com.mirage.bob1.ui.screens.match
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,12 +21,12 @@ import dev.kindling.compose.KScreen
 import dev.kindling.core.components.ui.button.KButton
 import dev.kindling.core.components.ui.button.KButtonSize
 import dev.kindling.core.components.ui.button.KButtonVariant
-import org.bob1.app.domain.model.Ride
-import org.bob1.app.domain.model.Slot
-import org.bob1.app.ui.core.components.*
-import org.bob1.app.ui.core.formatDayTime
-import org.bob1.app.ui.core.formatTime
-import org.bob1.app.ui.core.navigation.rememberUiEventHandler
+import com.mirage.bob1.domain.model.Ride
+import com.mirage.bob1.domain.model.Slot
+import com.mirage.bob1.ui.core.components.*
+import com.mirage.bob1.ui.core.formatDayTime
+import com.mirage.bob1.ui.core.formatTime
+import com.mirage.bob1.ui.core.navigation.rememberUiEventHandler
 
 @Composable
 fun MatchScreen(navController: NavController, viewModel: MatchViewModel = hiltViewModel()) {

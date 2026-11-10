@@ -1,6 +1,6 @@
-package org.bob1.app.domain.repository
+package com.mirage.bob1.domain.repository
 
-import org.bob1.app.domain.model.*
+import com.mirage.bob1.domain.model.*
 
 interface RankingRepository {
     suspend fun ranking(family: Boolean, category: String?): Result<Ranking>

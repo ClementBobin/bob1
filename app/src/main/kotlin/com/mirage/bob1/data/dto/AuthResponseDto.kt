@@ -1,4 +1,4 @@
-package org.bob1.app.data.dto
+package com.mirage.bob1ob1ob1.data.dto
 
 import kotlinx.serialization.Serializable
 

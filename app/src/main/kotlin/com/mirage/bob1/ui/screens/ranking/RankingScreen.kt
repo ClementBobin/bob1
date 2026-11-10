@@ -1,4 +1,4 @@
-package org.bob1.app.ui.screens.ranking
+package com.mirage.bob1.ui.screens.ranking
 
 import android.app.Application
 import androidx.compose.foundation.layout.*
@@ -23,13 +23,13 @@ import dev.kindling.core.components.ui.button.KButtonVariant
 import dev.kindling.core.components.ui.card.KCard
 import dev.kindling.core.components.ui.card.KCardContent
 import javax.inject.Inject
-import org.bob1.app.domain.model.Ranking
-import org.bob1.app.domain.model.RankingRow
-import org.bob1.app.domain.usecase.GetRankingUseCase
-import org.bob1.app.ui.core.Bob1ViewModel
-import org.bob1.app.ui.core.components.*
-import org.bob1.app.ui.core.navigation.rememberUiEventHandler
-import org.bob1.app.ui.core.userMessage
+import com.mirage.bob1.domain.model.Ranking
+import com.mirage.bob1.domain.model.RankingRow
+import com.mirage.bob1.domain.usecase.GetRankingUseCase
+import com.mirage.bob1.ui.core.Bob1ViewModel
+import com.mirage.bob1.ui.core.components.*
+import com.mirage.bob1.ui.core.navigation.rememberUiEventHandler
+import com.mirage.bob1.ui.core.userMessage
 
 data class RankingState(val family: Boolean = false, val loading: Boolean = true, val error: String? = null, val ranking: Ranking? = null)
 

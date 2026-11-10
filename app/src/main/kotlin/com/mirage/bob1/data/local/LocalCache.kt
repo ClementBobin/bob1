@@ -1,4 +1,4 @@
-package org.bob1.app.data.local
+package com.mirage.bob1.data.local
 
 import javax.inject.Inject
 import javax.inject.Singleton

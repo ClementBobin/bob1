@@ -1,4 +1,4 @@
-package org.bob1.app.ui.screens.staff
+package com.mirage.bob1.ui.screens.staff
 
 import android.app.Application
 import androidx.compose.foundation.clickable
@@ -23,15 +23,15 @@ import dev.kindling.compose.KScreen
 import dev.kindling.core.components.ui.card.KCard
 import dev.kindling.core.components.ui.card.KCardContent
 import javax.inject.Inject
-import org.bob1.app.domain.model.StaffAssignment
-import org.bob1.app.domain.usecase.GetAssignmentsUseCase
-import org.bob1.app.domain.usecase.GetStaffRankingUseCase
-import org.bob1.app.ui.core.Bob1ViewModel
-import org.bob1.app.ui.core.components.*
-import org.bob1.app.ui.core.formatDayTime
-import org.bob1.app.ui.core.navigation.StaffMatchDestination
-import org.bob1.app.ui.core.navigation.rememberUiEventHandler
-import org.bob1.app.ui.core.userMessage
+import com.mirage.bob1.domain.model.StaffAssignment
+import com.mirage.bob1.domain.usecase.GetAssignmentsUseCase
+import com.mirage.bob1.domain.usecase.GetStaffRankingUseCase
+import com.mirage.bob1.ui.core.Bob1ViewModel
+import com.mirage.bob1.ui.core.components.*
+import com.mirage.bob1.ui.core.formatDayTime
+import com.mirage.bob1.ui.core.navigation.StaffMatchDestination
+import com.mirage.bob1.ui.core.navigation.rememberUiEventHandler
+import com.mirage.bob1.ui.core.userMessage
 
 data class StaffAssignmentsState(
     val loading: Boolean = true,

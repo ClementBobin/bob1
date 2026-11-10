@@ -1,4 +1,4 @@
-package org.bob1.app.ui.screens.register
+package com.mirage.bob1.ui.screens.register
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -21,8 +21,8 @@ import dev.kindling.compose.KScreen
 import dev.kindling.core.components.ui.KInput
 import dev.kindling.core.components.ui.button.KButton
 import dev.kindling.core.components.ui.button.KButtonVariant
-import org.bob1.app.ui.core.components.Bob1TopBar
-import org.bob1.app.ui.core.navigation.rememberUiEventHandler
+import com.mirage.bob1.ui.core.components.Bob1TopBar
+import com.mirage.bob1.ui.core.navigation.rememberUiEventHandler
 
 @Composable
 fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = hiltViewModel()) {

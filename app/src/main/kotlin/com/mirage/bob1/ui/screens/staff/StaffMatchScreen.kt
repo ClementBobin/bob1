@@ -1,4 +1,4 @@
-package org.bob1.app.ui.screens.staff
+package com.mirage.bob1.ui.screens.staff
 
 import android.app.Application
 import androidx.compose.foundation.layout.*
@@ -21,17 +21,17 @@ import dev.kindling.core.components.ui.button.KButtonSize
 import dev.kindling.core.components.ui.button.KButtonVariant
 import java.time.Instant
 import javax.inject.Inject
-import org.bob1.app.domain.model.Match
-import org.bob1.app.domain.model.MatchStatus
-import org.bob1.app.domain.model.Slot
-import org.bob1.app.domain.usecase.*
-import org.bob1.app.ui.core.Bob1ViewModel
-import org.bob1.app.ui.core.components.*
-import org.bob1.app.ui.core.formatDayTime
-import org.bob1.app.ui.core.navigation.HapticConfirm
-import org.bob1.app.ui.core.navigation.MatchDestination
-import org.bob1.app.ui.core.navigation.rememberUiEventHandler
-import org.bob1.app.ui.core.userMessage
+import com.mirage.bob1.domain.model.Match
+import com.mirage.bob1.domain.model.MatchStatus
+import com.mirage.bob1.domain.model.Slot
+import com.mirage.bob1.domain.usecase.*
+import com.mirage.bob1.ui.core.Bob1ViewModel
+import com.mirage.bob1.ui.core.components.*
+import com.mirage.bob1.ui.core.formatDayTime
+import com.mirage.bob1.ui.core.navigation.HapticConfirm
+import com.mirage.bob1.ui.core.navigation.MatchDestination
+import com.mirage.bob1.ui.core.navigation.rememberUiEventHandler
+import com.mirage.bob1.ui.core.userMessage
 
 /** Sign up or leave: both go through a confirmation dialog, like the design's "Voulez-vous vous inscrire comme Arbitre 1 ?". */
 data class PendingSlotAction(val slot: Slot, val join: Boolean)

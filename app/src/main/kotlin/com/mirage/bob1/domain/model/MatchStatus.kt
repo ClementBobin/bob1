@@ -1,3 +1,3 @@
-package org.bob1.app.domain.model
+package com.mirage.bob1.domain.model
 
 enum class MatchStatus { Scheduled, Cancelled, Played }

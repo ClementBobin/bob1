@@ -27,6 +27,9 @@ val ciVersionCode: Int    = (findProperty("versionCode") as String?)?.toInt() ?:
 val apiUrl = providers.gradleProperty("bob1.apiUrl").orElse("http://10.0.2.2:5000/api/v1/")
 
 android {
+    // Must match the Kotlin package (com.mirage.bob1): it decides where BuildConfig and R are generated
+    // and what ".MainActivity" / ".Bob1Application" resolve to in the manifest.
+    // Independent from applicationId, which stays com.mirage.bob1 (Play Store package).
     namespace = "com.mirage.bob1"
     compileSdk = 37
 

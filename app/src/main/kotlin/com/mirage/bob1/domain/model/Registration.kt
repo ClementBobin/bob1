@@ -1,4 +1,4 @@
-package org.bob1.app.domain.model
+package com.mirage.bob1.domain.model
 
 /**
  * Sign-up form. With [invitationCode] the person joins an existing family; without it a new family is created

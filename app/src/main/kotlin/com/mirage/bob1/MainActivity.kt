@@ -1,4 +1,4 @@
-package org.bob1.app
+package com.mirage.bob1ob1
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -6,7 +6,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.fragment.app.FragmentActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import org.bob1.app.ui.AppRoot
+import com.mirage.bob1ob1.ui.AppRoot
 import org.bob1.capacity.permission.NotificationPermission
 
 // FragmentActivity (not ComponentActivity) because Kindling's PermissionHelper registers its launcher on one.

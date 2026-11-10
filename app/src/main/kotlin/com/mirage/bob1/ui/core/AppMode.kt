@@ -1,4 +1,4 @@
-package org.bob1.app.ui.core
+package com.mirage.bob1.ui.core
 
 import javax.inject.Inject
 import javax.inject.Singleton

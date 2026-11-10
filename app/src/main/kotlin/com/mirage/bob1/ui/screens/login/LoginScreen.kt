@@ -1,4 +1,4 @@
-package org.bob1.app.ui.screens.login
+package com.mirage.bob1.ui.screens.login
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -20,8 +20,8 @@ import dev.kindling.compose.KScreen
 import dev.kindling.core.components.ui.KInput
 import dev.kindling.core.components.ui.button.KButton
 import dev.kindling.core.components.ui.button.KButtonVariant
-import org.bob1.app.ui.core.components.Bob1Logo
-import org.bob1.app.ui.core.navigation.rememberUiEventHandler
+import com.mirage.bob1.ui.core.components.Bob1Logo
+import com.mirage.bob1.ui.core.navigation.rememberUiEventHandler
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: LoginViewModel = hiltViewModel()) {

@@ -1,6 +1,6 @@
-package org.bob1.app.data.remote
+package com.mirage.bob1.data.remote
 
-import org.bob1.app.data.dto.*
+import com.mirage.bob1.data.dto.*
 import retrofit2.http.Body
 import retrofit2.http.POST
 

@@ -1,17 +1,17 @@
-package org.bob1.app.data.repository
+package com.mirage.bob1.data.repository
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import org.bob1.app.data.dto.*
-import org.bob1.app.data.local.*
-import org.bob1.app.data.remote.AuthApi
-import org.bob1.app.data.remote.Bob1Api
-import org.bob1.app.data.remote.apiCall
-import org.bob1.app.domain.model.*
-import org.bob1.app.domain.repository.*
+import com.mirage.bob1.data.dto.*
+import com.mirage.bob1.data.local.*
+import com.mirage.bob1.data.remote.AuthApi
+import com.mirage.bob1.data.remote.Bob1Api
+import com.mirage.bob1.data.remote.apiCall
+import com.mirage.bob1.domain.model.*
+import com.mirage.bob1.domain.repository.*
 import org.bob1.capacity.push.PushMessaging
 import org.bob1.capacity.session.SecureSession
 

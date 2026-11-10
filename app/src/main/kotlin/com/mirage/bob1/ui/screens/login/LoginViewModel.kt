@@ -1,11 +1,11 @@
-package org.bob1.app.ui.screens.login
+package com.mirage.bob1.ui.screens.login
 
 import android.app.Application
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import org.bob1.app.domain.usecase.LoginUseCase
-import org.bob1.app.ui.core.Bob1ViewModel
-import org.bob1.app.ui.core.navigation.RegisterDestination
+import com.mirage.bob1.domain.usecase.LoginUseCase
+import com.mirage.bob1.ui.core.Bob1ViewModel
+import com.mirage.bob1.ui.core.navigation.RegisterDestination
 
 data class LoginState(val email: String = "", val password: String = "", val loading: Boolean = false) {
     val canSubmit get() = email.isNotBlank() && password.isNotBlank() && !loading

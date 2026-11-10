@@ -1,7 +1,7 @@
-package org.bob1.app.domain.repository
+package com.mirage.bob1.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import org.bob1.app.domain.model.*
+import com.mirage.bob1.domain.model.*
 
 /** All suspend calls return [Result]; failures are `ApiException` (see data/remote) for HTTP errors. */
 interface AuthRepository {

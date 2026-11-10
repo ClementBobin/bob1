@@ -1,4 +1,4 @@
-package org.bob1.app.ui.screens.notifications
+package com.mirage.bob1.ui.screens.notifications
 
 import android.app.Application
 import androidx.compose.foundation.background
@@ -28,12 +28,12 @@ import dev.kindling.core.components.ui.button.KButtonSize
 import dev.kindling.core.components.ui.button.KButtonVariant
 import javax.inject.Inject
 import kotlinx.coroutines.launch
-import org.bob1.app.domain.model.AppNotification
-import org.bob1.app.domain.usecase.*
-import org.bob1.app.ui.core.Bob1ViewModel
-import org.bob1.app.ui.core.components.*
-import org.bob1.app.ui.core.formatShort
-import org.bob1.app.ui.core.navigation.rememberUiEventHandler
+import com.mirage.bob1.domain.model.AppNotification
+import com.mirage.bob1.domain.usecase.*
+import com.mirage.bob1.ui.core.Bob1ViewModel
+import com.mirage.bob1.ui.core.components.*
+import com.mirage.bob1.ui.core.formatShort
+import com.mirage.bob1.ui.core.navigation.rememberUiEventHandler
 
 data class NotificationsState(val items: List<AppNotification> = emptyList(), val refreshing: Boolean = false) {
     val hasUnread get() = items.any { !it.isRead }

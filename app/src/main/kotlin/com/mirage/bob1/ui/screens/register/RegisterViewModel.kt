@@ -1,11 +1,11 @@
-package org.bob1.app.ui.screens.register
+package com.mirage.bob1.ui.screens.register
 
 import android.app.Application
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import org.bob1.app.domain.model.Registration
-import org.bob1.app.domain.usecase.RegisterUseCase
-import org.bob1.app.ui.core.Bob1ViewModel
+import com.mirage.bob1.domain.model.Registration
+import com.mirage.bob1.domain.usecase.RegisterUseCase
+import com.mirage.bob1.ui.core.Bob1ViewModel
 
 const val INVITATION_CODE_LENGTH = 8   // the API generates 8-character codes
 

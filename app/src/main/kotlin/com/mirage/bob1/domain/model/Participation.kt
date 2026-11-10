@@ -1,3 +1,3 @@
-package org.bob1.app.domain.model
+package com.mirage.bob1.domain.model
 
 data class Participation(val presenceConfirmed: Boolean, val slots: List<Slot>)

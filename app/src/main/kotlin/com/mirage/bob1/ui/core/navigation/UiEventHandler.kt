@@ -1,4 +1,4 @@
-package org.bob1.app.ui.core.navigation
+package com.mirage.bob1.ui.core.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember

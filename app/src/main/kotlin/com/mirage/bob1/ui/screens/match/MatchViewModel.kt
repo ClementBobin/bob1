@@ -1,4 +1,4 @@
-package org.bob1.app.ui.screens.match
+package com.mirage.bob1.ui.screens.match
 
 import android.app.Application
 import androidx.lifecycle.SavedStateHandle
@@ -6,13 +6,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
-import org.bob1.app.domain.model.*
-import org.bob1.app.domain.usecase.*
-import org.bob1.app.ui.core.Bob1ViewModel
-import org.bob1.app.ui.core.navigation.HapticConfirm
-import org.bob1.app.ui.core.navigation.MatchDestination
-import org.bob1.app.ui.core.navigation.OpenDirections
-import org.bob1.app.ui.core.userMessage
+import com.mirage.bob1.domain.model.*
+import com.mirage.bob1.domain.usecase.*
+import com.mirage.bob1.ui.core.Bob1ViewModel
+import com.mirage.bob1.ui.core.navigation.HapticConfirm
+import com.mirage.bob1.ui.core.navigation.MatchDestination
+import com.mirage.bob1.ui.core.navigation.OpenDirections
+import com.mirage.bob1.ui.core.userMessage
 
 data class MatchState(
     val loading: Boolean = true,

@@ -1,4 +1,4 @@
-package org.bob1.app.ui.screens.profile
+package com.mirage.bob1.ui.screens.profile
 
 import android.app.Application
 import androidx.compose.foundation.layout.*
@@ -21,16 +21,16 @@ import dev.kindling.core.components.ui.button.KButton
 import dev.kindling.core.components.ui.button.KButtonVariant
 import javax.inject.Inject
 import kotlinx.coroutines.launch
-import org.bob1.app.domain.model.Family
-import org.bob1.app.domain.model.User
-import org.bob1.app.domain.model.UserRole
-import org.bob1.app.ui.core.AppMode
-import org.bob1.app.ui.core.AppModeStore
-import org.bob1.app.domain.usecase.*
-import org.bob1.app.ui.core.Bob1ViewModel
-import org.bob1.app.ui.core.components.*
-import org.bob1.app.ui.core.navigation.ShareText
-import org.bob1.app.ui.core.navigation.rememberUiEventHandler
+import com.mirage.bob1.domain.model.Family
+import com.mirage.bob1.domain.model.User
+import com.mirage.bob1.domain.model.UserRole
+import com.mirage.bob1.ui.core.AppMode
+import com.mirage.bob1.ui.core.AppModeStore
+import com.mirage.bob1.domain.usecase.*
+import com.mirage.bob1.ui.core.Bob1ViewModel
+import com.mirage.bob1.ui.core.components.*
+import com.mirage.bob1.ui.core.navigation.ShareText
+import com.mirage.bob1.ui.core.navigation.rememberUiEventHandler
 import org.bob1.capacity.permission.NotificationPermission
 
 data class ProfileState(

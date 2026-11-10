@@ -1,4 +1,4 @@
-package org.bob1.app.di
+package com.mirage.bob1.di
 
 import android.content.Context
 import dagger.Binds
@@ -13,13 +13,13 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.bob1.app.BuildConfig
-import org.bob1.app.data.remote.AuthApi
-import org.bob1.app.data.remote.AuthInterceptor
-import org.bob1.app.data.remote.Bob1Api
-import org.bob1.app.data.remote.TokenAuthenticator
-import org.bob1.app.data.repository.*
-import org.bob1.app.domain.repository.*
+import com.mirage.bob1.BuildConfig
+import com.mirage.bob1.data.remote.AuthApi
+import com.mirage.bob1.data.remote.AuthInterceptor
+import com.mirage.bob1.data.remote.Bob1Api
+import com.mirage.bob1.data.remote.TokenAuthenticator
+import com.mirage.bob1.data.repository.*
+import com.mirage.bob1.domain.repository.*
 import org.bob1.capacity.haptics.Haptics
 import org.bob1.capacity.network.NetworkMonitor
 import org.bob1.capacity.permission.NotificationPermission

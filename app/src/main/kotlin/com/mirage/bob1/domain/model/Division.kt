@@ -1,4 +1,4 @@
-package org.bob1.app.domain.model
+package com.mirage.bob1.domain.model
 
 data class Division(
     val id: String,

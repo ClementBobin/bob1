@@ -1,4 +1,4 @@
-package org.bob1.app.ui.core.components
+package com.mirage.bob1.ui.core.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
@@ -42,12 +42,12 @@ import dev.kindling.core.components.ui.card.KCard
 import dev.kindling.core.components.ui.card.KCardContent
 import dev.kindling.core.components.ui.empty.KEmptyState
 import dev.kindling.core.components.ui.spinner.KSpinner
-import org.bob1.app.domain.model.Match
-import org.bob1.app.domain.model.MatchStatus
-import org.bob1.app.ui.core.formatTime
-import org.bob1.app.domain.model.UserRole
-import org.bob1.app.ui.core.AppMode
-import org.bob1.app.ui.core.navigation.*
+import com.mirage.bob1.domain.model.Match
+import com.mirage.bob1.domain.model.MatchStatus
+import com.mirage.bob1.ui.core.formatTime
+import com.mirage.bob1.domain.model.UserRole
+import com.mirage.bob1.ui.core.AppMode
+import com.mirage.bob1.ui.core.navigation.*
 
 // ── Brand ───────────────────────────────────────────────────
 

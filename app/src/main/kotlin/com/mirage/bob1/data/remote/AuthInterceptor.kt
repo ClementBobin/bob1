@@ -1,4 +1,4 @@
-package org.bob1.app.data.remote
+package com.mirage.bob1.data.remote
 
 import okhttp3.Interceptor
 import okhttp3.Response

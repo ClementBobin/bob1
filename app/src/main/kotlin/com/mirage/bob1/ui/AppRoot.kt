@@ -1,4 +1,4 @@
-package org.bob1.app.ui
+package com.mirage.bob1.ui
 
 import android.app.Application
 import androidx.compose.foundation.background
@@ -28,27 +28,27 @@ import dev.kindling.core.components.ui.toast.KToaster
 import javax.inject.Inject
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import org.bob1.app.domain.model.UserRole
-import org.bob1.app.domain.usecase.GetMeUseCase
-import org.bob1.app.ui.core.AppMode
-import org.bob1.app.ui.core.AppModeStore
-import org.bob1.app.ui.core.components.tabsFor
-import org.bob1.app.ui.screens.staff.*
-import org.bob1.app.domain.usecase.ObserveSessionUseCase
-import org.bob1.app.domain.usecase.RegisterPushTokenUseCase
-import org.bob1.app.ui.core.Bob1ViewModel
-import org.bob1.app.ui.core.components.Bob1BottomBar
-import org.bob1.app.ui.core.components.LoadingBox
-import org.bob1.app.ui.core.navigation.*
-import org.bob1.app.ui.core.theme.Bob1Theme
-import org.bob1.app.ui.screens.calendar.CalendarScreen
-import org.bob1.app.ui.screens.commitments.CommitmentsScreen
-import org.bob1.app.ui.screens.login.LoginScreen
-import org.bob1.app.ui.screens.match.MatchScreen
-import org.bob1.app.ui.screens.notifications.NotificationsScreen
-import org.bob1.app.ui.screens.profile.ProfileScreen
-import org.bob1.app.ui.screens.register.RegisterScreen
-import org.bob1.app.ui.screens.ranking.RankingScreen
+import com.mirage.bob1.domain.model.UserRole
+import com.mirage.bob1.domain.usecase.GetMeUseCase
+import com.mirage.bob1.ui.core.AppMode
+import com.mirage.bob1.ui.core.AppModeStore
+import com.mirage.bob1.ui.core.components.tabsFor
+import com.mirage.bob1.ui.screens.staff.*
+import com.mirage.bob1.domain.usecase.ObserveSessionUseCase
+import com.mirage.bob1.domain.usecase.RegisterPushTokenUseCase
+import com.mirage.bob1.ui.core.Bob1ViewModel
+import com.mirage.bob1.ui.core.components.Bob1BottomBar
+import com.mirage.bob1.ui.core.components.LoadingBox
+import com.mirage.bob1.ui.core.navigation.*
+import com.mirage.bob1.ui.core.theme.Bob1Theme
+import com.mirage.bob1.ui.screens.calendar.CalendarScreen
+import com.mirage.bob1.ui.screens.commitments.CommitmentsScreen
+import com.mirage.bob1.ui.screens.login.LoginScreen
+import com.mirage.bob1.ui.screens.match.MatchScreen
+import com.mirage.bob1.ui.screens.notifications.NotificationsScreen
+import com.mirage.bob1.ui.screens.profile.ProfileScreen
+import com.mirage.bob1.ui.screens.register.RegisterScreen
+import com.mirage.bob1.ui.screens.ranking.RankingScreen
 import org.bob1.capacity.permission.NotificationPermission
 
 /** `authenticated`: null while the encrypted session is being read. */

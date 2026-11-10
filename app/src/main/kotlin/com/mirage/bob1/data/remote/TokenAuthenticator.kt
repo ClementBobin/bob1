@@ -1,4 +1,4 @@
-package org.bob1.app.data.remote
+package com.mirage.bob1.data.remote
 
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
@@ -22,7 +22,7 @@ class TokenAuthenticator(private val session: SecureSession, private val authApi
 
             val refresh = session.refreshToken ?: return null
             return try {
-                val fresh = runBlocking { authApi.refresh(org.bob1.app.data.dto.RefreshRequestDto(refresh)) }
+                val fresh = runBlocking { authApi.refresh(com.mirage.bob1.data.dto.RefreshRequestDto(refresh)) }
                 runBlocking { session.save(fresh.accessToken, fresh.refreshToken) }
                 response.request.withToken(fresh.accessToken)
             } catch (e: HttpException) {

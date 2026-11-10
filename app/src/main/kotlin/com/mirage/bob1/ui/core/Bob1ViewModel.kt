@@ -1,10 +1,10 @@
-package org.bob1.app.ui.core
+package com.mirage.bob1.ui.core
 
 import android.app.Application
 import dev.kindling.compose.KDestination
 import dev.kindling.compose.KViewModel
-import org.bob1.app.ui.core.navigation.Navigate
-import org.bob1.app.ui.core.navigation.ShowMessage
+import com.mirage.bob1.ui.core.navigation.Navigate
+import com.mirage.bob1.ui.core.navigation.ShowMessage
 
 /**
  * Kindling's [KViewModel] (state + one-shot events + fetchData) plus the two things every Bob1 screen does:

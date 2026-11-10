@@ -1,12 +1,12 @@
-package org.bob1.app.data.repository
+package com.mirage.bob1.data.repository
 
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
-import org.bob1.app.data.dto.*
-import org.bob1.app.data.remote.Bob1Api
-import org.bob1.app.data.remote.apiCall
-import org.bob1.app.domain.repository.*
+import com.mirage.bob1.data.dto.*
+import com.mirage.bob1.data.remote.Bob1Api
+import com.mirage.bob1.data.remote.apiCall
+import com.mirage.bob1.domain.repository.*
 
 @Singleton
 class CarpoolRepositoryImpl @Inject constructor(private val api: Bob1Api) : CarpoolRepository {

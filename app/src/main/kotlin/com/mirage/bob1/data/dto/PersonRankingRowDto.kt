@@ -1,7 +1,7 @@
-package org.bob1.app.data.dto
+package com.mirage.bob1ob1.data.dto
 
 import kotlinx.serialization.Serializable
-import org.bob1.app.domain.model.*
+import com.mirage.bob1ob1.domain.model.*
 
 @Serializable
 data class PersonRankingRowDto(

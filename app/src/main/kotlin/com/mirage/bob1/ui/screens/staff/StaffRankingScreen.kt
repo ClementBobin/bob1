@@ -1,4 +1,4 @@
-package org.bob1.app.ui.screens.staff
+package com.mirage.bob1.ui.screens.staff
 
 import android.app.Application
 import androidx.compose.foundation.layout.*
@@ -19,16 +19,16 @@ import androidx.navigation.NavController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.kindling.compose.KScreen
 import javax.inject.Inject
-import org.bob1.app.domain.model.PointEntry
-import org.bob1.app.domain.model.Ranking
-import org.bob1.app.domain.usecase.GetMyPointEntriesUseCase
-import org.bob1.app.domain.usecase.GetStaffRankingUseCase
-import org.bob1.app.ui.core.Bob1ViewModel
-import org.bob1.app.ui.core.components.*
-import org.bob1.app.ui.core.formatShort
-import org.bob1.app.ui.core.navigation.rememberUiEventHandler
-import org.bob1.app.ui.core.userMessage
-import org.bob1.app.ui.screens.ranking.RankingRowCard
+import com.mirage.bob1.domain.model.PointEntry
+import com.mirage.bob1.domain.model.Ranking
+import com.mirage.bob1.domain.usecase.GetMyPointEntriesUseCase
+import com.mirage.bob1.domain.usecase.GetStaffRankingUseCase
+import com.mirage.bob1.ui.core.Bob1ViewModel
+import com.mirage.bob1.ui.core.components.*
+import com.mirage.bob1.ui.core.formatShort
+import com.mirage.bob1.ui.core.navigation.rememberUiEventHandler
+import com.mirage.bob1.ui.core.userMessage
+import com.mirage.bob1.ui.screens.ranking.RankingRowCard
 
 data class StaffRankingState(
     val loading: Boolean = true,

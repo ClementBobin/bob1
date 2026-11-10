@@ -1,4 +1,4 @@
-package org.bob1.app.ui.screens.commitments
+package com.mirage.bob1.ui.screens.commitments
 
 import android.app.Application
 import androidx.compose.foundation.clickable
@@ -22,15 +22,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.kindling.compose.KScreen
 import javax.inject.Inject
 import kotlinx.coroutines.launch
-import org.bob1.app.domain.model.Commitment
-import org.bob1.app.domain.model.CommitmentType
-import org.bob1.app.domain.usecase.ObserveCommitmentsUseCase
-import org.bob1.app.domain.usecase.RefreshCommitmentsUseCase
-import org.bob1.app.ui.core.Bob1ViewModel
-import org.bob1.app.ui.core.components.*
-import org.bob1.app.ui.core.formatShort
-import org.bob1.app.ui.core.navigation.MatchDestination
-import org.bob1.app.ui.core.navigation.rememberUiEventHandler
+import com.mirage.bob1.domain.model.Commitment
+import com.mirage.bob1.domain.model.CommitmentType
+import com.mirage.bob1.domain.usecase.ObserveCommitmentsUseCase
+import com.mirage.bob1.domain.usecase.RefreshCommitmentsUseCase
+import com.mirage.bob1.ui.core.Bob1ViewModel
+import com.mirage.bob1.ui.core.components.*
+import com.mirage.bob1.ui.core.formatShort
+import com.mirage.bob1.ui.core.navigation.MatchDestination
+import com.mirage.bob1.ui.core.navigation.rememberUiEventHandler
 
 data class CommitmentsState(val items: List<Commitment> = emptyList(), val refreshing: Boolean = false)
 

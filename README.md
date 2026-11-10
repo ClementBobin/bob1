@@ -5,7 +5,7 @@ Android client for [Bob1-api-2](https://github.com/ClementBobin/Bob1-api-2). Kot
 ## Layout
 
 ```
-:app        org.bob1.app
+:app        com.mirage.bob1
   data/     dto · local (Room -> domain mapping) · remote (Retrofit, auth) · repository
   di/       AppModule.kt   (kotlin_app-module: Room, capacity, network, repository bindings)
   domain/   model · repository (interfaces) · usecase

@@ -1,9 +1,9 @@
-package org.bob1.app.data.remote
+package com.mirage.bob1.data.remote
 
 import java.io.IOException
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.serialization.json.Json
-import org.bob1.app.data.dto.ProblemDto
+import com.mirage.bob1.data.dto.ProblemDto
 import retrofit2.HttpException
 
 private val problemJson = Json { ignoreUnknownKeys = true; isLenient = true }

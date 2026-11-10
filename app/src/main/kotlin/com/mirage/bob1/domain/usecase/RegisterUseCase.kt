@@ -1,8 +1,8 @@
-package org.bob1.app.domain.usecase
+package com.mirage.bob1.domain.usecase
 
 import javax.inject.Inject
-import org.bob1.app.domain.model.Registration
-import org.bob1.app.domain.repository.*
+import com.mirage.bob1.domain.model.Registration
+import com.mirage.bob1.domain.repository.*
 
 class RegisterUseCase @Inject constructor(private val repo: AuthRepository, private val push: PushRepository) {
     suspend operator fun invoke(form: Registration) = repo.register(

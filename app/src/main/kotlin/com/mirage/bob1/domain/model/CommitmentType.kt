@@ -1,4 +1,4 @@
-package org.bob1.app.domain.model
+package com.mirage.bob1.domain.model
 
 enum class CommitmentType {
     Presence, Volunteer, Staff, CarpoolDriver, CarpoolPassenger, Other;

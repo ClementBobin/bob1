@@ -1,11 +1,11 @@
-package org.bob1.app.ui.core
+package com.mirage.bob1.ui.core
 
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import org.bob1.app.data.remote.ApiException
+import com.mirage.bob1.data.remote.ApiException
 
 private val fr = Locale.FRANCE
 private val zone get() = ZoneId.systemDefault()
