@@ -1,0 +1,114 @@
+name: 🧪 Manual Android APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: "Version name (leave empty to use last tag + -dev.<run number>)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Resolve version
+      id: version
+      env:
+        INPUT_VERSION: ${{ inputs.version_name }}
+        RUN_NUMBER: ${{ github.run_number }}
+      run: |
+        BASE=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || true)
+        BASE=${BASE:-1.0.0}
+
+        if [ -n "$INPUT_VERSION" ]; then
+          VERSION="$INPUT_VERSION"
+        else
+          VERSION="${BASE}-dev.${RUN_NUMBER}"
+        fi
+
+        # versionCode from the numeric base: major*10000 + minor*100 + patch
+        NUMERIC=$(echo "$VERSION" | grep -oE '^[0-9]+\.[0-9]+\.[0-9]+' || echo "$BASE")
+        MAJOR=$(echo "$NUMERIC" | cut -d. -f1)
+        MINOR=$(echo "$NUMERIC" | cut -d. -f2)
+        PATCH=$(echo "$NUMERIC" | cut -d. -f3)
+        VERSION_CODE=$(( MAJOR * 10000 + MINOR * 100 + PATCH ))
+
+        echo "version=$VERSION"           >> $GITHUB_OUTPUT
+        echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
+        echo "✅ Version: $VERSION (code: $VERSION_CODE)"
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
+
+    - name: Decode Keystore
+      env:
+        KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      run: |
+        echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/release.keystore"
+
+    - name: Build Release APK (signed)
+      env:
+        VERSION:           ${{ steps.version.outputs.version }}
+        VERSION_CODE:      ${{ steps.version.outputs.version_code }}
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_ALIAS:         ${{ secrets.KEY_ALIAS }}
+      run: |
+        echo "🏗️  Building v$VERSION (code $VERSION_CODE)"
+        ./gradlew assembleRelease \
+          -PversionName="$VERSION" \
+          -PversionCode="$VERSION_CODE" \
+          -Pandroid.injected.signing.store.file="$RUNNER_TEMP/release.keystore" \
+          -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
+          -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+          -Pandroid.injected.signing.key.password="$KEYSTORE_PASSWORD" \
+          --build-cache
+
+    - name: Rename and verify APK
+      id: outputs
+      env:
+        VERSION: ${{ steps.version.outputs.version }}
+      run: |
+        echo "📂 Build outputs:"
+        find app/build/outputs -type f 2>/dev/null || echo "  (nothing found)"
+
+        APK_SRC="app/build/outputs/apk/release/app-release.apk"
+        [ ! -f "$APK_SRC" ] && APK_SRC=$(find app/build/outputs -name "*release*.apk" -type f | head -1)
+
+        if [ -z "$APK_SRC" ] || [ ! -f "$APK_SRC" ]; then
+          echo "❌ APK release non trouvé"
+          exit 1
+        fi
+
+        APK_OUT="app/build/outputs/apk/release/app-release-v${VERSION}.apk"
+        mv "$APK_SRC" "$APK_OUT"
+
+        echo "APK_PATH=$APK_OUT" >> $GITHUB_OUTPUT
+        echo "✅ APK: $APK_OUT"
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: bob1-apk-v${{ steps.version.outputs.version }}
+        path: ${{ steps.outputs.outputs.APK_PATH }}
+        retention-days: 1
+        if-no-files-found: error

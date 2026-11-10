@@ -1,10 +1,8 @@
 # [1.10.0](https://github.com/ClementBobin/bob1/compare/v1.9.0...v1.10.0) (2026-08-25)
 
-
 ### Bug Fixes
 
 * updated icon launcher ([9665281](https://github.com/ClementBobin/bob1/commit/9665281778e7262124ec43752f1add818c52f77f))
-
 
 ### Features
 
@@ -13,13 +11,11 @@
 
 # [1.9.0](https://github.com/ClementBobin/bob1/compare/v1.8.1...v1.9.0) (2026-08-25)
 
-
 ### Features
 
 * add calendar and notifications screens with view models ([e09fca1](https://github.com/ClementBobin/bob1/commit/e09fca16a69d2e9572a63f450ecf7cb475625629))
 
 ## [1.8.1](https://github.com/ClementBobin/bob1/compare/v1.8.0...v1.8.1) (2026-08-25)
-
 
 ### Bug Fixes
 
@@ -27,11 +23,9 @@
 
 # [1.8.0](https://github.com/ClementBobin/bob1/compare/v1.7.1...v1.8.0) (2026-08-23)
 
-
 ### Bug Fixes
 
 * Change application namespace and ID to com.mirage.bob1 ([d18026b](https://github.com/ClementBobin/bob1/commit/d18026b32d5879d2deb9ff20501664d14aaedd29))
-
 
 ### Features
 
@@ -40,13 +34,11 @@
 
 ## [1.7.1](https://github.com/ClementBobin/bob1/compare/v1.7.0...v1.7.1) (2026-08-20)
 
-
 ### Bug Fixes
 
 * Update README with project documentation details ([36fa3c0](https://github.com/ClementBobin/bob1/commit/36fa3c0183ad46d4f65df52e3ad013b82451c524))
 
 # [1.7.0](https://github.com/ClementBobin/bob1/compare/v1.6.1...v1.7.0) (2026-08-20)
-
 
 ### Features
 
@@ -55,13 +47,11 @@
 
 ## [1.6.1](https://github.com/ClementBobin/bob1/compare/v1.6.0...v1.6.1) (2026-08-20)
 
-
 ### Bug Fixes
 
 * formatting in README.md ([99ba638](https://github.com/ClementBobin/bob1/commit/99ba638364dfd365d61609e9dfce7b4ec405bc6b))
 
 # [1.6.0](https://github.com/ClementBobin/bob1/compare/v1.5.0...v1.6.0) (2026-08-20)
-
 
 ### Features
 
@@ -69,7 +59,6 @@
 * implement biometric authentication for login and credential management ([add4587](https://github.com/ClementBobin/bob1/commit/add45876d215823a68936cf148aed8657d2fe05b))
 
 # [1.5.0](https://github.com/ClementBobin/bob1/compare/v1.4.0...v1.5.0) (2026-08-19)
-
 
 ### Bug Fixes
 
@@ -82,7 +71,6 @@
 * update imports and ProGuard rules for Koin and Kindling components ([79f8a4e](https://github.com/ClementBobin/bob1/commit/79f8a4ee1def4e02135c9b1f803f50c7bce6d884))
 * update semantic-release plugins to use angular preset ([55f71de](https://github.com/ClementBobin/bob1/commit/55f71dec3859524a7619549733ab0a8fc9963c35))
 
-
 ### Features
 
 * enhance build workflow with semantic versioning and artifact handling for APK and AAB ([59806d4](https://github.com/ClementBobin/bob1/commit/59806d402f70fd77c79fcf12b08f131d1c01318d))
@@ -92,14 +80,12 @@
 
 # [1.4.0](https://github.com/ClementBobin/bob1/compare/v1.3.0...v1.4.0) (2026-08-18)
 
-
 ### Features
 
 * remove androidx.compose.bom dependency from build.gradle.kts ([784803a](https://github.com/ClementBobin/bob1/commit/784803acfd4622f9bc4f7544d050d1cc86a05fd3))
 * update BASE_URL in build.gradle.kts and remove minification for release build ([3c4edc4](https://github.com/ClementBobin/bob1/commit/3c4edc4e7410a3fb5bf56bdd07cc8b72f81ece20))
 
 # [1.3.0](https://github.com/ClementBobin/bob1/compare/v1.2.0...v1.3.0) (2026-08-18)
-
 
 ### Features
 
@@ -108,20 +94,17 @@
 
 # [1.2.0](https://github.com/ClementBobin/bob1/compare/v1.1.0...v1.2.0) (2026-08-18)
 
-
 ### Features
 
 * implement signing configuration for release APK and update build workflow ([4a25e08](https://github.com/ClementBobin/bob1/commit/4a25e08fd4fa237a50cee84e3a802095ed351982))
 
 # [1.1.0](https://github.com/ClementBobin/bob1/compare/v1.0.0...v1.1.0) (2026-07-14)
 
-
 ### Features
 
 * enhance notification and location handling, add new APIs and update repositories ([3611cf0](https://github.com/ClementBobin/bob1/commit/3611cf08d9f98e6e9f20afe8be85c8c06483583c))
 
 # 1.0.0 (2026-07-06)
-
 
 ### Features
 
