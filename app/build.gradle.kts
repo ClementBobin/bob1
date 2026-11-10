@@ -24,7 +24,7 @@ val localProps = Properties().apply {
 
 // Accept version injection from CI via -PversionName=x.y.z -PversionCode=N
 // Falls back to local defaults when building outside CI.
-val ciVersionName: String = findProperty("versionName") as String? ?: "1.0.0"
+val ciVersionName: String = findProperty("versionName") as String? ?: "dev"
 val ciVersionCode: Int    = (findProperty("versionCode") as String?)?.toInt() ?: 1
 
 // ./gradlew assembleDebug -Pbob1.apiUrl=http://192.168.1.20:5000/api/v1/   (must end with a slash)
