@@ -1,12 +1,12 @@
 # BOB1 mobile
 
-Android client for [Bob1-api-2](https://github.com/ClementBobin/Bob1-api-2). Kotlin · Jetpack Compose · MVVM · Hilt · Retrofit · Room, with UI/navigation/native capabilities from [Kindling](https://clementbobin.github.io/Kindling/llms.txt).
+Android client for [Bob1-api-2](https://github.com/ClementBobin/Bob1-api-2). Kotlin · Jetpack Compose · MVVM · Hilt · Ktor · Room, with UI/navigation/native capabilities from [Kindling](https://clementbobin.github.io/Kindling/llms.txt).
 
 ## Layout
 
 ```
 :app        com.mirage.bob1
-  data/     dto · local (Room -> domain mapping) · remote (Retrofit, auth) · repository
+  data/     dto · local (Room -> domain mapping) · remote (Ktor client + one *API class per feature) · repository
   di/       AppModule.kt   (kotlin_app-module: Room, capacity, network, repository bindings)
   domain/   model · repository (interfaces) · usecase
   ui/       core (theme, components, navigation, Bob1ViewModel, AppMode)  ·  screens:
@@ -33,9 +33,13 @@ Dependencies point one way: `:app -> :room`, `:app -> :capacity`. `:capacity` re
 
 ## Notes
 
-- Lists use the HTTP `QUERY` method (`@HTTP(method = "QUERY", hasBody = true)`), as the API does.
+- Lists use the HTTP `QUERY` method (`client.query(path, body)` in `HttpHelpers.kt`), as the API does.
 - Calendar, commitments and notifications are offline-first (Room is the source of truth, refresh writes into it).
-- 401 -> `TokenAuthenticator` refreshes once and replays; a rejected refresh token signs the user out.
+- `createHttpClient` (data/remote) owns the Ktor client: bearer token, one refresh-and-replay on 401, a rejected refresh token clears the session (back to login),
+  and every HTTP/network failure becomes an `HttpException` with a toast + vibration (de-duplicated over 4 s). ViewModels don't toast `HttpException` again.
+- One `*API` class per feature (`MatchAPI`, `NotificationAPI`...) takes the client; repositories call them through `apiCall { }` (which keeps coroutine cancellation intact, unlike `runCatching`).
+- `AuthAPI` uses the anonymous client, every other API the authenticated one (`@AnonymousClient` / `@AuthenticatedClient`).
+- Request paths are relative (`"matches"`), the base URL (`API_BASE_URL`, ends with `/api/v1/`) is added by the client.
 - Dates without an offset from the API are read as UTC (see `parseUtc`).
 
 ## Roles

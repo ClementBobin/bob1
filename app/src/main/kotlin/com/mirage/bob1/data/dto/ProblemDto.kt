@@ -8,4 +8,7 @@ data class ProblemDto(
     val detail: String? = null,
     val code: String? = null,
     val status: Int? = null,
-)
+) {
+    /** What to show: the detail when the server gave one, else the title. */
+    val text: String? get() = detail ?: title
+}

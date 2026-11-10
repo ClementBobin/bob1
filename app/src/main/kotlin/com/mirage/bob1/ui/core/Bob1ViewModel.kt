@@ -3,6 +3,7 @@ package com.mirage.bob1.ui.core
 import android.app.Application
 import dev.kindling.compose.KDestination
 import dev.kindling.compose.KViewModel
+import com.mirage.bob1.data.remote.HttpException
 import com.mirage.bob1.ui.core.navigation.Navigate
 import com.mirage.bob1.ui.core.navigation.ShowMessage
 
@@ -23,7 +24,11 @@ abstract class Bob1ViewModel<S>(initialState: S, application: Application) : KVi
         }
     }
 
-    protected fun sendError(t: Throwable) = sendEvent(ShowMessage(t.userMessage(), isError = true))
+    /** HTTP failures were already shown (toast + vibration) by the Ktor client; only the other errors are toasted here. */
+    protected fun sendError(t: Throwable) {
+        if (t is HttpException) return
+        sendEvent(ShowMessage(t.userMessage(), isError = true))
+    }
     protected fun sendInfo(text: String) = sendEvent(ShowMessage(text, isError = false))
     protected fun navigate(destination: KDestination) = sendEvent(Navigate(destination))
 }

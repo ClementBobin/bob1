@@ -16,7 +16,7 @@ class SecureSession(context: Context) {
     val accessTokenFlow: StateFlow<String?> get() = manager.accessToken
     val isReady: StateFlow<Boolean> get() = manager.isReady
 
-    /** Non-suspending read for the OkHttp interceptor. */
+    /** Non-suspending read for the HTTP client (called on every request). */
     val accessToken: String? get() = manager.accessToken.value
     val refreshToken: String? get() = manager.refreshToken.value
 
