@@ -13,6 +13,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import com.mirage.bob1.BuildConfig
 import com.mirage.bob1.data.remote.AuthApi
 import com.mirage.bob1.data.remote.AuthInterceptor
 import com.mirage.bob1.data.remote.Bob1Api
