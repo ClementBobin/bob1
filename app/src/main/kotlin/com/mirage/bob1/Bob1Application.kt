@@ -1,4 +1,4 @@
-package com.mirage.bob1ob1ob1
+package com.mirage.bob1
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
@@ -7,8 +7,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import com.mirage.bob1ob1ob1.domain.usecase.RefreshNotificationsUseCase
-import com.mirage.bob1ob1ob1.domain.usecase.RegisterPushTokenUseCase
+import com.mirage.bob1.domain.usecase.RefreshNotificationsUseCase
+import com.mirage.bob1.domain.usecase.RegisterPushTokenUseCase
 import org.bob1.capacity.push.PushBridge
 import org.bob1.capacity.push.PushChannels
 
