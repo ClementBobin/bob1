@@ -45,7 +45,7 @@ android {
         }
         release {
             isMinifyEnabled = false
-            buildConfigField("String", "API_BASE_URL", "\"${providers.gradleProperty("bob1.apiUrl").orElse("https://api.bob1.example/api/v1/").get()}\"")
+            buildConfigField("String", "API_BASE_URL", "\"${providers.gradleProperty("bob1.apiUrl").orElse("https://oak.tail025bf6.ts.net/api/v1/").get()}\"")
             manifestPlaceholders["usesCleartext"] = "false"
         }
     }
