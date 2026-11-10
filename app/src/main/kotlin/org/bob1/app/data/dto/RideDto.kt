@@ -1,0 +1,18 @@
+package org.bob1.app.data.dto
+
+import kotlinx.serialization.Serializable
+import org.bob1.app.domain.model.*
+
+@Serializable
+data class RideDto(
+    val id: String,
+    val driverName: String,
+    val seats: Int,
+    val seatsLeft: Int,
+    val departureUtc: String,
+    val notes: String? = null,
+    val isMine: Boolean = false,
+    val bookedByMe: Boolean = false,
+) {
+    fun toDomain() = Ride(id, driverName, seats, seatsLeft, parseUtc(departureUtc), notes, isMine, bookedByMe)
+}

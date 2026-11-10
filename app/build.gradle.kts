@@ -1,134 +1,81 @@
-import java.util.Properties
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
-val localProps = Properties().apply {
-    val f = rootProject.file("local.properties")
-    if (f.exists()) load(f.inputStream())
-}
+// Push is optional while developing: without google-services.json the app builds and runs, it just has no FCM token.
+if (file("google-services.json").exists()) apply(plugin = "com.google.gms.google-services")
 
-// Accept version injection from CI via -PversionName=x.y.z -PversionCode=N
-// Falls back to local defaults when building outside CI.
-val ciVersionName: String = findProperty("versionName") as String? ?: "1.0.0"
-val ciVersionCode: Int    = (findProperty("versionCode") as String?)?.toInt() ?: 1
+// ./gradlew assembleDebug -Pbob1.apiUrl=http://192.168.1.20:5000/api/v1/   (must end with a slash)
+val apiUrl = providers.gradleProperty("bob1.apiUrl").orElse("http://10.0.2.2:5000/api/v1/")
 
 android {
-    namespace = "com.mirage.bob1"
+    namespace = "org.bob1.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.mirage.bob1"
-        minSdk = 29
+        applicationId = "org.bob1.app"
+        minSdk = 26
         targetSdk = 36
-        versionCode = ciVersionCode
-        versionName = ciVersionName
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        buildConfigField(
-            "boolean",
-            "MOCK_API",
-            localProps.getProperty("MOCK_API", "false")
-        )
-        buildConfigField(
-            "String",
-            "BASE_URL",
-            "\"${localProps.getProperty("BASE_URL", "https://docker-bob1.tail025bf6.ts.net")}\""
-        )
+        versionCode = 1
+        versionName = "0.1.0"
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-        isCoreLibraryDesugaringEnabled = true
-    }
-    tasks.withType<KotlinCompile>().configureEach {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    buildTypes {
+        debug {
+            buildConfigField("String", "API_BASE_URL", "\"${apiUrl.get()}\"")
+            manifestPlaceholders["usesCleartext"] = "true"   // dev API runs on http://
+        }
+        release {
+            isMinifyEnabled = false
+            buildConfigField("String", "API_BASE_URL", "\"${providers.gradleProperty("bob1.apiUrl").orElse("https://api.bob1.example/api/v1/").get()}\"")
+            manifestPlaceholders["usesCleartext"] = "false"
         }
     }
+
     buildFeatures {
         compose = true
         buildConfig = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "..."
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-
-    val keystorePath = (project.findProperty("KEYSTORE_PATH") as? String)?.takeIf { it.isNotBlank() }
-    val keystorePassword = project.findProperty("KEYSTORE_PASSWORD") as? String
-    val keyAlias = project.findProperty("KEY_ALIAS") as? String
-    val keyPassword = project.findProperty("KEY_PASSWORD") as? String
-
-    signingConfigs {
-        if (keystorePath != null && keystorePassword != null && keyAlias != null && keyPassword != null) {
-            create("release") {
-                storeFile = file(keystorePath)
-                storePassword = keystorePassword
-                this.keyAlias = keyAlias
-                this.keyPassword = keyPassword
-            }
-        }
-    }
-    buildTypes {
-        release {
-            val releaseConfig = signingConfigs.findByName("release")
-            signingConfig = releaseConfig ?: signingConfigs.getByName("debug")
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
-    }
+    kotlin { jvmToolchain(17) }
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
+    implementation(project(":room"))
+    implementation(project(":capacity"))
 
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.compose.material.icons.core)
-    implementation(libs.androidx.compose.material.icons.extended)
-
-    implementation(libs.androidx.navigation.compose)
-
-    implementation(libs.koin.core)
-    implementation(libs.koin.android)
-    implementation(libs.koin.androidx.compose)
-
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.cio)
-    implementation(libs.ktor.client.okhttp)
-    implementation(libs.ktor.client.auth)
-    implementation(libs.ktor.client.content.negotiation)
-    implementation(libs.ktor.serialization.kotlinx.json)
-    implementation(libs.ktor.client.logging)
-    implementation(libs.ktor.client.mock)
-
-    implementation(libs.kotlinx.serialization.json)
-
+    // Kindling: ui (core), compose (KScreen / KViewModel / KDestination), android (via :capacity)
     implementation(libs.kindling.core)
-    implementation(libs.kindling.compose)
     implementation(libs.kindling.utils)
-    implementation(libs.kindling.android)
+    implementation(libs.kindling.compose)
 
-    implementation(libs.coil.compose)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.material.icons.extended)
+    implementation(libs.compose.ui.tooling.preview)
+    debugImplementation(libs.compose.ui.tooling)
 
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
 
-    coreLibraryDesugaring(libs.android.desugar.jdk.libs)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.kotlinx.serialization)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
 }

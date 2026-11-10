@@ -1,0 +1,15 @@
+package org.bob1.app.data.dto
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class MatchQueryDto(
+    val divisionId: String? = null,
+    val memberId: String? = null,
+    val from: String? = null,
+    val to: String? = null,
+    val status: String? = null,
+    val search: String? = null,
+    val skip: Int? = null,
+    val take: Int? = null,
+)
