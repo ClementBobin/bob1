@@ -28,12 +28,12 @@ val apiUrl = providers.gradleProperty("bob1.apiUrl").orElse("http://10.0.2.2:500
 
 android {
     namespace = "com.mirage.bob1"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.mirage.bob1"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = ciVersionCode
         versionName = ciVersionName
     }
@@ -57,6 +57,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlin { jvmToolchain(17) }
@@ -116,4 +117,6 @@ dependencies {
     implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }

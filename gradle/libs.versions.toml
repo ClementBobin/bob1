@@ -1,8 +1,8 @@
 [versions]
-agp = "8.9.2"
+agp = "9.1.0"
 kotlin = "2.3.21"            # Kindling is built with 2.3.x: keep the app on the same minor
 ksp = "2.3.7"
-hilt = "2.58"
+hilt = "2.59"
 hilt-navigation-compose = "1.3.0"
 compose-bom = "2025.10.01"
 activity-compose = "1.11.0"
@@ -15,12 +15,15 @@ okhttp = "4.12.0"
 room = "2.8.3"
 google-services = "4.4.3"
 kindling = "4.3.7"
+desugar-jdk-libs = "2.1.4"
 
 [libraries]
 kindling-core = { group = "com.github.ClementBobin.Kindling", name = "core", version.ref = "kindling" }
 kindling-utils = { group = "com.github.ClementBobin.Kindling", name = "utils", version.ref = "kindling" }
 kindling-compose = { group = "com.github.ClementBobin.Kindling", name = "compose", version.ref = "kindling" }
 kindling-android = { group = "com.github.ClementBobin.Kindling", name = "android", version.ref = "kindling" }
+
+desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar-jdk-libs" }
 
 androidx-core-ktx = { module = "androidx.core:core-ktx", version = "1.17.0" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
