@@ -56,6 +56,10 @@ jobs:
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
+      with:
+        # Skip the default "tools platform-tools" install: the "tools"
+        # package no longer exists and makes sdkmanager fail.
+        packages: ''
 
     - name: Make gradlew executable
       run: chmod +x ./gradlew
