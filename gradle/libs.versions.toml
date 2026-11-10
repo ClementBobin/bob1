@@ -17,10 +17,10 @@ google-services = "4.4.3"
 kindling = "0.3.0"
 
 [libraries]
-kindling-core = { module = "com.github.ClementBobin:core", version.ref = "kindling" }
-kindling-utils = { module = "com.github.ClementBobin:utils", version.ref = "kindling" }
-kindling-compose = { module = "com.github.ClementBobin:compose", version.ref = "kindling" }
-kindling-android = { module = "com.github.ClementBobin:android", version.ref = "kindling" }
+kindling-core = { module = "com.github.ClementBobin:Kindling:core", version.ref = "kindling" }
+kindling-utils = { module = "com.github.ClementBobin:Kindling:utils", version.ref = "kindling" }
+kindling-compose = { module = "com.github.ClementBobin:Kindling:compose", version.ref = "kindling" }
+kindling-android = { module = "com.github.ClementBobin:Kindling:android", version.ref = "kindling" }
 
 androidx-core-ktx = { module = "androidx.core:core-ktx", version = "1.17.0" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
