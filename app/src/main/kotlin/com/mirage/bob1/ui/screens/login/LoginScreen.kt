@@ -16,37 +16,50 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.mirage.bob1.ui.components.Bob1Logo
+import com.mirage.bob1.ui.core.navigation.rememberUiEventHandler
 import dev.kindling.compose.KScreen
 import dev.kindling.core.components.ui.KInput
 import dev.kindling.core.components.ui.button.KButton
 import dev.kindling.core.components.ui.button.KButtonVariant
-import com.mirage.bob1.ui.core.components.Bob1Logo
-import com.mirage.bob1.ui.core.navigation.rememberUiEventHandler
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: LoginViewModel = hiltViewModel()) {
     val handle = rememberUiEventHandler()
     KScreen(viewModel = viewModel, navController = navController, onEvent = { _, _, event -> handle(event) }) { state, vm ->
-        Column(
-            Modifier.fillMaxSize().systemBarsPadding().imePadding().verticalScroll(rememberScrollState()).padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterVertically),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Bob1Logo(72.dp)
-            Text("BOB1", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold)
-            Text("Le club, ensemble", color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(Modifier.height(16.dp))
-            KInput(
-                value = state.email, onValueChange = vm::onEmail, placeholder = "Adresse e-mail",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
-            )
-            KInput(
-                value = state.password, onValueChange = vm::onPassword, placeholder = "Mot de passe", isPassword = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = { vm.submit() }),
-            )
-            KButton(text = "Se connecter", onClick = vm::submit, modifier = Modifier.fillMaxWidth(), enabled = state.canSubmit, isLoading = state.loading)
-            KButton(text = "Créer un compte", onClick = vm::openRegister, modifier = Modifier.fillMaxWidth(), variant = KButtonVariant.Ghost)
-        }
+        LoginContent(
+            state = state,
+            actions = LoginActions(
+                onEmail = vm::onEmail,
+                onPassword = vm::onPassword,
+                openRegister = vm::openRegister,
+                submit = vm::submit,
+            ),
+        )
+    }
+}
+
+@Composable
+fun LoginContent(state: LoginState, actions: LoginActions) {
+    Column(
+        Modifier.fillMaxSize().systemBarsPadding().imePadding().verticalScroll(rememberScrollState()).padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Bob1Logo(72.dp)
+        Text("BOB1", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold)
+        Text("Le club, ensemble", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(16.dp))
+        KInput(
+            value = state.email, onValueChange = actions.onEmail, placeholder = "Adresse e-mail",
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+        )
+        KInput(
+            value = state.password, onValueChange = actions.onPassword, placeholder = "Mot de passe", isPassword = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { actions.submit() }),
+        )
+        KButton(text = "Se connecter", onClick = actions.submit, modifier = Modifier.fillMaxWidth(), enabled = state.canSubmit, isLoading = state.loading)
+        KButton(text = "Créer un compte", onClick = actions.openRegister, modifier = Modifier.fillMaxWidth(), variant = KButtonVariant.Ghost)
     }
 }

@@ -2,33 +2,28 @@ package com.mirage.bob1.ui.screens.match
 
 import android.app.Application
 import androidx.lifecycle.SavedStateHandle
-import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.Instant
-import java.time.temporal.ChronoUnit
-import javax.inject.Inject
-import com.mirage.bob1.domain.model.*
-import com.mirage.bob1.domain.usecase.*
+import com.mirage.bob1.domain.model.Ride
+import com.mirage.bob1.domain.model.Slot
+import com.mirage.bob1.domain.usecase.BookRideUseCase
+import com.mirage.bob1.domain.usecase.CancelBookingUseCase
+import com.mirage.bob1.domain.usecase.CancelRideUseCase
+import com.mirage.bob1.domain.usecase.ConfirmPresenceUseCase
+import com.mirage.bob1.domain.usecase.GetMatchUseCase
+import com.mirage.bob1.domain.usecase.GetParticipationUseCase
+import com.mirage.bob1.domain.usecase.GetRidesUseCase
+import com.mirage.bob1.domain.usecase.GetVenueUseCase
+import com.mirage.bob1.domain.usecase.JoinSlotUseCase
+import com.mirage.bob1.domain.usecase.LeaveSlotUseCase
+import com.mirage.bob1.domain.usecase.OfferRideUseCase
 import com.mirage.bob1.ui.core.Bob1ViewModel
 import com.mirage.bob1.ui.core.navigation.HapticConfirm
 import com.mirage.bob1.ui.core.navigation.MatchDestination
 import com.mirage.bob1.ui.core.navigation.OpenDirections
 import com.mirage.bob1.ui.core.userMessage
-
-data class MatchState(
-    val loading: Boolean = true,
-    val error: String? = null,
-    val match: Match? = null,
-    val venue: Venue? = null,
-    val participation: Participation? = null,
-    val rides: List<Ride> = emptyList(),
-    val seats: Int = 3,
-    val busy: Boolean = false,
-) {
-    /** Sign-ups are closed for cancelled / played / already started matches (the API answers 409 `match.closed`). */
-    val isOpen: Boolean get() = match?.let { it.status == MatchStatus.Scheduled && it.startsAt.isAfter(Instant.now()) } ?: false
-    val volunteerSlots: List<Slot> get() = participation?.slots?.filter { it.kind.equals("Volunteer", true) }.orEmpty()
-    val myRide: Ride? get() = rides.firstOrNull { it.isMine }
-}
+import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+import javax.inject.Inject
 
 @HiltViewModel
 class MatchViewModel @Inject constructor(

@@ -1,15 +1,12 @@
 package com.mirage.bob1.ui.screens.login
 
 import android.app.Application
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
+import androidx.compose.runtime.getValue
 import com.mirage.bob1.domain.usecase.LoginUseCase
 import com.mirage.bob1.ui.core.Bob1ViewModel
 import com.mirage.bob1.ui.core.navigation.RegisterDestination
-
-data class LoginState(val email: String = "", val password: String = "", val loading: Boolean = false) {
-    val canSubmit get() = email.isNotBlank() && password.isNotBlank() && !loading
-}
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
