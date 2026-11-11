@@ -2,6 +2,7 @@ package com.mirage.bob1.di
 
 import android.content.Context
 import com.mirage.bob1.BuildConfig
+import com.mirage.bob1.data.remote.ApiUrlHolder
 import com.mirage.bob1.data.remote.AuthAPI
 import com.mirage.bob1.data.remote.createHttpClient
 import dagger.Module
@@ -54,7 +55,7 @@ internal object AppModule {
 
     @Provides @Singleton @AnonymousClient
     fun anonymousClient(json: Json, vibration: VibrationHelper): HttpClient =
-        createHttpClient(BuildConfig.API_BASE_URL, json, vibrationHelper = vibration, logLevel = logLevel)
+        createHttpClient({ ApiUrlHolder.current }, json, vibrationHelper = vibration, logLevel = logLevel)
 
     @Provides @Singleton @AuthenticatedClient
     fun authenticatedClient(
@@ -63,7 +64,7 @@ internal object AppModule {
         session: SecureSession,
         @AnonymousClient anonymous: HttpClient,
     ): HttpClient = createHttpClient(
-        BuildConfig.API_BASE_URL, json,
+        { ApiUrlHolder.current }, json,
         vibrationHelper = vibration,
         sessionManager = session,
         refreshSession = { refreshToken -> AuthAPI(anonymous).refresh(refreshToken) },

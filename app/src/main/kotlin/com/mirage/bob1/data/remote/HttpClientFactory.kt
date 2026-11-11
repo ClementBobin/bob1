@@ -36,7 +36,8 @@ import org.bob1.capacity.session.SecureSession
 /**
  * Builds the Ktor client shared by every API class.
  *
- * - [baseUrl] prefixes every request (it ends with a slash, request paths are relative: `"matches"`, not `"/matches"`).
+ * - [baseUrl] prefixes every request and is evaluated per request, so it can change at runtime (see [ApiUrlHolder]).
+ *   Request paths are relative: `"matches"`, not `"/matches"`.
  * - With a [sessionManager], `Authorization: Bearer <token>` is added to each request.
  * - A 401 on a protected route triggers ONE refresh through [refreshSession] (serialised) and a replay;
  *   if the refresh token is rejected the session is cleared, which sends the user back to the login screen.
@@ -44,7 +45,7 @@ import org.bob1.capacity.session.SecureSession
  */
 @SuppressLint("MissingPermission") // VIBRATE is declared in :capacity
 fun createHttpClient(
-    baseUrl: String,
+    baseUrl: () -> String,
     json: Json,
     engine: HttpClientEngine = CIO.create(),
     vibrationHelper: VibrationHelper? = null,
@@ -59,7 +60,7 @@ fun createHttpClient(
         expectSuccess = false // we validate ourselves, below
 
         defaultRequest {
-            url(baseUrl)
+            url(baseUrl().withTrailingSlash()) // read on every request: a new Remote Config value applies immediately
             sessionManager?.accessToken?.let { header(HttpHeaders.Authorization, "Bearer $it") }
         }
         install(ContentNegotiation) { json(json) }
@@ -90,7 +91,7 @@ fun createHttpClient(
     client.plugin(HttpSend).intercept { request ->
         var call = execute(request)
 
-        val path = request.url.encodedPath
+        val path = request.url.build().encodedPath
         if (call.response.status == HttpStatusCode.Unauthorized && sessionManager != null && refreshSession != null && !path.isAuthEndpoint()) {
             val token = refreshLock.withLock {
                 val sent = request.headers[HttpHeaders.Authorization]?.removePrefix("Bearer ")
@@ -122,6 +123,8 @@ fun createHttpClient(
     }
     return client
 }
+
+private fun String.withTrailingSlash() = if (endsWith('/')) this else "$this/"
 
 private fun String.isAuthEndpoint() = endsWith("/auth/login") || endsWith("/auth/register") || endsWith("/auth/refresh")
 

@@ -6,7 +6,7 @@ import com.mirage.bob1.BuildConfig
  * Mutable holder for the API base URL.
  *
  * Initialized from the build-time [BuildConfig.API_BASE_URL] and updated when
- * Firebase Remote Config fetches a new value. Read by [RemoteConfigBaseUrlInterceptor].
+ * Firebase Remote Config fetches a new value. Read by the Ktor client on every request (see `createHttpClient`).
  */
 object ApiUrlHolder {
     @Volatile
