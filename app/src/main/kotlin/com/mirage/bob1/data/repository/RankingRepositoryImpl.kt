@@ -12,8 +12,8 @@ internal class RankingRepositoryImpl @Inject constructor(
     private val rankingAPI: RankingAPI,
 ) : RankingRepository {
 
-    override suspend fun ranking(family: Boolean, category: String?): Result<Ranking> = apiCall {
-        if (family) rankingAPI.getFamilyRanking(category).toDomain()
-        else rankingAPI.getPersonRanking(category).toDomain()
+    override suspend fun ranking(family: Boolean, category: String?, season: String?): Result<Ranking> = apiCall {
+        if (family) rankingAPI.getFamilyRanking(category, season).toDomain()
+        else rankingAPI.getPersonRanking(category, season).toDomain()
     }
 }

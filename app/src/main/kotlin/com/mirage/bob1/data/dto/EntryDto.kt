@@ -13,6 +13,9 @@ data class EntryDto(
     val createdAtUtc: String,
     val personId: String = "",
     val personName: String = "",
+    // Manual adjustments are created by an admin; a revoked one no longer counts.
+    val isManual: Boolean = false,
+    val isRevoked: Boolean = false,
 ) {
-    fun toDomain() = PointEntry(id, category, points, reason, parseUtc(createdAtUtc))
+    fun toDomain() = PointEntry(id, category, points, reason, parseUtc(createdAtUtc), isManual, isRevoked)
 }

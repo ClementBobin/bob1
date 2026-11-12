@@ -17,6 +17,7 @@ import com.mirage.bob1.ui.components.Bob1TopBar
 import com.mirage.bob1.ui.components.EmptyBox
 import com.mirage.bob1.ui.components.ErrorBox
 import com.mirage.bob1.ui.components.LoadingBox
+import com.mirage.bob1.ui.components.SeasonSelector
 import com.mirage.bob1.ui.components.ranking.RankingRowCard
 import com.mirage.bob1.ui.core.navigation.rememberUiEventHandler
 import dev.kindling.compose.KScreen
@@ -32,6 +33,7 @@ fun RankingScreen(navController: NavController, viewModel: RankingViewModel = hi
             actions = RankingActions(
                 load = vm::load,
                 setFamily = vm::setFamily,
+                selectSeason = vm::selectSeason,
             ),
         )
     }
@@ -45,6 +47,7 @@ fun RankingContent(state: RankingState, actions: RankingActions) {
             KButton("Personnes", { actions.setFamily(false) }, Modifier.weight(1f), variant = if (!state.family) KButtonVariant.Default else KButtonVariant.Outline)
             KButton("Familles", { actions.setFamily(true) }, Modifier.weight(1f), variant = if (state.family) KButtonVariant.Default else KButtonVariant.Outline)
         }
+        SeasonSelector(state.seasons, state.season, actions.selectSeason, Modifier.padding(top = 8.dp))
         val r = state.ranking
         when {
             state.loading && r == null -> LoadingBox()

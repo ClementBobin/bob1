@@ -10,6 +10,8 @@ data class MatchQueryDto(
     val to: String? = null,
     val status: String? = null,
     val search: String? = null,
+    // With a season the API lists the whole season; without one it defaults to the next 120 days.
+    val season: String? = null,
     val skip: Int? = null,
     val take: Int? = null,
 )

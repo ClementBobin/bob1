@@ -8,4 +8,6 @@ data class PointEntry(
     val points: Int,
     val reason: String,
     val createdAt: Instant,
+    val isManual: Boolean = false,
+    val isRevoked: Boolean = false,
 )

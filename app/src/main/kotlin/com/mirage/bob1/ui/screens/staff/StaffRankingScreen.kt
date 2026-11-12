@@ -17,6 +17,7 @@ import com.mirage.bob1.ui.components.Bob1TopBar
 import com.mirage.bob1.ui.components.EmptyBox
 import com.mirage.bob1.ui.components.ErrorBox
 import com.mirage.bob1.ui.components.LoadingBox
+import com.mirage.bob1.ui.components.SeasonSelector
 import com.mirage.bob1.ui.components.SectionCard
 import com.mirage.bob1.ui.components.ranking.RankingRowCard
 import com.mirage.bob1.ui.components.staff.PointEntryRow
@@ -31,6 +32,7 @@ fun StaffRankingScreen(navController: NavController, viewModel: StaffRankingView
             state = state,
             actions = StaffRankingActions(
                 load = vm::load,
+                selectSeason = vm::selectSeason,
             ),
         )
     }
@@ -40,6 +42,7 @@ fun StaffRankingScreen(navController: NavController, viewModel: StaffRankingView
 fun StaffRankingContent(state: StaffRankingState, actions: StaffRankingActions) {
     Column(Modifier.fillMaxSize()) {
         Bob1TopBar(title = "Classement des officiels")
+        SeasonSelector(state.seasons, state.season, actions.selectSeason, Modifier.padding(top = 8.dp))
         val r = state.ranking
         when {
             state.loading && r == null -> LoadingBox()

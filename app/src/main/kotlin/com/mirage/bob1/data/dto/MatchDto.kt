@@ -14,6 +14,8 @@ data class MatchDto(
     val venueId: String,
     val startsAtUtc: String,
     val status: String,
+    // Club season of the match, e.g. "2026-2027".
+    val season: String = "",
 ) {
     fun toDomain() = Match(
         id, title, divisionId, divisionName, homeTeamId, awayTeamId, venueId, parseUtc(startsAtUtc),

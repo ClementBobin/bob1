@@ -12,15 +12,15 @@ import javax.inject.Inject
 
 internal class RankingAPI @Inject constructor(@AuthenticatedClient private val client: HttpClient) {
 
-    /** QUERY /rankings — [category] `null` = all, `"staff"` = officials. */
-    suspend fun getPersonRanking(category: String?): PersonRankingDto =
-        client.query("rankings", RankingQueryDto(category = category, take = 50)).body()
+    /** QUERY /rankings — [category] `null` = all, `"staff"` = officials; [season] `null` = the current season. */
+    suspend fun getPersonRanking(category: String?, season: String? = null): PersonRankingDto =
+        client.query("rankings", RankingQueryDto(category = category, season = season, take = 50)).body()
 
     /** QUERY /rankings with `view = "family"` answers with another shape. */
-    suspend fun getFamilyRanking(category: String?): FamilyRankingDto =
-        client.query("rankings", RankingQueryDto(category = category, view = "family", take = 50)).body()
+    suspend fun getFamilyRanking(category: String?, season: String? = null): FamilyRankingDto =
+        client.query("rankings", RankingQueryDto(category = category, season = season, view = "family", take = 50)).body()
 
     /** QUERY /rankings/me/entries — the points ledger of the signed-in person. */
-    suspend fun getMyEntries(): List<EntryDto> =
-        client.query("rankings/me/entries", MyEntriesQueryDto(take = 50)).body()
+    suspend fun getMyEntries(season: String? = null): List<EntryDto> =
+        client.query("rankings/me/entries", MyEntriesQueryDto(season = season, take = 50)).body()
 }

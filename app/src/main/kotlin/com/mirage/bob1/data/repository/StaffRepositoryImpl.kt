@@ -23,6 +23,6 @@ internal class StaffRepositoryImpl @Inject constructor(
     override suspend fun openSlots(from: Instant?, to: Instant?): Result<List<OpenStaffMatch>> =
         apiCall { staffAPI.getOpenSlots(from?.toString(), to?.toString()).map { it.toDomain() } }
 
-    override suspend fun myPointEntries(): Result<List<PointEntry>> =
-        apiCall { rankingAPI.getMyEntries().map { it.toDomain() } }
+    override suspend fun myPointEntries(season: String?): Result<List<PointEntry>> =
+        apiCall { rankingAPI.getMyEntries(season).map { it.toDomain() } }
 }

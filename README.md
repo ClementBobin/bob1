@@ -56,3 +56,10 @@ The response carries the tokens, so the user is signed in immediately.
 
 Firebase only, no local notifications. The API sends notification + data payloads: when the app is in the background FCM shows them (channel `bob1_push` and icon from the app manifest).
 While the app is open nothing pops up; the in-app list is refreshed and the bell badge updates.
+
+## Seasons
+
+A season runs 1 Sept to 31 Aug (label `2026-2027`); `QUERY /seasons` lists them and the API marks the current one.
+The ranking screens (people / families, and the officials' ranking with the history of my points) have a season selector; no season means the current one.
+Past seasons are read-only on the API side (`season.closed`), and a parent can only confirm presence / sign up for a match when one of their players is in one of its teams (`participation.not_in_team`).
+Manual point adjustments are tagged "Manuel", and a revoked one "Révoqué", in the points history.
