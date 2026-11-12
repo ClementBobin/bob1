@@ -2,14 +2,14 @@ package org.bob1.capacity.config
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.remoteConfigSettings
-import com.google.firebase.remoteconfig.remoteConfigSettings
+import javax.inject.Inject
 
 /**
  * Thin wrapper around Firebase Remote Config, mirroring [org.bob1.capacity.push.PushMessaging]:
  * keeps Firebase details inside :capacity and degrades gracefully when Firebase is not
  * configured (no google-services.json).
  */
-class RemoteConfig {
+class RemoteConfig @Inject constructor() {
 
     fun isAvailable(): Boolean = runCatching { FirebaseRemoteConfig.getInstance() }.isSuccess
 
