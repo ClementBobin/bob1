@@ -1,0 +1,7 @@
+package com.mirage.bob1.domain.model
+
+data class Team(
+    val id: String,
+    val name: String,
+    val divisionId: String,
+)
