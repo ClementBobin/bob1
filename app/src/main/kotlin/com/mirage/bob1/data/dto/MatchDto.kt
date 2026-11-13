@@ -7,8 +7,6 @@ import com.mirage.bob1.domain.model.*
 data class MatchDto(
     val id: String,
     val title: String,
-    val divisionId: String,
-    val divisionName: String = "",
     val homeTeamId: String,
     val awayTeamId: String,
     val venueId: String,
@@ -18,7 +16,7 @@ data class MatchDto(
     val season: String = "",
 ) {
     fun toDomain() = Match(
-        id, title, divisionId, divisionName, homeTeamId, awayTeamId, venueId, parseUtc(startsAtUtc),
+        id, title, homeTeamId, awayTeamId, venueId, parseUtc(startsAtUtc),
         MatchStatus.entries.firstOrNull { it.name.equals(status, true) } ?: MatchStatus.Scheduled,
     )
 }

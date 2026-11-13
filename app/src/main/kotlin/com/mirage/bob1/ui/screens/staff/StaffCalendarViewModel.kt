@@ -39,7 +39,6 @@ class StaffCalendarViewModel @Inject constructor(
         call({ getAssignments() }, onError = {}) { a -> updateState { copy(upcomingAssignments = a.size) } }
     }
 
-    fun filter(division: String?) = updateState { copy(division = division) }
     fun open(m: OpenStaffMatch) = navigate(StaffMatchDestination(m.matchId))
     fun openNotifications() = navigate(NotificationsDestination)
 }

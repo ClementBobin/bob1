@@ -25,7 +25,6 @@ fun StaffMatchLine(m: OpenStaffMatch, onClick: () -> Unit) {
         Text(m.startsAt.formatTime(), fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.width(44.dp))
         Column(Modifier.weight(1f)) {
             Text(m.title, fontWeight = FontWeight.SemiBold, maxLines = 1)
-            Text(m.divisionName, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
         }
         when {
             m.mine -> StatusBadge("Inscrit", Tone.Joined)

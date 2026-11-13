@@ -3,8 +3,8 @@ package com.mirage.bob1.data.repository
 import com.mirage.bob1.data.remote.ClubAPI
 import com.mirage.bob1.data.remote.HttpException
 import com.mirage.bob1.data.remote.apiCall
-import com.mirage.bob1.domain.model.Division
 import com.mirage.bob1.domain.model.Season
+import com.mirage.bob1.domain.model.Team
 import com.mirage.bob1.domain.model.Venue
 import com.mirage.bob1.domain.repository.ClubRepository
 import javax.inject.Inject
@@ -19,8 +19,8 @@ internal class ClubRepositoryImpl @Inject constructor(
     private val mutex = Mutex()
     private var venues: Map<String, Venue>? = null
 
-    override suspend fun divisions(): Result<List<Division>> =
-        apiCall { clubAPI.getDivisions().map { it.toDomain() } }
+    override suspend fun teams(): Result<List<Team>> =
+        apiCall { clubAPI.getTeams().map { it.toDomain() } }
 
     override suspend fun seasons(): Result<List<Season>> =
         apiCall { clubAPI.getSeasons().map { it.toDomain() } }

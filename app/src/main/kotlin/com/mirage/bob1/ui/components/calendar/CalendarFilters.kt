@@ -15,9 +15,9 @@ import dev.kindling.core.components.ui.avatar.KAvatarSize
 fun CalendarFilters(state: CalendarState, actions: CalendarActions) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            item { FilterChip(selected = state.divisionFilter == null && state.childFilter == null, onClick = { actions.filterDivision(null) }, label = { Text("Tous") }) }
-            items(state.divisions, key = { it.id }) { d ->
-                FilterChip(selected = state.divisionFilter == d.id, onClick = { actions.filterDivision(d.id) }, label = { Text(d.name) })
+            item { FilterChip(selected = state.teamFilter == null && state.childFilter == null, onClick = { actions.filterTeam(null) }, label = { Text("Tous") }) }
+            items(state.teamsInView, key = { it.id }) { t ->
+                FilterChip(selected = state.teamFilter == t.id, onClick = { actions.filterTeam(t.id) }, label = { Text(t.name) })
             }
         }
         if (state.children.isNotEmpty()) {

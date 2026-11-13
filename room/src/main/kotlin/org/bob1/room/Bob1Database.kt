@@ -13,7 +13,7 @@ import org.bob1.room.entity.NotificationEntity
 
 @Database(
     entities = [MatchEntity::class, CommitmentEntity::class, NotificationEntity::class],
-    version = 1,
+    version = 2,   // 2: matches lost divisionId / divisionName (the cache is rebuilt from the API)
     exportSchema = true,
 )
 abstract class Bob1Database : RoomDatabase() {

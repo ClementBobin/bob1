@@ -32,7 +32,6 @@ fun StaffCalendarScreen(navController: NavController, viewModel: StaffCalendarVi
         StaffCalendarContent(
             state = state,
             actions = StaffCalendarActions(
-                filter = vm::filter,
                 load = vm::load,
                 open = vm::open,
                 openNotifications = vm::openNotifications,
@@ -60,13 +59,7 @@ fun StaffCalendarContent(state: StaffCalendarState, actions: StaffCalendarAction
                             )
                         }
                     }
-                    item {
-                        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            item { FilterChip(selected = state.division == null, onClick = { actions.filter(null) }, label = { Text("Tous") }) }
-                            items(state.divisions) { d -> FilterChip(selected = state.division == d, onClick = { actions.filter(d) }, label = { Text(d) }) }
-                        }
-                    }
-                    if (state.visible.isEmpty()) {
+                    if (state.matches.isEmpty()) {
                         item { EmptyBox(Icons.Outlined.EventBusy, "Aucun poste à pourvoir", "Aucun match avec des postes d'officiels dans les 30 prochains jours.") }
                     }
                     state.byDay.forEach { (day, list) ->

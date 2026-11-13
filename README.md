@@ -63,3 +63,9 @@ A season runs 1 Sept to 31 Aug (label `2026-2027`); `QUERY /seasons` lists them 
 The ranking screens (people / families, and the officials' ranking with the history of my points) have a season selector; no season means the current one.
 Past seasons are read-only on the API side (`season.closed`), and a parent can only confirm presence / sign up for a match when one of their players is in one of its teams (`participation.not_in_team`).
 Manual point adjustments are tagged "Manuel", and a revoked one "Révoqué", in the points history.
+
+## Matches, teams and divisions
+
+A match is between two teams and has no division (API `main`). The calendar filters by **team** (chips of the teams playing in the displayed month) or by **child**:
+a child's calendar is the matches of the teams listed in their `teamIds` (from `GET /family`). The division of a player (profile, family) is still shown.
+The Room cache is at version 2 for that reason (the matches table lost its division columns; it is rebuilt from the API).

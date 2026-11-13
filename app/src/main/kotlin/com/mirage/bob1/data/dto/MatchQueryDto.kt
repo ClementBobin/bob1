@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MatchQueryDto(
-    val divisionId: String? = null,
     val memberId: String? = null,
     val from: String? = null,
     val to: String? = null,

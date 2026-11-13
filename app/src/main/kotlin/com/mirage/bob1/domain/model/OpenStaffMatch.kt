@@ -6,7 +6,6 @@ import java.time.Instant
 data class OpenStaffMatch(
     val matchId: String,
     val title: String,
-    val divisionName: String,
     val startsAt: Instant,
     val slots: List<Slot>,
 ) {

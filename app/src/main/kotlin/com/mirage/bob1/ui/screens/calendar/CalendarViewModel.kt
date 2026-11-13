@@ -3,9 +3,9 @@ package com.mirage.bob1.ui.screens.calendar
 import android.app.Application
 import androidx.lifecycle.viewModelScope
 import com.mirage.bob1.domain.model.Match
-import com.mirage.bob1.domain.usecase.GetDivisionsUseCase
 import com.mirage.bob1.domain.usecase.GetFamilyUseCase
 import com.mirage.bob1.domain.usecase.GetMeUseCase
+import com.mirage.bob1.domain.usecase.GetTeamsUseCase
 import com.mirage.bob1.domain.usecase.ObserveCommitmentsUseCase
 import com.mirage.bob1.domain.usecase.ObserveMatchesUseCase
 import com.mirage.bob1.domain.usecase.ObserveUnreadCountUseCase
@@ -39,7 +39,7 @@ class CalendarViewModel @Inject constructor(
     private val refreshNotifications: RefreshNotificationsUseCase,
     private val getMe: GetMeUseCase,
     private val getFamily: GetFamilyUseCase,
-    private val getDivisions: GetDivisionsUseCase,
+    private val getTeams: GetTeamsUseCase,
 ) : Bob1ViewModel<CalendarState>(CalendarState(), application) {
 
     private val zone = ZoneId.systemDefault()
@@ -56,7 +56,7 @@ class CalendarViewModel @Inject constructor(
 
         call({ getMe() }, onError = {}) { me -> updateState { copy(firstName = me.firstName) } }
         call({ getFamily() }, onError = {}) { f -> updateState { copy(children = f.members.filter { it.isChild }) } }
-        call({ getDivisions() }, onError = {}) { d -> updateState { copy(divisions = d) } }
+        call({ getTeams() }, onError = {}) { t -> updateState { copy(teams = t) } }
         refresh()
     }
 
@@ -83,8 +83,8 @@ class CalendarViewModel @Inject constructor(
     }
 
     fun selectDate(date: LocalDate) = updateState { copy(selectedDate = if (selectedDate == date) null else date) }
-    fun filterDivision(id: String?) = updateState { copy(divisionFilter = id, childFilter = null) }
-    fun filterChild(userId: String?) = updateState { copy(childFilter = userId, divisionFilter = null) }
+    fun filterTeam(id: String?) = updateState { copy(teamFilter = id, childFilter = null) }
+    fun filterChild(userId: String?) = updateState { copy(childFilter = userId, teamFilter = null) }
 
     fun openMatch(match: Match) = navigate(MatchDestination(match.id))
     fun openNotifications() = navigate(NotificationsDestination)

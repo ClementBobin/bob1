@@ -24,7 +24,6 @@ fun MatchRow(match: Match, committed: Boolean, onClick: () -> Unit, modifier: Mo
         Text(match.startsAt.formatTime(), fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.width(44.dp))
         Column(Modifier.weight(1f)) {
             Text(match.title, fontWeight = FontWeight.SemiBold, maxLines = 1)
-            Text(match.divisionName, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
         }
         StatusBadge(match.statusLabel(committed), match.tone(committed))
         Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)

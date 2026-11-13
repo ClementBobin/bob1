@@ -12,11 +12,11 @@ import org.bob1.room.entity.MatchEntity
 // Room lives in :room and knows nothing about the domain; the mapping happens here.
 
 private fun MatchEntity.toDomain() = Match(
-    id, title, divisionId, divisionName, homeTeamId, awayTeamId, venueId, Instant.ofEpochMilli(startsAtUtc),
+    id, title, homeTeamId, awayTeamId, venueId, Instant.ofEpochMilli(startsAtUtc),
     MatchStatus.entries.firstOrNull { it.name == status } ?: MatchStatus.Scheduled,
 )
 
-private fun Match.toEntity() = MatchEntity(id, title, divisionId, divisionName, homeTeamId, awayTeamId, venueId, startsAt.toEpochMilli(), status.name)
+private fun Match.toEntity() = MatchEntity(id, title, homeTeamId, awayTeamId, venueId, startsAt.toEpochMilli(), status.name)
 
 @Singleton
 class MatchLocalDataSource @Inject constructor(private val dao: MatchDao) {

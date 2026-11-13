@@ -54,7 +54,6 @@ fun StaffMatchContent(state: StaffMatchState, actions: StaffMatchActions) {
                 item {
                     SectionCard(title = match.title) {
                         Text(match.startsAt.formatDayTime(), fontWeight = FontWeight.SemiBold)
-                        Text(match.divisionName, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         if (!state.isOpen) StatusBadge("Inscriptions closes", Tone.Danger)
                     }
                 }

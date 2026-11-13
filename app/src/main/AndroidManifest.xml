@@ -16,7 +16,7 @@
             android:value="bob1_push" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/ic_stat_bob1" />
+            android:resource="@drawable/ic_stat_bob1_motion" />
 
         <activity
             android:name=".MainActivity"

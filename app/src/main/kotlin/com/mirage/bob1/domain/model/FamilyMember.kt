@@ -8,9 +8,10 @@ data class FamilyMember(
     val isMe: Boolean,
     val divisionId: String?,
     val divisionName: String?,
+    val teamIds: List<String> = emptyList(),
 ) {
     val fullName get() = "$firstName $lastName".trim()
     val initials get() = "${firstName.firstOrNull() ?: ' '}${lastName.firstOrNull() ?: ' '}".trim().uppercase()
-    /** Children have a division, adults don't. */
-    val isChild get() = divisionId != null
+    /** Children play (a division, teams); adults don't. */
+    val isChild get() = divisionId != null || teamIds.isNotEmpty()
 }

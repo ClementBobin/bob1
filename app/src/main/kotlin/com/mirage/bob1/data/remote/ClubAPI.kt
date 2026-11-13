@@ -1,10 +1,10 @@
 package com.mirage.bob1.data.remote
 
 import com.mirage.bob1.data.dto.ClubQueryDto
-import com.mirage.bob1.data.dto.DivisionDto
 import com.mirage.bob1.data.dto.EmptyQueryDto
 import com.mirage.bob1.data.dto.PagedDto
 import com.mirage.bob1.data.dto.SeasonDto
+import com.mirage.bob1.data.dto.TeamDto
 import com.mirage.bob1.data.dto.VenueDto
 import com.mirage.bob1.di.AuthenticatedClient
 import io.ktor.client.HttpClient
@@ -17,9 +17,9 @@ internal class ClubAPI @Inject constructor(@AuthenticatedClient private val clie
     suspend fun getSeasons(): List<SeasonDto> =
         client.query("seasons", EmptyQueryDto()).body()
 
-    /** QUERY /divisions — active divisions only. */
-    suspend fun getDivisions(): List<DivisionDto> =
-        client.query("divisions", ClubQueryDto(isActive = true, take = 100)).body<PagedDto<DivisionDto>>().items
+    /** QUERY /teams — active teams only. A match is between two teams: that is how it is linked to players. */
+    suspend fun getTeams(): List<TeamDto> =
+        client.query("teams", ClubQueryDto(isActive = true, take = 200)).body<PagedDto<TeamDto>>().items
 
     /** QUERY /venues */
     suspend fun getVenues(): List<VenueDto> =

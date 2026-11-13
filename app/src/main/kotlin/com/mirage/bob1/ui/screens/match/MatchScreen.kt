@@ -64,7 +64,6 @@ fun MatchContent(state: MatchState, actions: MatchActions) {
                 item {
                     SectionCard(title = match.title) {
                         Text(match.startsAt.formatDayTime(), fontWeight = FontWeight.SemiBold)
-                        Text(match.divisionName, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         if (!state.isOpen) StatusBadge(if (match.status.name == "Cancelled") "Match annulé" else "Inscriptions closes", Tone.Danger)
                     }
                 }
