@@ -35,11 +35,14 @@ jobs:
 
       - name: Install semantic-release
         run: |
+          # conventionalcommits preset is pinned to v8: v9 requires
+          # conventional-changelog-writer@9, which release-notes-generator
+          # does not load yet ("Missing helper" error).
           npm install --save-dev semantic-release \
             @semantic-release/changelog \
             @semantic-release/git \
             @semantic-release/github \
-            conventional-changelog-conventionalcommits
+            conventional-changelog-conventionalcommits@8
 
       - name: Write .releaserc.json (dry-run config)
         run: |
@@ -207,11 +210,12 @@ jobs:
 
       - name: Install semantic-release
         run: |
+          # Same pin as job 1 (see comment there).
           npm install --save-dev semantic-release \
             @semantic-release/changelog \
             @semantic-release/git \
             @semantic-release/github \
-            conventional-changelog-conventionalcommits
+            conventional-changelog-conventionalcommits@8
 
       - name: Write .releaserc.json (real release with assets)
         env:
