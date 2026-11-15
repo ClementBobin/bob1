@@ -1,3 +1,39 @@
+## [1.11.0](https://github.com/ClementBobin/bob1/compare/v1.10.0...v1.11.0) (2026-11-15)
+
+### Features
+
+* add .releaserc.json and CHANGELOG.md for semantic release configuration ([7b238fe](https://github.com/ClementBobin/bob1/commit/7b238fe97384ea542ff54fa1bea112c99b2d021c))
+* add adaptive icons and update drawable resources for improved app visuals ([7f404e1](https://github.com/ClementBobin/bob1/commit/7f404e1efde99a4eac784b4fde172a5fe9ecfdcd))
+* add dependency injection to RemoteConfig class constructor ([cde545c](https://github.com/ClementBobin/bob1/commit/cde545cae994e2684a362c5e9ecfd8e6fbd0505e))
+* add Firebase Crashlytics and Performance Monitoring plugins and dependencies ([f1254b4](https://github.com/ClementBobin/bob1/commit/f1254b473d011ce404a4d6125e364341a74fd306))
+* add Gradle startup scripts for POSIX and Windows environments ([a64cefe](https://github.com/ClementBobin/bob1/commit/a64cefe1d606e49bb0707a0c42dd171f0fc2085a))
+* add Gradle wrapper files for project setup ([2be9387](https://github.com/ClementBobin/bob1/commit/2be93872b64c3af55e6043e7889df7d0ccbdfd27))
+* add manual workflow for building and uploading Android APK ([91afb4b](https://github.com/ClementBobin/bob1/commit/91afb4bb461c8c19de7d9f1e80b504559b367c80))
+* ci/cd ([73f0845](https://github.com/ClementBobin/bob1/commit/73f0845c9bd7417bf70a7587bfe3aa04f5d7c896))
+* ci/cd ([9b58dc9](https://github.com/ClementBobin/bob1/commit/9b58dc9b8d5e46b6ed74a73a4ebc5ea35e222bd2))
+* implement Firebase Remote Config for dynamic API URL management ([36bda73](https://github.com/ClementBobin/bob1/commit/36bda73faff8c1359e2d670ec547a71f079781e1))
+* implement Ktor client with authenticated and anonymous API classes for improved network handling ([c6c3d3e](https://github.com/ClementBobin/bob1/commit/c6c3d3ebee7f3ea5aa994f7f647c5b57b4b8be21))
+* implement season management with new SeasonDto and related updates across the application ([a4ecc3a](https://github.com/ClementBobin/bob1/commit/a4ecc3a50d0b90538f64cafac2511f30674eb651))
+* update API base URL handling to use ApiUrlHolder for dynamic configuration ([6cb2cc6](https://github.com/ClementBobin/bob1/commit/6cb2cc66e26364713b39dbb1296c7166e2c94665))
+* update API base URL handling to use ApiUrlHolder for dynamic configuration ([61e6101](https://github.com/ClementBobin/bob1/commit/61e610129f9e68988b497a1e1ff5000e55996e0c))
+* update API base URL handling to use ApiUrlHolder for dynamic configuration ([f9a0f82](https://github.com/ClementBobin/bob1/commit/f9a0f820a8862d13ec5b59a2eab04d7876e10e6f))
+* update build.gradle.kts to support CI versioning and improve signing configuration ([65e225c](https://github.com/ClementBobin/bob1/commit/65e225cd42fd31277389f03a28196d53fa8b8580))
+
+### Bug Fixes
+
+* add missing import for BuildConfig in AppModule.kt ([6cabf3e](https://github.com/ClementBobin/bob1/commit/6cabf3e9e2126e6927c7209084265fdb91327f9d))
+* correct Kindling library module paths in libs.versions.toml ([edbef43](https://github.com/ClementBobin/bob1/commit/edbef43c83c2ee84e0ad419b0e5fb112f282f7b1))
+* correct package declaration in SlotDto.kt ([2cec400](https://github.com/ClementBobin/bob1/commit/2cec400d535a60f61a353b7963c6720428f2de68))
+* update Android SDK setup to skip obsolete tools installation ([4417788](https://github.com/ClementBobin/bob1/commit/4417788c7ecec48275b264ce03a3b80b53b87955))
+* update API_BASE_URL and correct Kindling library module paths ([3f45232](https://github.com/ClementBobin/bob1/commit/3f452321fb2c81757987e9bd5d4fc446a620fc4a))
+* update CI version name to 'dev' and upgrade firebase-perf-plugin to version 2.0.2 ([bc4b782](https://github.com/ClementBobin/bob1/commit/bc4b7822b62d0e2758e0d97d227909d87d8d0455))
+* update compileSdk and targetSdk to 37, enable core library desugaring, and update AGP and Hilt versions ([32552dd](https://github.com/ClementBobin/bob1/commit/32552ddc5674f6dbd16710ccd0043485a08a1dee))
+* update firebase-config module to use the correct dependency ([e35324b](https://github.com/ClementBobin/bob1/commit/e35324b0aa0dab08beff1fc21799d46d17044bee))
+* update Kindling library group paths in libs.versions.toml ([da97f3a](https://github.com/ClementBobin/bob1/commit/da97f3ad7191323f88bf5a78db985474568cdade))
+* update Kindling library group paths in libs.versions.toml ([4460881](https://github.com/ClementBobin/bob1/commit/446088198c1935852fedc29a45179c013ef2b5b8))
+* update Kindling library version and module paths in libs.versions.toml ([90c3b40](https://github.com/ClementBobin/bob1/commit/90c3b4048d1ca5e06c18948d2dea9dfc60d3d298))
+* update package paths to correct structure across multiple DTO files ([58ffb93](https://github.com/ClementBobin/bob1/commit/58ffb937121016b0effd930ad83005faf80a67f2))
+
 # [1.10.0](https://github.com/ClementBobin/bob1/compare/v1.9.0...v1.10.0) (2026-08-25)
 
 ### Bug Fixes
