@@ -1,3 +1,13 @@
+## [1.12.0](https://github.com/ClementBobin/bob1/compare/v1.11.0...v1.12.0) (2026-11-16)
+
+### Features
+
+* added failsafe firebase missing ([1edd37d](https://github.com/ClementBobin/bob1/commit/1edd37d5a739159a67e14ec5f02caaf7dcad2e5c))
+
+### Bug Fixes
+
+* ci/cd format ([b14743f](https://github.com/ClementBobin/bob1/commit/b14743fa1fbf7a9c9c542a6117de131e27c3ee17))
+
 ## [1.11.0](https://github.com/ClementBobin/bob1/compare/v1.10.0...v1.11.0) (2026-11-15)
 
 ### Features
