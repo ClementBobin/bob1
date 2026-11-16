@@ -17,6 +17,19 @@ if (file("google-services.json").exists()) {
     apply(plugin = "com.google.firebase.firebase-perf")
 }
 
+// A release built without google-services.json has no Firebase (no Crashlytics, no push, no Remote Config).
+// Fail loudly instead of shipping it; -Pbob1.allowNoFirebase=true overrides for a deliberate build.
+tasks.matching { it.name == "preReleaseBuild" }.configureEach {
+    doFirst {
+        if (!file("google-services.json").exists() && findProperty("bob1.allowNoFirebase") != "true") {
+            throw GradleException(
+                "app/google-services.json is missing: this release would have no Firebase. " +
+                    "In CI, decode the GOOGLE_SERVICES_JSON_BASE64 secret into it before building."
+            )
+        }
+    }
+}
+
 val localProps = Properties().apply {
     val f = rootProject.file("local.properties")
     if (f.exists()) load(f.inputStream())

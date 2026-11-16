@@ -13,12 +13,15 @@ class RemoteConfig @Inject constructor() {
 
     fun isAvailable(): Boolean = runCatching { FirebaseRemoteConfig.getInstance() }.isSuccess
 
+    /** No-op when Firebase is not configured: this runs in `Application.onCreate`, a throw here kills the app at launch. */
     fun configure(minimumFetchIntervalInSeconds: Long, defaults: Map<String, Any>) {
-        val rc = FirebaseRemoteConfig.getInstance()
-        rc.setConfigSettingsAsync(
-            remoteConfigSettings { this.minimumFetchIntervalInSeconds = minimumFetchIntervalInSeconds }
-        )
-        rc.setDefaultsAsync(defaults)
+        runCatching {
+            val rc = FirebaseRemoteConfig.getInstance()
+            rc.setConfigSettingsAsync(
+                remoteConfigSettings { this.minimumFetchIntervalInSeconds = minimumFetchIntervalInSeconds }
+            )
+            rc.setDefaultsAsync(defaults)
+        }
     }
 
     fun fetchAndActivate(onComplete: (Boolean) -> Unit) {
