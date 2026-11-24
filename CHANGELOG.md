@@ -1,3 +1,9 @@
+## [1.13.0](https://github.com/ClementBobin/bob1/compare/v1.12.0...v1.13.0) (2026-11-24)
+
+### Features
+
+* added biométrie ([6d69e76](https://github.com/ClementBobin/bob1/commit/6d69e76fe58c3528c80225afd045ca5e56b98531))
+
 ## [1.12.0](https://github.com/ClementBobin/bob1/compare/v1.11.0...v1.12.0) (2026-11-16)
 
 ### Features
