@@ -1,0 +1,10 @@
+# Signs out from the Profil tab (works for every role).
+appId: com.mirage.bob1
+---
+- tapOn: "Profil"
+- scrollUntilVisible:
+    element: "Se déconnecter"
+- tapOn: "Se déconnecter"
+- extendedWaitUntil:
+    visible: "Se connecter"
+    timeout: 15000

@@ -1,0 +1,27 @@
+# Signs in through the login form.
+# Usage:
+#   - runFlow:
+#       file: ../subflows/login.yaml
+#       env:
+#         EMAIL: parent@bob1.local
+#         PASSWORD: Parent123!
+appId: com.mirage.bob1
+---
+- tapOn: "Adresse e-mail"
+- inputText: ${EMAIL}
+- tapOn: "Mot de passe"
+- inputText: ${PASSWORD}
+- hideKeyboard
+- tapOn: "Se connecter"
+
+# Wait for either the main screen (bottom bar) or the biometric offer dialog.
+- extendedWaitUntil:
+    visible: "Profil|Non merci"
+    timeout: 20000
+
+# The offer only appears when the device can do biometrics: dismiss it when it shows up.
+- runFlow:
+    when:
+      visible: "Non merci"
+    commands:
+      - tapOn: "Non merci"

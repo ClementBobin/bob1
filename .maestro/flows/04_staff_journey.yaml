@@ -1,0 +1,32 @@
+appId: com.mirage.bob1
+name: Staff - sign in, browse the tabs, sign out
+tags:
+  - smoke
+  - staff
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow:
+    file: ../subflows/login.yaml
+    env:
+      EMAIL: staff@bob1.local
+      PASSWORD: Staff123!
+
+# Staff bottom bar: Calendrier / Affectations / Classement / Profil (no Engagements tab).
+- extendedWaitUntil:
+    visible: "Affectations"
+    timeout: 20000
+- assertNotVisible: "Engagements"
+
+- tapOn: "Affectations"
+- assertVisible: "Mes affectations"
+
+- tapOn: "Classement"
+- assertVisible: "Classement"
+
+- tapOn: "Profil"
+- assertVisible: "staff@bob1.local"
+
+- runFlow: ../subflows/logout.yaml

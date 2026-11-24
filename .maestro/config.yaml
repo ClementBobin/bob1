@@ -1,0 +1,7 @@
+# Maestro workspace: `maestro test .maestro` runs every flow in flows/.
+# Subflows (reusable steps) live in subflows/ and are NOT run on their own.
+flows:
+  - flows/*.yaml
+
+# Where Maestro writes screenshots / logs (build/ is already git-ignored).
+testOutputDir: build/maestro

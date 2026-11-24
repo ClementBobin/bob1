@@ -1,0 +1,38 @@
+appId: com.mirage.bob1
+name: Parent - sign in, browse the tabs, sign out
+tags:
+  - smoke
+  - parent
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow:
+    file: ../subflows/login.yaml
+    env:
+      EMAIL: parent@bob1.local
+      PASSWORD: Parent123!
+
+# Calendar is the landing tab, greeted with the seeded first name.
+- extendedWaitUntil:
+    visible: "Le calendrier du club"
+    timeout: 20000
+- assertVisible: "Bonjour Camille,"
+
+# Parent bottom bar: Calendrier / Engagements / Classement / Profil.
+- tapOn: "Engagements"
+- assertVisible: "Mes engagements"
+
+- tapOn: "Classement"
+- assertVisible: "Personnes"
+- assertVisible: "Familles"
+- tapOn: "Familles"
+- tapOn: "Personnes"
+
+# Profile shows the account and the family actions.
+- tapOn: "Profil"
+- assertVisible: "parent@bob1.local"
+- assertVisible: "Inviter un parent"
+
+- runFlow: ../subflows/logout.yaml

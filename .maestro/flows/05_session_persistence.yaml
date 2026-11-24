@@ -1,0 +1,30 @@
+appId: com.mirage.bob1
+name: Session survives an app restart
+tags:
+  - auth
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow:
+    file: ../subflows/login.yaml
+    env:
+      EMAIL: parent@bob1.local
+      PASSWORD: Parent123!
+
+- extendedWaitUntil:
+    visible: "Le calendrier du club"
+    timeout: 20000
+
+# Kill and relaunch WITHOUT clearing the state: the stored session must be reused.
+- stopApp
+- launchApp:
+    clearState: false
+
+- extendedWaitUntil:
+    visible: "Le calendrier du club"
+    timeout: 20000
+- assertNotVisible: "Se connecter"
+
+- runFlow: ../subflows/logout.yaml

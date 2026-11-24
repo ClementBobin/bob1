@@ -1,0 +1,196 @@
+name: 🧪 E2E (Maestro)
+
+# Runs the Maestro flows from .maestro/ against a debug build of the app and a real
+# BOB1-Api (+ PostgreSQL) started on the runner. The API seeds its dev accounts itself.
+#
+# Three ways to run it:
+#   - pull_request / push        -> app code of this repo, API from `main`
+#   - workflow_dispatch          -> pick the API ref to test against
+#   - workflow_call (from the API repo) -> API code of the PR, app from `main`
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'CHANGELOG.md'
+  workflow_dispatch:
+    inputs:
+      api_ref:
+        description: "BOB1-Api branch, tag or SHA to test against"
+        required: false
+        default: main
+        type: string
+  workflow_call:
+    inputs:
+      app_repository:
+        description: "Repository holding the Android app"
+        required: false
+        default: ClementBobin/bob1
+        type: string
+      app_ref:
+        description: "App branch, tag or SHA"
+        required: false
+        default: main
+        type: string
+      api_repository:
+        description: "Repository holding the API"
+        required: false
+        default: ClementBobin/BOB1-Api
+        type: string
+      api_ref:
+        description: "API branch, tag or SHA"
+        required: false
+        default: main
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  MAESTRO_VERSION: "2.12.1"
+  API_PORT: "5000"
+
+jobs:
+  maestro:
+    name: Maestro on Android API ${{ matrix.api-level }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [ 34 ]
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: bob1
+          POSTGRES_USER: bob1
+          POSTGRES_PASSWORD: bob1
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U bob1 -d bob1"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    steps:
+      - name: Checkout app
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.app_repository || github.repository }}
+          ref: ${{ inputs.app_ref || github.sha }}
+          path: app
+
+      - name: Checkout API
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.api_repository || 'ClementBobin/BOB1-Api' }}
+          ref: ${{ inputs.api_ref || 'main' }}
+          path: api
+
+      # ── API ────────────────────────────────────────────────────────────
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish API
+        run: dotnet publish api/src/Bob1.Api/Bob1.Api.csproj -c Release -o "$RUNNER_TEMP/api"
+
+      # Development environment: applies the migrations and seeds the accounts the flows use
+      # (parent@bob1.local, staff@bob1.local, ...). Bound on 0.0.0.0 so the emulator reaches
+      # it through 10.0.2.2, which is the default API_BASE_URL of the debug build.
+      - name: Start API
+        working-directory: ${{ runner.temp }}/api
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+          ASPNETCORE_URLS: http://0.0.0.0:${{ env.API_PORT }}
+          ConnectionStrings__Default: Host=localhost;Port=5432;Database=bob1;Username=bob1;Password=bob1
+        run: |
+          nohup dotnet Bob1.Api.dll > "$RUNNER_TEMP/api.log" 2>&1 &
+          echo "Waiting for the API..."
+          for i in $(seq 1 60); do
+            if curl -fsS "http://localhost:${API_PORT}/openapi/v1.json" > /dev/null; then
+              echo "✅ API is up"; exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::API did not start in time"; cat "$RUNNER_TEMP/api.log"; exit 1
+
+      - name: Check seeded login
+        run: |
+          curl -fsS -X POST "http://localhost:${API_PORT}/api/v1/auth/login" \
+            -H 'Content-Type: application/json' \
+            -d '{"email":"parent@bob1.local","password":"Parent123!"}' > /dev/null
+          echo "✅ Seeded parent can log in"
+
+      # ── Android ────────────────────────────────────────────────────────
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Build debug APK
+        working-directory: app
+        run: |
+          chmod +x ./gradlew
+          ./gradlew :app:assembleDebug --build-cache
+
+      - name: Install Maestro
+        run: |
+          curl -fsSL "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run Maestro flows
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          working-directory: app
+          script: |
+            adb install -r app/build/outputs/apk/debug/app-debug.apk
+            maestro test .maestro \
+              --format junit \
+              --output build/maestro-report.xml \
+              --debug-output build/maestro-debug
+
+      - name: Upload Maestro report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-report-api${{ matrix.api-level }}
+          path: |
+            app/build/maestro-report.xml
+            app/build/maestro-debug
+            app/build/maestro
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Upload API log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-log-api${{ matrix.api-level }}
+          path: ${{ runner.temp }}/api.log
+          retention-days: 7
+          if-no-files-found: ignore

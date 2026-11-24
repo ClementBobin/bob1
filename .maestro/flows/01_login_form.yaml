@@ -1,0 +1,34 @@
+appId: com.mirage.bob1
+name: Login form - validation and wrong credentials
+tags:
+  - smoke
+  - auth
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+# Login screen is shown to a signed-out user.
+- assertVisible: "Le club, ensemble"
+- assertVisible: "Créer un compte"
+
+# The submit button stays disabled until both fields are filled.
+- assertVisible:
+    text: "Se connecter"
+    enabled: false
+
+- tapOn: "Adresse e-mail"
+- inputText: "parent@bob1.local"
+- tapOn: "Mot de passe"
+- inputText: "wrong-password"
+- hideKeyboard
+- assertVisible:
+    text: "Se connecter"
+    enabled: true
+
+# Wrong password: API answers auth.invalid_credentials, the user stays on the login screen.
+- tapOn: "Se connecter"
+- extendedWaitUntil:
+    visible: "E-mail ou mot de passe incorrect."
+    timeout: 15000
+- assertVisible: "Le club, ensemble"
