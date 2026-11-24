@@ -10,7 +10,9 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mirage.bob1.ui.components.ConfirmDialog
 import com.mirage.bob1.ui.components.LoadingBox
+import com.mirage.bob1.ui.core.rememberFragmentActivity
 import com.mirage.bob1.ui.core.theme.Bob1Theme
 import com.mirage.bob1.ui.navigation.AuthNavGraph
 import com.mirage.bob1.ui.navigation.MainNavGraph
@@ -19,11 +21,18 @@ import dev.kindling.core.components.ui.toast.KToaster
 @Composable
 fun AppRoot(viewModel: RootViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    AppRootContent(state)
+    val activity = rememberFragmentActivity()
+    AppRootContent(
+        state = state,
+        actions = RootActions(
+            acceptBiometricOffer = { activity?.let(viewModel::acceptBiometricOffer) },
+            declineBiometricOffer = viewModel::declineBiometricOffer,
+        ),
+    )
 }
 
 @Composable
-fun AppRootContent(state: RootState) {
+fun AppRootContent(state: RootState, actions: RootActions = RootActions()) {
     Bob1Theme {
         Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
             when (state.authenticated) {
@@ -31,6 +40,16 @@ fun AppRootContent(state: RootState) {
                 // key(): signing in / out rebuilds the NavHost so the back stack never leaks across sessions.
                 false -> key("auth") { AuthNavGraph() }
                 true -> state.roles?.let { roles -> key("main", state.mode) { MainNavGraph(roles, state.mode) } } ?: LoadingBox()
+            }
+            if (state.authenticated == true && state.roles != null && state.biometricOffer) {
+                ConfirmDialog(
+                    title = "Connexion biométrique",
+                    message = "Connectez-vous plus vite avec votre empreinte ou votre visage, sans retaper votre mot de passe.",
+                    confirmText = "Activer",
+                    dismissText = "Non merci",
+                    onConfirm = actions.acceptBiometricOffer,
+                    onDismiss = actions.declineBiometricOffer,
+                )
             }
             KToaster()
         }

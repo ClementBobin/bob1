@@ -1,6 +1,7 @@
 package com.mirage.bob1.data.remote
 
 import com.mirage.bob1.data.dto.AuthResponseDto
+import com.mirage.bob1.data.dto.BiometricLoginRequestDto
 import com.mirage.bob1.data.dto.LoginRequestDto
 import com.mirage.bob1.data.dto.RefreshRequestDto
 import com.mirage.bob1.data.dto.RegisterRequestDto
@@ -18,6 +19,10 @@ internal class AuthAPI @Inject constructor(@AnonymousClient private val client: 
 
     suspend fun register(request: RegisterRequestDto): AuthResponseDto =
         client.post("auth/register") { setBodyJson(request) }.body()
+
+    /** POST /auth/biometric/login — the device token (unlocked by the biometric prompt) for a normal session. */
+    suspend fun biometricLogin(biometricToken: String): AuthResponseDto =
+        client.post("auth/biometric/login") { setBodyJson(BiometricLoginRequestDto(biometricToken)) }.body()
 
     suspend fun refresh(refreshToken: String): AuthResponseDto =
         client.post("auth/refresh") { setBodyJson(RefreshRequestDto(refreshToken)) }.body()

@@ -1,5 +1,8 @@
 package com.mirage.bob1.data.remote
 
+import com.mirage.bob1.data.dto.BiometricDisableRequestDto
+import com.mirage.bob1.data.dto.BiometricEnrollRequestDto
+import com.mirage.bob1.data.dto.BiometricEnrollResponseDto
 import com.mirage.bob1.data.dto.FamilyDto
 import com.mirage.bob1.data.dto.InvitationDto
 import com.mirage.bob1.data.dto.RefreshRequestDto
@@ -19,6 +22,15 @@ internal class AccountAPI @Inject constructor(@AuthenticatedClient private val c
     /** POST /auth/logout — revokes the refresh token. */
     suspend fun logout(refreshToken: String) {
         client.post("auth/logout") { setBodyJson(RefreshRequestDto(refreshToken)) }.ok()
+    }
+
+    /** POST /auth/biometric/enroll — the response holds the only copy of the device token. */
+    suspend fun enrollBiometric(deviceName: String?): BiometricEnrollResponseDto =
+        client.post("auth/biometric/enroll") { setBodyJson(BiometricEnrollRequestDto(deviceName)) }.body()
+
+    /** POST /auth/biometric/disable — revokes one device's credential. */
+    suspend fun disableBiometric(credentialId: String) {
+        client.post("auth/biometric/disable") { setBodyJson(BiometricDisableRequestDto(credentialId)) }.ok()
     }
 
     suspend fun getFamily(): FamilyDto = client.get("family").body()

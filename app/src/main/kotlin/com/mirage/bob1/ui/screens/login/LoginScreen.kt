@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mirage.bob1.ui.components.Bob1Logo
+import com.mirage.bob1.ui.core.rememberFragmentActivity
 import com.mirage.bob1.ui.core.navigation.rememberUiEventHandler
 import dev.kindling.compose.KScreen
 import dev.kindling.core.components.ui.KInput
@@ -26,6 +27,7 @@ import dev.kindling.core.components.ui.button.KButtonVariant
 @Composable
 fun LoginScreen(navController: NavController, viewModel: LoginViewModel = hiltViewModel()) {
     val handle = rememberUiEventHandler()
+    val activity = rememberFragmentActivity()
     KScreen(viewModel = viewModel, navController = navController, onEvent = { _, _, event -> handle(event) }) { state, vm ->
         LoginContent(
             state = state,
@@ -34,6 +36,7 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = hiltVi
                 onPassword = vm::onPassword,
                 openRegister = vm::openRegister,
                 submit = vm::submit,
+                biometricLogin = { activity?.let(vm::biometricLogin) },
             ),
         )
     }
@@ -60,6 +63,9 @@ fun LoginContent(state: LoginState, actions: LoginActions) {
             keyboardActions = KeyboardActions(onDone = { actions.submit() }),
         )
         KButton(text = "Se connecter", onClick = actions.submit, modifier = Modifier.fillMaxWidth(), enabled = state.canSubmit, isLoading = state.loading)
+        if (state.biometricReady) {
+            KButton(text = "Connexion biométrique", onClick = actions.biometricLogin, modifier = Modifier.fillMaxWidth(), variant = KButtonVariant.Secondary, enabled = !state.loading)
+        }
         KButton(text = "Créer un compte", onClick = actions.openRegister, modifier = Modifier.fillMaxWidth(), variant = KButtonVariant.Ghost)
     }
 }

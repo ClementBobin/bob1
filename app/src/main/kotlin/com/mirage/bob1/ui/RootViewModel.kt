@@ -1,9 +1,13 @@
 package com.mirage.bob1.ui
 
 import android.app.Application
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewModelScope
 import com.mirage.bob1.domain.model.UserRole
+import com.mirage.bob1.domain.usecase.DismissBiometricOfferUseCase
+import com.mirage.bob1.domain.usecase.EnableBiometricUseCase
 import com.mirage.bob1.domain.usecase.GetMeUseCase
+import com.mirage.bob1.domain.usecase.ObserveBiometricStatusUseCase
 import com.mirage.bob1.domain.usecase.ObserveSessionUseCase
 import com.mirage.bob1.domain.usecase.RegisterPushTokenUseCase
 import com.mirage.bob1.ui.core.AppMode
@@ -22,9 +26,13 @@ class RootViewModel @Inject constructor(
     private val notificationPermission: NotificationPermission,
     private val getMe: GetMeUseCase,
     private val modeStore: AppModeStore,
+    private val enableBiometric: EnableBiometricUseCase,
+    private val dismissBiometricOffer: DismissBiometricOfferUseCase,
+    observeBiometricStatus: ObserveBiometricStatusUseCase,
 ) : Bob1ViewModel<RootState>(RootState(), application) {
 
     init {
+        viewModelScope.launch { observeBiometricStatus().collect { s -> updateState { copy(biometricOffer = s.canOffer) } } }
         viewModelScope.launch { modeStore.mode.collect { m -> updateState { copy(mode = m) } } }
         collectData({ observeSession() }) {
             onSuccess { authed ->
@@ -36,6 +44,16 @@ class RootViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun acceptBiometricOffer(activity: FragmentActivity) {
+        updateState { copy(biometricOffer = false) }
+        call({ enableBiometric(activity) }) { sendInfo("Connexion biométrique activée") }
+    }
+
+    fun declineBiometricOffer() {
+        updateState { copy(biometricOffer = false) }
+        dismissBiometricOffer()
     }
 
     /** Roles decide which tabs exist. If the profile can't be loaded (offline), fall back to the parent experience. */

@@ -23,6 +23,7 @@ dependencies {
     api(libs.firebase.crashlytics)
     api(libs.firebase.perf)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.biometric)      // BiometricHelper (Kindling :android) keeps it as `implementation`
     implementation(libs.androidx.fragment.ktx)   // PermissionHelper.registerLauncher needs a FragmentActivity
     implementation(libs.kotlinx.coroutines.android)
 }

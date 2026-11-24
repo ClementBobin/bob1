@@ -1,11 +1,15 @@
 package com.mirage.bob1.ui.screens.profile
 
 import android.app.Application
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewModelScope
 import com.mirage.bob1.domain.usecase.CreateInvitationUseCase
+import com.mirage.bob1.domain.usecase.DisableBiometricUseCase
+import com.mirage.bob1.domain.usecase.EnableBiometricUseCase
 import com.mirage.bob1.domain.usecase.GetFamilyUseCase
 import com.mirage.bob1.domain.usecase.GetMeUseCase
 import com.mirage.bob1.domain.usecase.LogoutUseCase
+import com.mirage.bob1.domain.usecase.ObserveBiometricStatusUseCase
 import com.mirage.bob1.ui.core.AppMode
 import com.mirage.bob1.ui.core.AppModeStore
 import com.mirage.bob1.ui.core.Bob1ViewModel
@@ -24,17 +28,38 @@ class ProfileViewModel @Inject constructor(
     private val logoutUseCase: LogoutUseCase,
     private val permission: NotificationPermission,
     private val modeStore: AppModeStore,
+    private val enableBiometric: EnableBiometricUseCase,
+    private val disableBiometric: DisableBiometricUseCase,
+    observeBiometricStatus: ObserveBiometricStatusUseCase,
 ) : Bob1ViewModel<ProfileState>(ProfileState(), application) {
 
     init {
         viewModelScope.launch { modeStore.mode.collect { m -> updateState { copy(mode = m) } } }
         viewModelScope.launch { permission.granted.collect { g -> updateState { copy(notificationsEnabled = g) } } }
+        viewModelScope.launch {
+            observeBiometricStatus().collect { s -> updateState { copy(biometricAvailable = s.available || s.enrolled, biometricEnabled = s.enrolled) } }
+        }
         call({ getMe() }) { u -> updateState { copy(user = u) } }
         call({ getFamily() }, onError = {}) { f -> updateState { copy(family = f) } }
     }
 
     fun enableNotifications() = permission.request()
     fun setMode(mode: AppMode) = modeStore.set(mode)
+
+    /** Turns biometric sign-in on (fingerprint / face prompt to lock the device token) or off for this device. */
+    fun toggleBiometric(activity: FragmentActivity) {
+        if (state.value.biometricBusy) return
+        val enabling = !state.value.biometricEnabled
+        updateState { copy(biometricBusy = true) }
+        call(
+            block = { if (enabling) enableBiometric(activity) else disableBiometric() },
+            onError = { updateState { copy(biometricBusy = false) }; sendError(it) },
+            onOk = {
+                updateState { copy(biometricBusy = false) }
+                sendInfo(if (enabling) "Connexion biométrique activée" else "Connexion biométrique désactivée")
+            },
+        )
+    }
 
     fun invite() {
         updateState { copy(inviting = true) }

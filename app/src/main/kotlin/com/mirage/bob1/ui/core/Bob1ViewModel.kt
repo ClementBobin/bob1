@@ -4,6 +4,7 @@ import android.app.Application
 import dev.kindling.compose.KDestination
 import dev.kindling.compose.KViewModel
 import com.mirage.bob1.data.remote.HttpException
+import com.mirage.bob1.domain.model.BiometricException
 import com.mirage.bob1.ui.core.navigation.Navigate
 import com.mirage.bob1.ui.core.navigation.ShowMessage
 
@@ -26,7 +27,7 @@ abstract class Bob1ViewModel<S>(initialState: S, application: Application) : KVi
 
     /** HTTP failures were already shown (toast + vibration) by the Ktor client; only the other errors are toasted here. */
     protected fun sendError(t: Throwable) {
-        if (t is HttpException) return
+        if (t is HttpException || t is BiometricException.Cancelled) return
         sendEvent(ShowMessage(t.userMessage(), isError = true))
     }
     protected fun sendInfo(text: String) = sendEvent(ShowMessage(text, isError = false))

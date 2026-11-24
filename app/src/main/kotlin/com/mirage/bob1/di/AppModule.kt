@@ -15,6 +15,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.logging.LogLevel
 import javax.inject.Singleton
 import kotlinx.serialization.json.Json
+import org.bob1.capacity.biometric.BiometricVault
 import org.bob1.capacity.haptics.Haptics
 import org.bob1.capacity.network.NetworkMonitor
 import org.bob1.capacity.permission.NotificationPermission
@@ -38,6 +39,7 @@ internal object AppModule {
 
     // ── Native capacity (external module :capacity, built on Kindling :android) ─
     @Provides @Singleton fun secureSession(@ApplicationContext c: Context) = SecureSession(c)
+    @Provides @Singleton fun biometricVault(@ApplicationContext c: Context) = BiometricVault(c)
     @Provides @Singleton fun networkMonitor(@ApplicationContext c: Context) = NetworkMonitor(c)
     @Provides @Singleton fun notificationPermission(@ApplicationContext c: Context) = NotificationPermission(c)
     @Provides @Singleton fun pushMessaging() = PushMessaging()

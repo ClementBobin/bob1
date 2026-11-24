@@ -12,6 +12,10 @@ data class ProfileState(
     val inviting: Boolean = false,
     val loggingOut: Boolean = false,
     val mode: AppMode = AppMode.Parent,
+    /** The phone can check a fingerprint / face (otherwise the section is hidden). */
+    val biometricAvailable: Boolean = false,
+    val biometricEnabled: Boolean = false,
+    val biometricBusy: Boolean = false,
 ) {
     /** Only people who are both parent and staff get the switch. */
     val canSwitchMode get() = user?.roles?.let { UserRole.Parent in it && UserRole.Staff in it } == true
@@ -23,4 +27,5 @@ data class ProfileActions(
     val invite: () -> Unit,
     val logout: () -> Unit,
     val setMode: (AppMode) -> Unit,
+    val toggleBiometric: () -> Unit,
 )

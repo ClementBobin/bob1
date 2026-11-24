@@ -14,6 +14,7 @@ import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import org.bob1.capacity.biometric.BiometricVault
 import org.bob1.capacity.push.PushMessaging
 import org.bob1.capacity.session.SecureSession
 
@@ -25,6 +26,7 @@ internal class AuthRepositoryImpl @Inject constructor(
     private val session: SecureSession,
     private val cache: LocalCache,
     private val pushMessaging: PushMessaging,
+    private val biometricVault: BiometricVault,
 ) : AuthRepository {
 
     override val isAuthenticated: Flow<Boolean?> =
@@ -34,11 +36,13 @@ internal class AuthRepositoryImpl @Inject constructor(
     override suspend fun login(email: String, password: String): Result<User> = apiCall {
         val response = authAPI.login(email, password)
         session.save(response.accessToken, response.refreshToken)
+        biometricVault.clearIfOtherUser(response.user.id)
         response.user.toDomain()
     }
 
     override suspend fun register(form: Registration): Result<User> = apiCall {
         val response = authAPI.register(RegisterRequestDto.fromDomain(form))
+        biometricVault.clearIfOtherUser(response.user.id)
         session.save(response.accessToken, response.refreshToken) // signed in right away: AppRoot swaps to the main graph
         response.user.toDomain()
     }

@@ -16,6 +16,7 @@ import com.mirage.bob1.ui.components.Bob1TopBar
 import com.mirage.bob1.ui.components.PersonAvatar
 import com.mirage.bob1.ui.components.SectionCard
 import com.mirage.bob1.ui.core.AppMode
+import com.mirage.bob1.ui.core.rememberFragmentActivity
 import com.mirage.bob1.ui.core.navigation.rememberUiEventHandler
 import dev.kindling.compose.KScreen
 import dev.kindling.core.components.ui.avatar.KAvatarSize
@@ -25,6 +26,7 @@ import dev.kindling.core.components.ui.button.KButtonVariant
 @Composable
 fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = hiltViewModel()) {
     val handle = rememberUiEventHandler()
+    val activity = rememberFragmentActivity()
     KScreen(viewModel = viewModel, navController = navController, onEvent = { _, _, e -> handle(e) }) { state, vm ->
         ProfileContent(
             state = state,
@@ -33,6 +35,7 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = hi
                 invite = vm::invite,
                 logout = vm::logout,
                 setMode = vm::setMode,
+                toggleBiometric = { activity?.let(vm::toggleBiometric) },
             ),
         )
     }
@@ -79,6 +82,24 @@ fun ProfileContent(state: ProfileState, actions: ProfileActions) {
                             }
                         }
                         KButton("Inviter un parent", actions.invite, Modifier.fillMaxWidth(), variant = KButtonVariant.Secondary, isLoading = state.inviting)
+                    }
+                }
+            }
+            if (state.biometricAvailable) {
+                item {
+                    SectionCard(title = "Connexion biométrique") {
+                        Text(
+                            if (state.biometricEnabled) "Activée sur cet appareil : connectez-vous avec votre empreinte ou votre visage."
+                            else "Connectez-vous sans mot de passe, avec votre empreinte ou votre visage.",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        KButton(
+                            text = if (state.biometricEnabled) "Désactiver" else "Activer",
+                            onClick = actions.toggleBiometric,
+                            modifier = Modifier.fillMaxWidth(),
+                            variant = if (state.biometricEnabled) KButtonVariant.Outline else KButtonVariant.Default,
+                            isLoading = state.biometricBusy,
+                        )
                     }
                 }
             }

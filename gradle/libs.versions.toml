@@ -10,6 +10,7 @@ firebase-crashlytics-gradle = "3.0.6"
 firebase-perf-plugin = "2.0.2"
 activity-compose = "1.11.0"
 fragment = "1.8.9"
+biometric = "1.1.0"          # same as Kindling
 lifecycle = "2.9.4"
 coroutines = "1.10.2"
 serialization = "1.9.0"
@@ -29,6 +30,7 @@ desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref 
 
 androidx-core-ktx = { module = "androidx.core:core-ktx", version = "1.17.0" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
+androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }

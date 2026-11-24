@@ -11,6 +11,7 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 internal abstract class RepositoryModule {
     @Binds abstract fun auth(impl: AuthRepositoryImpl): AuthRepository
+    @Binds abstract fun biometric(impl: BiometricRepositoryImpl): BiometricRepository
     @Binds abstract fun matches(impl: MatchRepositoryImpl): MatchRepository
     @Binds abstract fun carpool(impl: CarpoolRepositoryImpl): CarpoolRepository
     @Binds abstract fun club(impl: ClubRepositoryImpl): ClubRepository
