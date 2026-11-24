@@ -15,7 +15,7 @@ Android client for [Bob1-api-2](https://github.com/ClementBobin/Bob1-api-2). Kot
               auth    login, registration (new family, or join one with an invitation code)
 :room       external module: Bob1Database, entities, DAOs (knows nothing about the app)
 :capacity   external module: native capabilities on Kindling :android
-            SecureSession · NetworkMonitor · FCM (Bob1MessagingService/PushBridge/PushChannels) · Haptics · NotificationPermission · Directions/ShareText
+            SecureSession · NetworkMonitor · PlayIntegrity · FCM (Bob1MessagingService/PushBridge/PushChannels) · Haptics · NotificationPermission · Directions/ShareText
 ```
 
 Conventions: one class per file in `dto`, `local`, `remote`, `repository`, `domain/*`.
@@ -69,3 +69,17 @@ Manual point adjustments are tagged "Manuel", and a revoked one "Révoqué", in 
 A match is between two teams and has no division (API `main`). The calendar filters by **team** (chips of the teams playing in the displayed month) or by **child**:
 a child's calendar is the matches of the teams listed in their `teamIds` (from `GET /family`). The division of a player (profile, family) is still shown.
 The Room cache is at version 2 for that reason (the matches table lost its division columns; it is rebuilt from the API).
+
+## Play Integrity
+
+`:capacity` -> `PlayIntegrity.requestToken()` (Kindling `PlayIntegrityHelper`, [docs](https://clementbobin.github.io/Kindling/#/android/play-integrity)) returns a signed token with a fresh nonce, or `null` if the service fails.
+The app never decodes it: the API forwards it to `playintegrity.googleapis.com/v1/com.mirage.bob1:decodeIntegrityToken`.
+Play Console (App integrity -> Integrity API -> Response settings) has all of these enabled, so the decoded verdict carries:
+
+- Licence: `LICENSED`, `UNLICENSED`, `UNEVALUATED`
+- App integrity: `PLAY_RECOGNIZED`, `UNRECOGNIZED_VERSION`, `UNEVALUATED`
+- Device integrity: `MEETS_BASIC_INTEGRITY`, `MEETS_DEVICE_INTEGRITY`, `MEETS_STRONG_INTEGRITY`
+- Recent device activity: `UNEVALUATED`, `LEVEL_1` to `LEVEL_4`
+- Device attributes: `sdkVersion` (19 to 37)
+- Play Protect: `UNEVALUATED`, `NO_ISSUES`, `NO_DATA`, `MEDIUM_RISK`, `HIGH_RISK`, `POSSIBLE_RISK`
+- App access risk: `KNOWN_` / `UNKNOWN_` + `INSTALLED`, `CAPTURING`, `OVERLAYS`, `CONTROLLING`

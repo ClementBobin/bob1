@@ -17,6 +17,7 @@ import javax.inject.Singleton
 import kotlinx.serialization.json.Json
 import org.bob1.capacity.biometric.BiometricVault
 import org.bob1.capacity.haptics.Haptics
+import org.bob1.capacity.integrity.PlayIntegrity
 import org.bob1.capacity.network.NetworkMonitor
 import org.bob1.capacity.permission.NotificationPermission
 import org.bob1.capacity.push.PushMessaging
@@ -44,6 +45,7 @@ internal object AppModule {
     @Provides @Singleton fun notificationPermission(@ApplicationContext c: Context) = NotificationPermission(c)
     @Provides @Singleton fun pushMessaging() = PushMessaging()
     @Provides @Singleton fun haptics() = Haptics()
+    @Provides @Singleton fun playIntegrity(@ApplicationContext c: Context) = PlayIntegrity(c)
     @Provides @Singleton fun vibrationHelper(@ApplicationContext c: Context) = VibrationHelper(c)
 
     // ── Network (Ktor) ──────────────────────────────────────
