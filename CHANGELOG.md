@@ -1,3 +1,9 @@
+## [1.14.0](https://github.com/ClementBobin/bob1/compare/v1.13.0...v1.14.0) (2026-11-24)
+
+### Features
+
+* play integrity ([9fb36d8](https://github.com/ClementBobin/bob1/commit/9fb36d8bc15103dfafbf649d56f7743cc128f44f))
+
 ## [1.13.0](https://github.com/ClementBobin/bob1/compare/v1.12.0...v1.13.0) (2026-11-24)
 
 ### Features
