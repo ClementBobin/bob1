@@ -19,16 +19,24 @@ class RegisterViewModel @Inject constructor(
     fun onPassword(v: String) = updateState { copy(password = v) }
     fun onFamilyName(v: String) = updateState { copy(familyName = v) }
     fun onCode(v: String) = updateState { copy(code = v.filter { it.isLetterOrDigit() }.uppercase().take(INVITATION_CODE_LENGTH)) }
-    fun setHasCode(value: Boolean) = updateState { copy(hasCode = value) }
+    fun setFamilyMode(mode: FamilyMode) = updateState { copy(familyMode = mode) }
+
+    /** A staff member cannot start a family: "new family" falls back to "skip". */
+    fun setParent(value: Boolean) = updateState {
+        copy(isParent = value, familyMode = if (!value && familyMode == FamilyMode.Create) FamilyMode.Skip else familyMode)
+    }
 
     fun submit() {
         val s = state.value
         if (!s.canSubmit) return
         updateState { copy(loading = true) }
+        val creating = s.isParent && s.familyMode == FamilyMode.Create
         val form = Registration(
             firstName = s.firstName, lastName = s.lastName, email = s.email, password = s.password,
-            familyName = if (s.hasCode) null else s.familyName,
-            invitationCode = if (s.hasCode) s.code else null,
+            isParent = s.isParent,
+            familyName = if (creating) s.familyName else null,
+            invitationCode = if (s.familyMode == FamilyMode.Join) s.code else null,
+            createFamily = creating,
         )
         call(
             block = { register(form) },

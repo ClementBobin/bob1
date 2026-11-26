@@ -1,0 +1,42 @@
+appId: com.mirage.bob1
+name: Register - a staff member without a family
+tags:
+  - auth
+  - register
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- evalScript: ${output.email = 'e2e+' + Date.now() + '@bob1.local'}
+
+- tapOn: "Créer un compte"
+- tapOn: "Prénom"
+- inputText: Alice
+- tapOn: "Nom"
+- inputText: Durand
+- tapOn: "Adresse e-mail"
+- inputText: ${output.email}
+- tapOn: "Mot de passe (12 caractères min.)"
+- inputText: Corr3ct-Horse-Battery!
+- hideKeyboard
+
+# Not a parent: no "new family", skip it.
+- tapOn: "Je suis parent"
+- assertNotVisible: "Nouvelle famille"
+- tapOn: "Passer"
+- scrollUntilVisible:
+    element: "Créer mon compte"
+- tapOn: "Créer mon compte"
+
+- runFlow: ../subflows/after-register.yaml
+
+# Staff bottom bar, and a profile that only offers to join a family (a staff member cannot create one).
+- assertVisible: "Affectations"
+- tapOn: "Profil"
+- extendedWaitUntil:
+    visible: "Rejoindre avec un code"
+    timeout: 15000
+- assertNotVisible: "Créer ma famille"
+- assertNotVisible: "Inviter un parent"
+
+- runFlow: ../subflows/logout.yaml

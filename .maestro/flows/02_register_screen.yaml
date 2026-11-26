@@ -11,6 +11,18 @@ tags:
 - assertVisible: "Votre famille"
 - assertVisible: "Nouvelle famille"
 
+# The password rules are listed from the start; the role switch defaults to "parent".
+- assertVisible: "Entre 12 et 128 caractères"
+- assertVisible: "Je suis parent"
+- assertVisible: "Passer"
+
+# A staff member cannot start a family: the option disappears, joining with a code or skipping stay.
+- tapOn: "Je suis parent"
+- assertNotVisible: "Nouvelle famille"
+- assertVisible: "J'ai un code"
+- tapOn: "Je suis parent"
+- assertVisible: "Nouvelle famille"
+
 # Switching to "I have a code" reveals the invitation code field.
 - tapOn: "J'ai un code"
 - assertVisible: "Code d'invitation (8 caractères)"

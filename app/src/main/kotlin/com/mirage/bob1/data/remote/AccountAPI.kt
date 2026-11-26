@@ -1,10 +1,13 @@
 package com.mirage.bob1.data.remote
 
+import com.mirage.bob1.data.dto.AuthResponseDto
 import com.mirage.bob1.data.dto.BiometricDisableRequestDto
 import com.mirage.bob1.data.dto.BiometricEnrollRequestDto
 import com.mirage.bob1.data.dto.BiometricEnrollResponseDto
+import com.mirage.bob1.data.dto.CreateFamilyRequestDto
 import com.mirage.bob1.data.dto.FamilyDto
 import com.mirage.bob1.data.dto.InvitationDto
+import com.mirage.bob1.data.dto.JoinFamilyRequestDto
 import com.mirage.bob1.data.dto.RefreshRequestDto
 import com.mirage.bob1.data.dto.UserDto
 import com.mirage.bob1.di.AuthenticatedClient
@@ -34,6 +37,17 @@ internal class AccountAPI @Inject constructor(@AuthenticatedClient private val c
     }
 
     suspend fun getFamily(): FamilyDto = client.get("family").body()
+
+    /** POST /family — a parent starts a family; the answer is a fresh session (the family id travels in the access token). */
+    suspend fun createFamily(name: String?): AuthResponseDto =
+        client.post("family") { setBodyJson(CreateFamilyRequestDto(name)) }.body()
+
+    /** POST /family/join — with a parent's code; fresh session in the answer. */
+    suspend fun joinFamily(code: String): AuthResponseDto =
+        client.post("family/join") { setBodyJson(JoinFamilyRequestDto(code)) }.body()
+
+    /** POST /family/leave — the last member out deletes the family; fresh session in the answer. */
+    suspend fun leaveFamily(): AuthResponseDto = client.post("family/leave").body()
 
     /** POST /family/invitations — a code of 8 characters, valid 7 days. */
     suspend fun createInvitation(): InvitationDto = client.post("family/invitations").body()

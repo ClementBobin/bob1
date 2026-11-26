@@ -11,6 +11,8 @@ data class RegisterRequestDto(
     val lastName: String,
     val familyName: String? = null,
     val invitationCode: String? = null,
+    val isParent: Boolean = true,
+    val createFamily: Boolean = true,
 ) {
     companion object {
         fun fromDomain(r: Registration) = RegisterRequestDto(
@@ -20,6 +22,8 @@ data class RegisterRequestDto(
             lastName = r.lastName,
             familyName = r.familyName,
             invitationCode = r.invitationCode,
+            isParent = r.isParent,
+            createFamily = r.createFamily,
         )
     }
 }

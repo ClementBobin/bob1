@@ -33,6 +33,13 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = hi
             actions = ProfileActions(
                 enableNotifications = vm::enableNotifications,
                 invite = vm::invite,
+                shareInvitation = vm::shareInvitation,
+                dismissInvitation = vm::dismissInvitation,
+                openFamilyDialog = vm::openFamilyDialog,
+                closeFamilyDialog = vm::closeFamilyDialog,
+                confirmFamilyDialog = vm::confirmFamilyDialog,
+                onFamilyName = vm::onFamilyName,
+                onJoinCode = vm::onJoinCode,
                 logout = vm::logout,
                 setMode = vm::setMode,
                 toggleBiometric = { activity?.let(vm::toggleBiometric) },
@@ -81,7 +88,27 @@ fun ProfileContent(state: ProfileState, actions: ProfileActions) {
                                 }
                             }
                         }
-                        KButton("Inviter un parent", actions.invite, Modifier.fillMaxWidth(), variant = KButtonVariant.Secondary, isLoading = state.inviting)
+                        // Only a parent hands out codes; anybody can leave.
+                        if (state.isParent) {
+                            KButton("Inviter un parent", actions.invite, Modifier.fillMaxWidth(), variant = KButtonVariant.Secondary, isLoading = state.inviting)
+                        }
+                        KButton("Quitter la famille", { actions.openFamilyDialog(FamilyDialog.Leave) }, Modifier.fillMaxWidth(), variant = KButtonVariant.Outline)
+                    }
+                }
+            }
+            if (state.noFamily) {
+                item {
+                    SectionCard(title = "Famille") {
+                        Text(
+                            if (state.isParent) "Vous n'avez pas encore de famille. Créez-la, ou rejoignez celle d'un autre parent avec son code."
+                            else "Vous n'avez pas de famille. Rejoignez celle d'un parent avec son code.",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        if (state.isParent) {
+                            KButton("Créer ma famille", { actions.openFamilyDialog(FamilyDialog.Create) }, Modifier.fillMaxWidth())
+                        }
+                        KButton("Rejoindre avec un code", { actions.openFamilyDialog(FamilyDialog.Join) }, Modifier.fillMaxWidth(),
+                            variant = if (state.isParent) KButtonVariant.Outline else KButtonVariant.Default)
                     }
                 }
             }
@@ -114,4 +141,5 @@ fun ProfileContent(state: ProfileState, actions: ProfileActions) {
             item { KButton("Se déconnecter", actions.logout, Modifier.fillMaxWidth(), variant = KButtonVariant.Outline, isLoading = state.loggingOut) }
         }
     }
+    FamilyDialogs(state, actions)
 }

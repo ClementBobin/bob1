@@ -1,0 +1,11 @@
+# Waits for the main screen after "Créer mon compte" and dismisses the biometric offer when the device shows it.
+appId: com.mirage.bob1
+---
+- extendedWaitUntil:
+    visible: "Profil|Non merci"
+    timeout: 30000
+- runFlow:
+    when:
+      visible: "Non merci"
+    commands:
+      - tapOn: "Non merci"

@@ -1,0 +1,61 @@
+appId: com.mirage.bob1
+name: Family - a parent without a family creates one, gets a code, then leaves
+tags:
+  - family
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- evalScript: ${output.email = 'e2e+' + Date.now() + '@bob1.local'}
+
+# Sign up as a parent but skip the family.
+- tapOn: "Créer un compte"
+- tapOn: "Prénom"
+- inputText: Alice
+- tapOn: "Nom"
+- inputText: Durand
+- tapOn: "Adresse e-mail"
+- inputText: ${output.email}
+- tapOn: "Mot de passe (12 caractères min.)"
+- inputText: Corr3ct-Horse-Battery!
+- hideKeyboard
+- tapOn: "Passer"
+- scrollUntilVisible:
+    element: "Créer mon compte"
+- tapOn: "Créer mon compte"
+- runFlow: ../subflows/after-register.yaml
+
+# A parent without a family can create one or join one.
+- tapOn: "Profil"
+- extendedWaitUntil:
+    visible: "Créer ma famille"
+    timeout: 15000
+- assertVisible: "Rejoindre avec un code"
+- tapOn: "Créer ma famille"
+- tapOn: "Nom de la famille (facultatif)"
+- inputText: Les Durand
+- tapOn: "Créer"
+
+# The family card replaces the "no family" card; a parent can hand out a code.
+- extendedWaitUntil:
+    visible: "Inviter un parent"
+    timeout: 20000
+- assertNotVisible: "Créer ma famille"
+- tapOn: "Inviter un parent"
+- extendedWaitUntil:
+    visible: "Code d'invitation"
+    timeout: 15000
+- tapOn: "Fermer"
+
+# Leaving as the only member deletes the family: back to the "no family" card.
+- scrollUntilVisible:
+    element: "Quitter la famille"
+- tapOn: "Quitter la famille"
+- assertVisible: "Quitter la famille ?"
+- tapOn: "Quitter"
+- extendedWaitUntil:
+    visible: "Créer ma famille"
+    timeout: 20000
+- assertNotVisible: "Inviter un parent"
+
+- runFlow: ../subflows/logout.yaml
