@@ -1,3 +1,9 @@
+## [1.15.0](https://github.com/ClementBobin/bob1/compare/v1.14.0...v1.15.0) (2026-11-26)
+
+### Features
+
+* register as parent or staff with optional family (code ([02067a2](https://github.com/ClementBobin/bob1/commit/02067a2afcd3c695c4dddf2c7f6dce7c1495620f))
+
 ## [1.14.0](https://github.com/ClementBobin/bob1/compare/v1.13.0...v1.14.0) (2026-11-24)
 
 ### Features
